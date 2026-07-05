@@ -1,0 +1,1672 @@
+c34ca23 feat(api): add residents and households API layer with CRUD functions
+ .superpowers/sdd/progress.md                       |  10 +-  .superpowers/sdd/task-1-brief.md                   | 241 +++-------  .superpowers/sdd/task-1-report.md                  |  69 +--  .superpowers/sdd/task-1-review-package.txt         |  69 +++  .superpowers/sdd/task-2-brief.md                   | 245 +++++++---  .../plans/2026-07-05-barangay-group-a.md           | 522 +++++++++++++++++++++  .../specs/2026-07-05-barangay-features-group-a.md  | 263 +++++++++++  src/api/households.ts                              |  63 +++  src/api/residents.ts                               | 109 +++++  9 files changed, 1295 insertions(+), 296 deletions(-)
+
+diff --git a/.superpowers/sdd/progress.md b/.superpowers/sdd/progress.md
+index 5f7671a..66dd6f6 100644
+--- a/.superpowers/sdd/progress.md
++++ b/.superpowers/sdd/progress.md
+@@ -1,8 +1,2 @@
+-?¬¬Task 1: complete (commits bb0cc77..6a9e441, review clean)
+-Task 2: complete (commits 6a9e441..c8cb3b1, review clean)
+-Task 3: complete (commits c8cb3b1..ac3c2a5, review clean)
+-Task 4: complete (commits ac3c2a5..d80f01c, review clean)
+-Task 5: complete (commits d80f01c..1d35b79, review clean)
+-Task 6: complete (commits 1d35b79..5c5e821, review clean)
+-Task 7: complete (commits 5c5e821..b0b0734, review clean)
+-Fix pass: complete (commits b0b0734..793e2e4, all findings addressed, build clean)
++?¬¬# Group A: Resident Profiles & Household Mapping
++
+diff --git a/.superpowers/sdd/task-1-brief.md b/.superpowers/sdd/task-1-brief.md
+index b2b8761..add8683 100644
+--- a/.superpowers/sdd/task-1-brief.md
++++ b/.superpowers/sdd/task-1-brief.md
+@@ -1,178 +1,75 @@
+-### Task 1: Design Tokens & Animation Utility Foundation
++### Task 1: PocketBase Migration JSON
+ 
+ **Files:**
+-- Modify: `src/index.css` (full file)
+-
+-- [ ] **Step 1: Add surface and text tokens to `@theme` block**
+-
+-Add these lines inside the existing `@theme` block (after line 23, before the Filipino color tokens):
+-
+-```css
+-  --color-surface-raised: var(--surface-raised);
+-  --color-surface-overlay: var(--surface-overlay);
+-  --color-text-subtle: var(--text-subtle);
+-```
+-
+-- [ ] **Step 2: Define new custom properties in `:root`**
+-
+-Add inside `:root` after line 130 (`--red-pinoy: #CE1126;`):
+-
+-```css
+-  --surface-raised: #FFFFFF;
+-  --surface-overlay: rgba(0, 0, 0, 0.4);
+-  --text-subtle: #A09688;
+-```
+-
+-- [ ] **Step 3: Define dark mode overrides for new tokens**
+-
+-Add inside `.dark` after line 161 (`--red-pinoy: #D94A45;`):
+-
+-```css
+-  --surface-raised: #1C1917;
+-  --surface-overlay: rgba(0, 0, 0, 0.6);
+-  --text-subtle: #7A7064;
+-```
+-
+-- [ ] **Step 4: Warm dark mode base**
+-
+-Change line 136 in `.dark` from `--bg: #0B0A09;` to `--bg: #12100E;`.
+-
+-- [ ] **Step 5: Remove universal transition, replace with targeted selector**
+-
+-Replace lines 87-91 (the `*, *::before, *::after { transition: ... }` block) with:
+-
+-```css
+-a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
+-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+-}
+-
+-@media (prefers-reduced-motion: reduce) {
+-  a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
+-    transition: none;
+-  }
+-}
+-```
+-
+-- [ ] **Step 6: Replace animation keyframes with `@utility` motion classes**
+-
+-Remove lines 35-85 (the `--animate-*` definitions in `@theme`, all `@keyframes`, `.theme-icon-enter`, and the old `@media (prefers-reduced-motion: reduce)` block). Add after the `@theme` block:
+-
+-```css
+-@utility motion-fade-in {
+-  animation: motion-fade-in 0.3s ease-out;
+-
+-  @media (prefers-reduced-motion: reduce) {
+-    animation: none;
+-  }
+-}
+-
+-@utility motion-slide-up {
+-  animation: motion-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+-
+-  @media (prefers-reduced-motion: reduce) {
+-    animation: none;
+-  }
+-}
+-
+-@utility motion-scale-in {
+-  animation: motion-scale-in 0.2s ease-out;
+-
+-  @media (prefers-reduced-motion: reduce) {
+-    animation: none;
+-  }
+-}
+-
+-@utility motion-lift {
+-  &:hover {
+-    transform: translateY(-2px);
+-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+-  }
+-
+-  @media (prefers-reduced-motion: reduce) {
+-    &:hover {
+-      transform: none;
+-      box-shadow: none;
+-    }
+-  }
+-}
+-
+-@utility motion-press {
+-  &:active {
+-    transform: scale(0.97);
+-  }
+-}
+-
+-@utility motion-stagger-50 {
+-  @media (prefers-reduced-motion: no-preference) {
+-    & > * {
+-      animation: motion-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+-      animation-delay: calc(var(--stagger-index, 0) * 50ms);
+-    }
+-  }
+-}
+-
+-@utility motion-stagger-75 {
+-  @media (prefers-reduced-motion: no-preference) {
+-    & > * {
+-      animation: motion-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+-      animation-delay: calc(var(--stagger-index, 0) * 75ms);
+-    }
+-  }
+-}
+-
+-@utility motion-stagger-100 {
+-  @media (prefers-reduced-motion: no-preference) {
+-    & > * {
+-      animation: motion-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+-      animation-delay: calc(var(--stagger-index, 0) * 100ms);
+-    }
++- Create: `pocketbase/migrations/001_residents_households.json`
++
++**Interfaces:**
++- Produces: Collection definitions that the API layer (Task 2) depends on for `residents` and `households` collection names and field names.
++
++- [ ] **Step 1: Create migration JSON**
++
++```json
++[
++  {
++    "name": "residents",
++    "type": "base",
++    "system": false,
++    "schema": [
++      { "name": "first_name", "type": "text", "required": true, "options": { "max": 255 } },
++      { "name": "last_name", "type": "text", "required": true, "options": { "max": 255 } },
++      { "name": "middle_name", "type": "text", "options": { "max": 255 } },
++      { "name": "suffix", "type": "select", "options": { "values": ["\u2014", "Jr.", "Sr.", "II", "III", "IV"] } },
++      { "name": "birth_date", "type": "date" },
++      { "name": "age", "type": "number" },
++      { "name": "gender", "type": "select", "options": { "values": ["male", "female"] } },
++      { "name": "contact_number", "type": "text", "options": { "max": 20 } },
++      { "name": "household_id", "type": "relation", "options": { "collectionId": "households", "maxSelect": 1 } },
++      { "name": "purok", "type": "text", "options": { "max": 100 } },
++      { "name": "civil_status", "type": "select", "options": { "values": ["single", "married", "widowed", "separated"] } },
++      { "name": "occupation", "type": "text", "options": { "max": 255 } },
++      { "name": "nationality", "type": "text", "options": { "max": 100 } },
++      { "name": "is_voter", "type": "bool" },
++      { "name": "is_4ps", "type": "bool" },
++      { "name": "is_senior", "type": "bool" },
++      { "name": "is_pwd", "type": "bool" },
++      { "name": "blood_type", "type": "select", "options": { "values": ["\u2014", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] } },
++      { "name": "notes", "type": "text", "options": { "max": 2000 } }
++    ],
++    "indexes": [
++      "CREATE INDEX idx_residents_name ON residents (last_name, first_name)",
++      "CREATE INDEX idx_residents_purok ON residents (purok)",
++      "CREATE INDEX idx_residents_household ON residents (household_id)"
++    ],
++    "listRule": "@request.auth.id != ''",
++    "viewRule": "@request.auth.id != ''",
++    "createRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "updateRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "deleteRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'"
++  },
++  {
++    "name": "households",
++    "type": "base",
++    "system": false,
++    "schema": [
++      { "name": "household_number", "type": "text", "required": true, "options": { "max": 50 } },
++      { "name": "purok", "type": "text", "options": { "max": 100 } },
++      { "name": "head_name", "type": "text", "required": true, "options": { "max": 255 } },
++      { "name": "address", "type": "text", "options": { "max": 500 } },
++      { "name": "notes", "type": "text", "options": { "max": 2000 } }
++    ],
++    "indexes": [
++      "CREATE UNIQUE INDEX idx_households_number ON households (household_number)",
++      "CREATE INDEX idx_households_purok ON households (purok)"
++    ],
++    "listRule": "@request.auth.id != ''",
++    "viewRule": "@request.auth.id != ''",
++    "createRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "updateRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "deleteRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'"
+   }
+-}
+-
+-@keyframes motion-fade-in {
+-  from { opacity: 0; }
+-  to { opacity: 1; }
+-}
+-
+-@keyframes motion-slide-up {
+-  from { opacity: 0; transform: translateY(12px); }
+-  to { opacity: 1; transform: translateY(0); }
+-}
+-
+-@keyframes motion-scale-in {
+-  from { opacity: 0; transform: scale(0.95); }
+-  to { opacity: 1; transform: scale(1); }
+-}
+-```
+-
+-- [ ] **Step 7: Preserve the `.theme-icon-enter` utility for theme toggle**
+-
+-Add this after the `@keyframes` block:
+-
+-```css
+-@keyframes theme-swirl {
+-  from { transform: rotate(-90deg) scale(0.6); opacity: 0; }
+-  to { transform: rotate(0deg) scale(1); opacity: 1; }
+-}
+-
+-.theme-icon-enter {
+-  animation: theme-swirl 0.3s ease;
+-
+-  @media (prefers-reduced-motion: reduce) {
+-    animation: none;
+-  }
+-}
++]
+ ```
+ 
+-- [ ] **Step 8: Clean up leftover reduced-motion block**
+-
+-Remove lines 184-188 (the second `@media (prefers-reduced-motion: reduce)` around body transition) ?Co body already has a specific transition with its own reduced-motion check on line 181-182.
++- [ ] **Step 2: Create the directory if needed, then save the file**
+ 
+-**Verification:** Run `npm run build` and confirm no errors. The CSS file should compile cleanly with new utilities available.
+-
+-- [ ] **Step 9: Commit**
+-
+-```bash
+-git add src/index.css
+-git commit -m "feat(design): add design tokens, animation utilities, warm dark mode"
+-```
++Make sure the directory `pocketbase/migrations` exists, then write the JSON.
+diff --git a/.superpowers/sdd/task-1-report.md b/.superpowers/sdd/task-1-report.md
+index b7ba8a3..a0cccfd 100644
+--- a/.superpowers/sdd/task-1-report.md
++++ b/.superpowers/sdd/task-1-report.md
+@@ -1,45 +1,24 @@
+-# Task 1: Design Tokens & Animation Utility Foundation
+-
+-## What Was Implemented
+-
+-All 8 steps from the task brief were applied to `src/index.css`:
+-
+-1. **Added surface and text tokens to `@theme`**: `--color-surface-raised`, `--color-surface-overlay`, `--color-text-subtle` mapped to CSS custom properties.
+-
+-2. **Defined new custom properties in `:root`**: `--surface-raised: #FFFFFF`, `--surface-overlay: rgba(0,0,0,0.4)`, `--text-subtle: #A09688`.
+-
+-3. **Defined dark mode overrides**: `--surface-raised: #1C1917`, `--surface-overlay: rgba(0,0,0,0.6)`, `--text-subtle: #7A7064`.
+-
+-4. **Warmed dark mode base**: Changed `.dark { --bg }` from `#0B0A09` to `#12100E`.
+-
+-5. **Removed universal `* { transition }`** and replaced with targeted `a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])` selector (with reduced-motion guard).
+-
+-6. **Replaced `--animate-*` keyframes with `@utility` motion classes**: `motion-fade-in`, `motion-slide-up`, `motion-scale-in`, `motion-lift`, `motion-press`, `motion-stagger-50/75/100`, plus `@keyframes` backing them.
+-
+-7. **Preserved `.theme-icon-enter`** with `@keyframes theme-swirl` and added reduced-motion support.
+-
+-8. **Removed duplicate reduced-motion block** around `body { transition: none }`.
+-
+-## Files Changed
+-
+-- `src/index.css` ?Co 91 insertions, 41 deletions
+-
+-## Testing
+-
+-- `npm run build` (tsc + vite build) ?Co **passes cleanly** (1865 modules, 403ms)
+-
+-## Self-Review
+-
+-| Check | Status |
+-|---|---|
+-| All new tokens added (surface-raised, surface-overlay, text-subtle) | ??a |
+-| Dark mode base warmed (#12100E) | ??a |
+-| Universal `* { transition }` removed, targeted selector added | ??a |
+-| All 8 motion utilities present (fade-in, slide-up, scale-in, lift, press, stagger-50/75/100) | ??a |
+-| `.theme-icon-enter` preserved with reduced-motion support | ??a |
+-| Duplicate reduced-motion block removed | ??a |
+-| `npm run build` passes | ??a |
+-
+-## Issues or Concerns
+-
+-None.
++# Task 1 Report: PocketBase Migration JSON
++
++## What was implemented
++- Created `pocketbase/migrations/001_residents_households.json` with PocketBase collection definitions for `residents` and `households`
++- File format matches the task brief specification exactly: `schema` array format (as per spec), with indexes, rules, and field definitions
++
++## What was verified
++- JSON is syntactically valid (parsed by `ConvertFrom-Json`, confirms 2 collections)
++- File path and naming convention matches the spec and task brief
++- All fields match the brief: 18 fields on `residents`, 5 fields on `households`
++- Relation field `household_id` uses `"collectionId": "households"` per task brief (spec had empty string)
++- Indexes match: 3 on residents, 2 on households (household_number has UNIQUE)
++- Rules match: list/view require auth, create/update/delete restricted to admin/staff
++
++## Files changed
++- `pocketbase/migrations/001_residents_households.json` (new, 59 lines)
++
++## Self-review findings
++- **Schema format vs fields format**: The migration uses `"schema"` array (the format specified in the brief and spec), while the existing `pb_schema.json` uses `"fields"` (PocketBase v0.23+ export format). This is intentional per the spec's explicit format.
++- **collectionId**: Task brief uses `"collectionId": "households"` ?Co this resolves by collection name during import. The spec had `""` but task brief takes precedence.
++- **Branch context**: Committed to `dark-mode-redesign` branch (current branch). This may need to be merged/rebased to the correct feature branch if different.
++
++## Issues or concerns
++- The `"schema"` format in this migration differs from the `"fields"` format in `pb_schema.json`. If PocketBase v0.39 expects the `"fields"` format for JSON migrations, this may need conversion. The spec explicitly defines the format, so this is alignment with the spec.
+diff --git a/.superpowers/sdd/task-1-review-package.txt b/.superpowers/sdd/task-1-review-package.txt
+new file mode 100644
+index 0000000..1449cb2
+--- /dev/null
++++ b/.superpowers/sdd/task-1-review-package.txt
+@@ -0,0 +1,69 @@
++42ecbd1 feat(db): add PocketBase migration JSON for residents and households collections
++ .../migrations/001_residents_households.json       | 59 ++++++++++++++++++++++  1 file changed, 59 insertions(+)
++
++diff --git a/pocketbase/migrations/001_residents_households.json b/pocketbase/migrations/001_residents_households.json
++new file mode 100644
++index 0000000..638819d
++--- /dev/null
+++++ b/pocketbase/migrations/001_residents_households.json
++@@ -0,0 +1,59 @@
+++[
+++  {
+++    "name": "residents",
+++    "type": "base",
+++    "system": false,
+++    "schema": [
+++      { "name": "first_name", "type": "text", "required": true, "options": { "max": 255 } },
+++      { "name": "last_name", "type": "text", "required": true, "options": { "max": 255 } },
+++      { "name": "middle_name", "type": "text", "options": { "max": 255 } },
+++      { "name": "suffix", "type": "select", "options": { "values": ["?Co", "Jr.", "Sr.", "II", "III", "IV"] } },
+++      { "name": "birth_date", "type": "date" },
+++      { "name": "age", "type": "number" },
+++      { "name": "gender", "type": "select", "options": { "values": ["male", "female"] } },
+++      { "name": "contact_number", "type": "text", "options": { "max": 20 } },
+++      { "name": "household_id", "type": "relation", "options": { "collectionId": "households", "maxSelect": 1 } },
+++      { "name": "purok", "type": "text", "options": { "max": 100 } },
+++      { "name": "civil_status", "type": "select", "options": { "values": ["single", "married", "widowed", "separated"] } },
+++      { "name": "occupation", "type": "text", "options": { "max": 255 } },
+++      { "name": "nationality", "type": "text", "options": { "max": 100 } },
+++      { "name": "is_voter", "type": "bool" },
+++      { "name": "is_4ps", "type": "bool" },
+++      { "name": "is_senior", "type": "bool" },
+++      { "name": "is_pwd", "type": "bool" },
+++      { "name": "blood_type", "type": "select", "options": { "values": ["?Co", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] } },
+++      { "name": "notes", "type": "text", "options": { "max": 2000 } }
+++    ],
+++    "indexes": [
+++      "CREATE INDEX idx_residents_name ON residents (last_name, first_name)",
+++      "CREATE INDEX idx_residents_purok ON residents (purok)",
+++      "CREATE INDEX idx_residents_household ON residents (household_id)"
+++    ],
+++    "listRule": "@request.auth.id != ''",
+++    "viewRule": "@request.auth.id != ''",
+++    "createRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
+++    "updateRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
+++    "deleteRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'"
+++  },
+++  {
+++    "name": "households",
+++    "type": "base",
+++    "system": false,
+++    "schema": [
+++      { "name": "household_number", "type": "text", "required": true, "options": { "max": 50 } },
+++      { "name": "purok", "type": "text", "options": { "max": 100 } },
+++      { "name": "head_name", "type": "text", "required": true, "options": { "max": 255 } },
+++      { "name": "address", "type": "text", "options": { "max": 500 } },
+++      { "name": "notes", "type": "text", "options": { "max": 2000 } }
+++    ],
+++    "indexes": [
+++      "CREATE UNIQUE INDEX idx_households_number ON households (household_number)",
+++      "CREATE INDEX idx_households_purok ON households (purok)"
+++    ],
+++    "listRule": "@request.auth.id != ''",
+++    "viewRule": "@request.auth.id != ''",
+++    "createRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
+++    "updateRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
+++    "deleteRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'"
+++  }
+++]
++
+diff --git a/.superpowers/sdd/task-2-brief.md b/.superpowers/sdd/task-2-brief.md
+index f0c336a..cf56ca6 100644
+--- a/.superpowers/sdd/task-2-brief.md
++++ b/.superpowers/sdd/task-2-brief.md
+@@ -1,92 +1,195 @@
+-### Task 2: Layout & Sidebar Refactoring
++### Task 2: API Layer ?Co Residents & Households
+ 
+ **Files:**
+-- Modify: `src/components/Layout.tsx`
+-- Modify: `src/components/Sidebar.tsx`
+-
+-- [ ] **Step 1: Refactor Layout.tsx to use CSS grid**
+-
+-Replace the entire component in `src/components/Layout.tsx`:
+-
+-```tsx
+-import { useState } from 'react'
+-import { Outlet, useLocation } from 'react-router'
+-import Sidebar from '@/components/Sidebar'
+-import OfflineIndicator from '@/offline/OfflineIndicator'
+-
+-const STORAGE_KEY = 'barangay-sidebar-pinned'
+-
+-export default function Layout() {
+-  const [pinned, setPinned] = useState(() => {
+-    const stored = localStorage.getItem(STORAGE_KEY)
+-    return stored !== null ? stored === 'true' : true
+-  })
+-  const location = useLocation()
+-
+-  function togglePinned() {
+-    setPinned((prev) => {
+-      const next = !prev
+-      localStorage.setItem(STORAGE_KEY, String(next))
+-      return next
+-    })
++- Create: `src/api/residents.ts`
++- Create: `src/api/households.ts`
++
++**Interfaces:**
++- Consumes: `getClient()` from `src/api/client.ts`, `handleApiError()` from `src/api/errorHandler.ts`
++- Produces: `ApiResident`, `ApiHousehold` types and CRUD functions used by Task 3/4 pages.
++
++- [ ] **Step 1: Create `src/api/residents.ts`**
++
++```typescript
++import type { RecordModel } from 'pocketbase'
++import { getClient } from './client'
++import { handleApiError } from './errorHandler'
++
++const COLLECTION = 'residents'
++
++export interface ResidentData {
++  first_name: string
++  last_name: string
++  middle_name?: string
++  suffix?: string
++  birth_date?: string
++  age?: number
++  gender?: string
++  contact_number?: string
++  household_id?: string
++  purok?: string
++  civil_status?: string
++  occupation?: string
++  nationality?: string
++  is_voter?: boolean
++  is_4ps?: boolean
++  is_senior?: boolean
++  is_pwd?: boolean
++  blood_type?: string
++  notes?: string
++}
++
++export interface ApiResident extends RecordModel {
++  first_name: string
++  last_name: string
++  middle_name: string
++  suffix: string
++  birth_date: string
++  age: number
++  gender: string
++  contact_number: string
++  household_id: string
++  purok: string
++  civil_status: string
++  occupation: string
++  nationality: string
++  is_voter: boolean
++  is_4ps: boolean
++  is_senior: boolean
++  is_pwd: boolean
++  blood_type: string
++  notes: string
++  updated: string
++}
++
++export async function getResidents(params?: { household_id?: string }): Promise<ApiResident[]> {
++  try {
++    const query: Record<string, unknown> = { sort: '-updated' }
++    if (params?.household_id) {
++      query.filter = `household_id = '${params.household_id}'`
++    }
++    return await getClient().collection(COLLECTION).getFullList<ApiResident>(query)
++  } catch (err) {
++    throw handleApiError(err)
+   }
++}
+ 
+-  return (
+-    <div className="grid min-h-screen grid-cols-[auto_1fr]">
+-      <Sidebar pinned={pinned} onTogglePin={togglePinned} />
+-      <main className="flex min-w-0 flex-col">
+-        <div key={location.pathname} className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6 lg:p-8 motion-fade-in motion-slide-up">
+-          <Outlet />
+-        </div>
+-        <OfflineIndicator />
+-      </main>
+-    </div>
+-  )
++export async function getResident(id: string): Promise<ApiResident> {
++  try {
++    return await getClient().collection(COLLECTION).getOne<ApiResident>(id)
++  } catch (err) {
++    throw handleApiError(err)
++  }
+ }
+-```
+ 
+-- [ ] **Step 2: Refactor Sidebar.tsx ?Co replace body overflow toggling with HTML class**
++export async function createResident(data: ResidentData): Promise<ApiResident> {
++  try {
++    return await getClient().collection(COLLECTION).create<ApiResident>(data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function updateResident(id: string, data: Partial<ResidentData>): Promise<ApiResident> {
++  try {
++    return await getClient().collection(COLLECTION).update<ApiResident>(id, data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
+ 
+-In `src/components/Sidebar.tsx`, remove the existing `useEffect` for body scroll (lines 67-74 in original code) and replace with:
++export async function deleteResident(id: string): Promise<boolean> {
++  try {
++    await getClient().collection(COLLECTION).delete(id)
++    return true
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
+ 
+-```tsx
+-  useEffect(() => {
+-    if (mobileOpen) {
+-      document.documentElement.classList.add('overflow-hidden')
+-    } else {
+-      document.documentElement.classList.remove('overflow-hidden')
++export async function getResidentsSummary(): Promise<{ total: number; voters: number; seniors: number; pwd: number }> {
++  try {
++    const all = await getClient().collection(COLLECTION).getFullList<ApiResident>({ requestKey: 'residents-summary' })
++    return {
++      total: all.length,
++      voters: all.filter((r) => r.is_voter).length,
++      seniors: all.filter((r) => r.is_senior).length,
++      pwd: all.filter((r) => r.is_pwd).length,
+     }
+-    return () => { document.documentElement.classList.remove('overflow-hidden') }
+-  }, [mobileOpen])
++  } catch {
++    return { total: 0, voters: 0, seniors: 0, pwd: 0 }
++  }
++}
+ ```
+ 
+-- [ ] **Step 3: Sidebar ?Co update active indicator to use CSS transition**
++- [ ] **Step 2: Create `src/api/households.ts`**
+ 
+-Replace the `ActiveDot` function. Change from the current implementation to:
++```typescript
++import type { RecordModel } from 'pocketbase'
++import { getClient } from './client'
++import { handleApiError } from './errorHandler'
+ 
+-```tsx
+-function ActiveDot() {
+-  return (
+-    <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-gold transition-all duration-200" />
+-  )
+-}
+-```
++const COLLECTION = 'households'
+ 
+-- [ ] **Step 4: Sidebar ?Co use motion-fade-in for mobile overlay**
++export interface HouseholdData {
++  household_number: string
++  purok?: string
++  head_name: string
++  address?: string
++  notes?: string
++}
+ 
+-Add `motion-fade-in` to the backdrop overlay div class name.
++export interface ApiHousehold extends RecordModel {
++  household_number: string
++  purok: string
++  head_name: string
++  address: string
++  notes: string
++  updated: string
++}
+ 
+-- [ ] **Step 5: Sidebar ?Co refactor user section (condensed in collapsed mode)**
++export async function getHouseholds(): Promise<ApiHousehold[]> {
++  try {
++    return await getClient().collection(COLLECTION).getFullList<ApiHousehold>({ sort: 'household_number' })
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
+ 
+-Replace the entire user section block (the part that renders user info and logout button) with a unified version that shows:
+-- In pinned mode: avatar + name + role + logout button
+-- In collapsed mode: avatar + logout button (without the duplicate conditional)
++export async function getHousehold(id: string): Promise<ApiHousehold> {
++  try {
++    return await getClient().collection(COLLECTION).getOne<ApiHousehold>(id)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
+ 
+-**Verification:** Run `npm run dev`. Sidebar should render, pin/unpin works, mobile drawer opens, grid layout replaces spacer div. No console errors.
++export async function createHousehold(data: HouseholdData): Promise<ApiHousehold> {
++  try {
++    return await getClient().collection(COLLECTION).create<ApiHousehold>(data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
+ 
+-- [ ] **Step 6: Commit**
++export async function updateHousehold(id: string, data: Partial<HouseholdData>): Promise<ApiHousehold> {
++  try {
++    return await getClient().collection(COLLECTION).update<ApiHousehold>(id, data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
+ 
+-```bash
+-git add src/components/Layout.tsx src/components/Sidebar.tsx
+-git commit -m "feat(layout): CSS grid layout, sidebar refinements, motion utilities"
++export async function deleteHousehold(id: string): Promise<boolean> {
++  try {
++    await getClient().collection(COLLECTION).delete(id)
++    return true
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
+ ```
++
++- [ ] **Step 3: Verify build passes**
++
++Run: `npm run build 2>&1` ?Co Expect clean output.
+diff --git a/docs/superpowers/plans/2026-07-05-barangay-group-a.md b/docs/superpowers/plans/2026-07-05-barangay-group-a.md
+new file mode 100644
+index 0000000..231d9b8
+--- /dev/null
++++ b/docs/superpowers/plans/2026-07-05-barangay-group-a.md
+@@ -0,0 +1,522 @@
++# Group A: Resident Profiles & Household Mapping Implementation Plan
++
++> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
++
++**Goal:** Build Resident Profiles and Household Mapping features with full CRUD, search/filter, and responsive UI.
++
++**Architecture:** Two PocketBase collections (`residents`, `households`), each with its own API module and page. Residents can optionally belong to a household. Household page shows expandable resident list per household. Both follow the existing RecordsPage pattern (table + slide-over form + delete confirm).
++
++**Tech Stack:** React 19, PocketBase 0.27+, Tailwind CSS v4, Lucide React icons, React Router 8
++
++## Global Constraints
++
++- Zero new JavaScript dependencies beyond what's already in `package.json`
++- All pages must be responsive (mobile bottom-drawer form, desktop slide-over panel)
++- Follow existing RecordsPage pattern for page structure, form panels, error handling, skeleton loading
++- Use `clsx`/`tailwind-merge` via `cn()` utility for conditional classes
++- All API files use `getClient()` from `src/api/client.ts` and `handleApiError()` from `src/api/errorHandler.ts`
++- Only `admin` and `staff` roles can create/edit/delete; `viewer` is read-only
++- Routes use `ProtectedRoute` with role guard matching the spec
++
++---
++
++## File Structure
++
++### Create:
++| File | Purpose |
++|------|---------|
++| `pocketbase/migrations/001_residents_households.json` | PocketBase collection schemas for both collections |
++| `src/api/residents.ts` | Residents CRUD + filter functions |
++| `src/api/households.ts` | Households CRUD + member count function |
++| `src/features/residents/ResidentsPage.tsx` | Resident list table, search/filter, form panel |
++| `src/features/households/HouseholdsPage.tsx` | Household list with expandable resident rows, form panel |
++
++### Modify:
++| File | Change |
++|------|--------|
++| `src/routes/index.tsx` | Add `/residents` and `/households` routes |
++| `src/components/Sidebar.tsx` | Add Residents and Households nav items |
++
++---
++
++### Task 1: PocketBase Migration JSON
++
++**Files:**
++- Create: `pocketbase/migrations/001_residents_households.json`
++
++**Interfaces:**
++- Produces: Collection definitions that the API layer (Task 2) depends on for `residents` and `households` collection names and field names.
++
++- [ ] **Step 1: Create migration JSON**
++
++```json
++[
++  {
++    "name": "residents",
++    "type": "base",
++    "system": false,
++    "schema": [
++      { "name": "first_name", "type": "text", "required": true, "options": { "max": 255 } },
++      { "name": "last_name", "type": "text", "required": true, "options": { "max": 255 } },
++      { "name": "middle_name", "type": "text", "options": { "max": 255 } },
++      { "name": "suffix", "type": "select", "options": { "values": ["\u2014", "Jr.", "Sr.", "II", "III", "IV"] } },
++      { "name": "birth_date", "type": "date" },
++      { "name": "age", "type": "number" },
++      { "name": "gender", "type": "select", "options": { "values": ["male", "female"] } },
++      { "name": "contact_number", "type": "text", "options": { "max": 20 } },
++      { "name": "household_id", "type": "relation", "options": { "collectionId": "households", "maxSelect": 1 } },
++      { "name": "purok", "type": "text", "options": { "max": 100 } },
++      { "name": "civil_status", "type": "select", "options": { "values": ["single", "married", "widowed", "separated"] } },
++      { "name": "occupation", "type": "text", "options": { "max": 255 } },
++      { "name": "nationality", "type": "text", "options": { "max": 100 } },
++      { "name": "is_voter", "type": "bool" },
++      { "name": "is_4ps", "type": "bool" },
++      { "name": "is_senior", "type": "bool" },
++      { "name": "is_pwd", "type": "bool" },
++      { "name": "blood_type", "type": "select", "options": { "values": ["\u2014", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] } },
++      { "name": "notes", "type": "text", "options": { "max": 2000 } }
++    ],
++    "indexes": [
++      "CREATE INDEX idx_residents_name ON residents (last_name, first_name)",
++      "CREATE INDEX idx_residents_purok ON residents (purok)",
++      "CREATE INDEX idx_residents_household ON residents (household_id)"
++    ],
++    "listRule": "@request.auth.id != ''",
++    "viewRule": "@request.auth.id != ''",
++    "createRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "updateRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "deleteRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'"
++  },
++  {
++    "name": "households",
++    "type": "base",
++    "system": false,
++    "schema": [
++      { "name": "household_number", "type": "text", "required": true, "options": { "max": 50 } },
++      { "name": "purok", "type": "text", "options": { "max": 100 } },
++      { "name": "head_name", "type": "text", "required": true, "options": { "max": 255 } },
++      { "name": "address", "type": "text", "options": { "max": 500 } },
++      { "name": "notes", "type": "text", "options": { "max": 2000 } }
++    ],
++    "indexes": [
++      "CREATE UNIQUE INDEX idx_households_number ON households (household_number)",
++      "CREATE INDEX idx_households_purok ON households (purok)"
++    ],
++    "listRule": "@request.auth.id != ''",
++    "viewRule": "@request.auth.id != ''",
++    "createRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "updateRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "deleteRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'"
++  }
++]
++```
++
++- [ ] **Step 2: Create the directory if needed, then save the file**
++
++Run: `Test-Path "D:\BARANGAYCC\barangay-system\pocketbase"` ?Co if it doesn't exist, create `pocketbase/migrations/`.
++
++Make sure the directory `pocketbase/migrations` exists, then write the JSON.
++
++---
++
++### Task 2: API Layer ?Co Residents & Households
++
++**Files:**
++- Create: `src/api/residents.ts`
++- Create: `src/api/households.ts`
++
++**Interfaces:**
++- Consumes: `getClient()` from `src/api/client.ts`, `handleApiError()` from `src/api/errorHandler.ts`
++- Produces: `ApiResident`, `ApiHousehold` types and CRUD functions used by Task 3/4 pages.
++
++- [ ] **Step 1: Create `src/api/residents.ts`**
++
++```typescript
++import type { RecordModel } from 'pocketbase'
++import { getClient } from './client'
++import { handleApiError } from './errorHandler'
++
++const COLLECTION = 'residents'
++
++export interface ResidentData {
++  first_name: string
++  last_name: string
++  middle_name?: string
++  suffix?: string
++  birth_date?: string
++  age?: number
++  gender?: string
++  contact_number?: string
++  household_id?: string
++  purok?: string
++  civil_status?: string
++  occupation?: string
++  nationality?: string
++  is_voter?: boolean
++  is_4ps?: boolean
++  is_senior?: boolean
++  is_pwd?: boolean
++  blood_type?: string
++  notes?: string
++}
++
++export interface ApiResident extends RecordModel {
++  first_name: string
++  last_name: string
++  middle_name: string
++  suffix: string
++  birth_date: string
++  age: number
++  gender: string
++  contact_number: string
++  household_id: string
++  purok: string
++  civil_status: string
++  occupation: string
++  nationality: string
++  is_voter: boolean
++  is_4ps: boolean
++  is_senior: boolean
++  is_pwd: boolean
++  blood_type: string
++  notes: string
++  updated: string
++}
++
++export async function getResidents(params?: { household_id?: string }): Promise<ApiResident[]> {
++  try {
++    const query: Record<string, unknown> = { sort: '-updated' }
++    if (params?.household_id) {
++      query.filter = `household_id = '${params.household_id}'`
++    }
++    return await getClient().collection(COLLECTION).getFullList<ApiResident>(query)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function getResident(id: string): Promise<ApiResident> {
++  try {
++    return await getClient().collection(COLLECTION).getOne<ApiResident>(id)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function createResident(data: ResidentData): Promise<ApiResident> {
++  try {
++    return await getClient().collection(COLLECTION).create<ApiResident>(data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function updateResident(id: string, data: Partial<ResidentData>): Promise<ApiResident> {
++  try {
++    return await getClient().collection(COLLECTION).update<ApiResident>(id, data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function deleteResident(id: string): Promise<boolean> {
++  try {
++    await getClient().collection(COLLECTION).delete(id)
++    return true
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function getResidentsSummary(): Promise<{ total: number; voters: number; seniors: number; pwd: number }> {
++  try {
++    const all = await getClient().collection(COLLECTION).getFullList<ApiResident>({ requestKey: 'residents-summary' })
++    return {
++      total: all.length,
++      voters: all.filter((r) => r.is_voter).length,
++      seniors: all.filter((r) => r.is_senior).length,
++      pwd: all.filter((r) => r.is_pwd).length,
++    }
++  } catch {
++    return { total: 0, voters: 0, seniors: 0, pwd: 0 }
++  }
++}
++```
++
++- [ ] **Step 2: Create `src/api/households.ts`**
++
++```typescript
++import type { RecordModel } from 'pocketbase'
++import { getClient } from './client'
++import { handleApiError } from './errorHandler'
++
++const COLLECTION = 'households'
++
++export interface HouseholdData {
++  household_number: string
++  purok?: string
++  head_name: string
++  address?: string
++  notes?: string
++}
++
++export interface ApiHousehold extends RecordModel {
++  household_number: string
++  purok: string
++  head_name: string
++  address: string
++  notes: string
++  updated: string
++}
++
++export async function getHouseholds(): Promise<ApiHousehold[]> {
++  try {
++    return await getClient().collection(COLLECTION).getFullList<ApiHousehold>({ sort: 'household_number' })
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function getHousehold(id: string): Promise<ApiHousehold> {
++  try {
++    return await getClient().collection(COLLECTION).getOne<ApiHousehold>(id)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function createHousehold(data: HouseholdData): Promise<ApiHousehold> {
++  try {
++    return await getClient().collection(COLLECTION).create<ApiHousehold>(data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function updateHousehold(id: string, data: Partial<HouseholdData>): Promise<ApiHousehold> {
++  try {
++    return await getClient().collection(COLLECTION).update<ApiHousehold>(id, data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function deleteHousehold(id: string): Promise<boolean> {
++  try {
++    await getClient().collection(COLLECTION).delete(id)
++    return true
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++```
++
++- [ ] **Step 3: Verify build passes**
++
++Run: `npm run build 2>&1` ?Co Expect clean output.
++
++---
++
++### Task 3: Residents Page
++
++**Files:**
++- Create: `src/features/residents/ResidentsPage.tsx`
++
++**Interfaces:**
++- Consumes: `ApiResident`, `ResidentData`, `getResidents`, `createResident`, `updateResident`, `deleteResident` from `src/api/residents.ts`
++
++- [ ] **Step 1: Create the Residents page component**
++
++The page follows the RecordsPage pattern exactly:
++
++- State variables: `residents[]`, `loading`, `search`, `purokFilter`, `tagFilter`, form fields, `editingId`, `deletingId`, `panelOpen`, `error`
++- `useEffect` on mount: `getResidents().then(setResidents)`
++- Filtered list: `useMemo` to filter by search (name), purok, and tags (voter/4ps/senior/pwd)
++- Table columns: Name (first + last), Purok, Age, Civil Status, Tags (small badges), Actions (edit/delete)
++- Form panel fields: all resident fields organized in sections
++- DO NOT re-create the statusConfig from RecordsPage. Instead use inline tag badge styling for resident tags.
++
++Key differences from RecordsPage:
++- Age is auto-computed from `birth_date` when birth_date changes
++- Tags are boolean toggles rendered as badges in table
++- Purok filter reads from localStorage system_settings or uses a hardcoded fallback set
++
++Implementation outline:
++
++```typescript
++// Age calculation helper
++function calculateAge(birthDate: string): number {
++  if (!birthDate) return 0
++  const today = new Date()
++  const bd = new Date(birthDate)
++  let age = today.getFullYear() - bd.getFullYear()
++  const m = today.getMonth() - bd.getMonth()
++  if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--
++  return Math.max(0, age)
++}
++```
++
++The filter bar: search input + purok dropdown + tag filter checkboxes. The tag filter is a multiselect using buttons/toggles.
++
++For now, purok options come from a simple hardcoded set: `['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6', 'Purok 7']`.
++
++Form panel fields in order:
++1. First Name* | Last Name* (side by side grid)
++2. Middle Name | Suffix (side by side)
++3. Birth Date | Age (auto, read-only)
++4. Gender | Contact Number
++5. Purok | Civil Status
++6. Household (text input for now ?Co simplified) | Occupation
++7. Nationality | Blood Type
++8. Tags row: Voter | 4Ps | Senior | PWD (as toggle buttons)
++9. Notes (full width textarea)
++
++- [ ] **Step 2: Update `src/features/residents/index.ts`**
++
++```typescript
++export { default as ResidentsPage } from './ResidentsPage'
++```
++
++- [ ] **Step 3: Verify build passes**
++
++Run: `npm run build 2>&1`
++
++---
++
++### Task 4: Households Page
++
++**Files:**
++- Create: `src/features/households/HouseholdsPage.tsx`
++
++**Interfaces:**
++- Consumes: `ApiHousehold`, `HouseholdData`, API functions from `src/api/households.ts`, `getResidents` from `src/api/residents.ts`
++
++- [ ] **Step 1: Create the Households page component**
++
++State variables: `households[]`, `residentsMap` (keyed by household_id), `loading`, `search`, `expandedId` (for expandable row), form fields, `editingId`, `deletingId`, `panelOpen`, `error`.
++
++On mount: fetch both `getHouseholds()` and `getResidents()`. Build a `Map<string, ApiResident[]>` keyed by `household_id`.
++
++Table columns: Household #, Purok, Head, Members Count (# of residents in that household from the map), Actions.
++
++Expandable row: clicking a row toggles `expandedId`. An extra `<tr>` renders below with a nested table showing the residents in that household (name, age, tags) or "No members" text.
++
++Form fields: Household Number*, Purok, Head Name*, Address, Notes.
++
++- [ ] **Step 2: Update `src/features/households/index.ts`**
++
++```typescript
++export { default as HouseholdsPage } from './HouseholdsPage'
++```
++
++- [ ] **Step 3: Verify build passes**
++
++Run: `npm run build 2>&1`
++
++---
++
++### Task 5: Routes
++
++**Files:**
++- Modify: `src/routes/index.tsx`
++
++- [ ] **Step 1: Add import and routes for residents and households**
++
++```typescript
++import { ResidentsPage } from '@/features/residents'
++import { HouseholdsPage } from '@/features/households'
++```
++
++Add these routes inside the `<Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>` block, after the settings route:
++
++```typescript
++<Route
++  path="residents"
++  element={
++    <ProtectedRoute roles={['admin', 'staff', 'viewer']}>
++      <ResidentsPage />
++    </ProtectedRoute>
++  }
++/>
++<Route
++  path="households"
++  element={
++    <ProtectedRoute roles={['admin', 'staff']}>
++      <HouseholdsPage />
++    </ProtectedRoute>
++  }
++/>
++```
++
++- [ ] **Step 2: Verify build passes**
++
++Run: `npm run build 2>&1`
++
++---
++
++### Task 6: Sidebar Navigation
++
++**Files:**
++- Modify: `src/components/Sidebar.tsx`
++
++- [ ] **Step 1: Add new nav groups and icons**
++
++Import new icons at the top:
++```typescript
++import {
++  Users,
++  Home,
++  // existing icons...
++} from 'lucide-react'
++```
++
++Update `navGroups`:
++```typescript
++const navGroups: { label: string; items: NavItem[] }[] = [
++  {
++    label: 'Overview',
++    items: [
++      { to: '/', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'staff', 'viewer'] },
++    ],
++  },
++  {
++    label: 'Residents',
++    items: [
++      { to: '/residents', label: 'Resident Profiles', icon: Users, roles: ['admin', 'staff', 'viewer'] },
++      { to: '/households', label: 'Households', icon: Home, roles: ['admin', 'staff'] },
++    ],
++  },
++  {
++    label: 'Records',
++    items: [
++      { to: '/records', label: 'Blotter Records', icon: FileText, roles: ['admin', 'staff', 'viewer'] },
++    ],
++  },
++  {
++    label: 'Administration',
++    items: [
++      { to: '/settings', label: 'System Settings', icon: Settings, roles: ['admin'] },
++    ],
++  },
++]
++```
++
++- [ ] **Step 2: Verify build passes**
++
++Run: `npm run build 2>&1`
++
++---
++
++## Self-Review Checklist
++
++After writing the plan, verify:
++1. **Spec coverage** ?Co Does every requirement from the spec have a corresponding task?
++   - Resident Profiles (Task 3)
++   - Household Mapping (Task 4)
++   - Migration JSON (Task 1)
++   - API layer (Task 2)
++   - Routes (Task 5)
++   - Sidebar (Task 6)
++2. **Placeholder scan** ?Co No "TBD", "TODO", "implement later" in the plan
++3. **Type consistency** ?Co Field names match between migration JSON, API types, and page components
++4. **Scope check** ?Co Group A is 2 features, well-scoped for a single plan
+diff --git a/docs/superpowers/specs/2026-07-05-barangay-features-group-a.md b/docs/superpowers/specs/2026-07-05-barangay-features-group-a.md
+new file mode 100644
+index 0000000..b464f07
+--- /dev/null
++++ b/docs/superpowers/specs/2026-07-05-barangay-features-group-a.md
+@@ -0,0 +1,263 @@
++# Barangay System ?Co Group A: Resident Profiles & Household Mapping
++
++## Overall Architecture
++
++### Route Plan
++Flat top-level routes for clarity:
++
++| Route | Feature | Roles |
++|---|---|---|
++| `/` | Dashboard | all |
++| `/residents` | Resident Profiles | all |
++| `/households` | Household Mapping | admin, staff |
++| `/documents` | Document Request & Queue | admin, staff |
++| `/documents/release` | Document Release Counter | admin, staff |
++| `/records` | Blotter Cases (extended) | admin, staff, viewer |
++| `/logs/activity` | Activity Log | admin, staff |
++| `/logs/visitors` | Visitor Log | admin, staff |
++| `/assets` | Asset Inventory | admin |
++| `/calendar` | Calendar of Activities | all |
++| `/agenda` | Agenda & Minutes | admin, staff |
++| `/reports` | Reports Dashboard | admin, staff |
++
++All feature routes are nested inside `<Layout />` under `<ProtectedRoute role>`.
++
++### Sidebar Navigation
++New sidebar nav groups replacing the current minimal setup:
++
++- **Overview** ?a? Dashboard
++- **Residents** ?a? Resident Profiles, Households
++- **Documents** ?a? Document Queue, Document Release
++- **Records** ?a? Blotter Cases
++- **Logs** ?a? Activity Log, Visitor Log
++- **Planning** ?a? Calendar, Agenda & Minutes
++- **Administration** ?a? Assets, System Settings
++- **Reports** ?a? Reports Dashboard
++
++Each nav item checks `hasRole(...)` ?Co viewers see only Dashboard, Residents (read-only), Blotter (read-only), Calendar.
++
++### Page Pattern
++Every feature page follows the `RecordsPage` pattern:
++1. `PageHeader` with title/subtitle + action button
++2. Card with table listing (overflow-x-auto on mobile)
++3. Slide-over panel / bottom drawer for create/edit forms
++4. `ConfirmDialog` for deletes
++5. Skeleton loading on fetch
++6. Error state display
++
++### API Pattern
++Each feature gets its own file in `src/api/`:
++- `src/api/residents.ts`
++- `src/api/households.ts`
++- etc.
++
++Each exports: `getAll()`, `getById(id)`, `create(data)`, `update(id, data)`, `delete(id)`. Uses PocketBase SDK via `getClient()`.
++
++PocketBase collection schemas are saved as JSON migration files in `pocketbase/migrations/`.
++
++---
++
++## Group A: Resident Profiles & Household Mapping
++
++### PocketBase Collections
++
++#### Collection: `residents`
++| Field | Type | Rules |
++|---|---|---|
++| first_name | text | required |
++| last_name | text | required |
++| middle_name | text | |
++| suffix | select | ?Co / Jr. / Sr. / II / III / IV |
++| birth_date | date | |
++| age | number | computed on save |
++| gender | select | male / female |
++| contact_number | text | |
++| household_id | relation ?a? households | optional |
++| purok | select | from system_settings purokOptions |
++| civil_status | select | single / married / widowed / separated |
++| occupation | text | |
++| nationality | text | default "Filipino" |
++| is_voter | bool | default false |
++| is_4ps | bool | default false |
++| is_senior | bool | default false |
++| is_pwd | bool | default false |
++| blood_type | select | A+ / A- / B+ / B- / AB+ / AB- / O+ / O- |
++| notes | text | |
++
++**Indexes**: `(last_name, first_name)`, `purok`, `household_id`
++
++---
++
++#### Collection: `households`
++| Field | Type | Rules |
++|---|---|---|
++| household_number | text | required, unique |
++| purok | select | from system_settings purokOptions |
++| head_name | text | required |
++| address | text | |
++| notes | text | |
++
++**Indexes**: `household_number`, `purok`
++
++---
++
++### API Layer
++
++#### `src/api/residents.ts`
++```typescript
++interface ResidentData {
++  first_name: string
++  last_name: string
++  middle_name?: string
++  suffix?: string
++  birth_date?: string
++  age?: number
++  gender?: string
++  contact_number?: string
++  household_id?: string
++  purok?: string
++  civil_status?: string
++  occupation?: string
++  nationality?: string
++  is_voter?: boolean
++  is_4ps?: boolean
++  is_senior?: boolean
++  is_pwd?: boolean
++  blood_type?: string
++  notes?: string
++}
++
++interface ApiResident extends RecordModel, ResidentData {}
++
++export async function getResidents(): Promise<ApiResident[]>
++export async function getResident(id: string): Promise<ApiResident>
++export async function createResident(data: ResidentData): Promise<ApiResident>
++export async function updateResident(id: string, data: Partial<ResidentData>): Promise<ApiResident>
++export async function deleteResident(id: string): Promise<boolean>
++export async function getResidentCount(): Promise<number>
++```
++
++#### `src/api/households.ts`
++```typescript
++interface HouseholdData {
++  household_number: string
++  purok?: string
++  head_name: string
++  address?: string
++  notes?: string
++}
++
++interface ApiHousehold extends RecordModel, HouseholdData {}
++
++export async function getHouseholds(): Promise<ApiHousehold[]>
++export async function getHousehold(id: string): Promise<ApiHousehold>
++export async function createHousehold(data: HouseholdData): Promise<ApiHousehold>
++export async function updateHousehold(id: string, data: Partial<HouseholdData>): Promise<ApiHousehold>
++export async function deleteHousehold(id: string): Promise<boolean>
++export async function getMembersCount(householdId: string): Promise<number>
++```
++
++---
++
++### UI Components
++
++#### Resident Profiles Page (`/residents`)
++- **List**: Table with columns Name, Purok, Age, Civil Status, Tags (voter/4ps/senior/pwd badges), Actions (edit/delete)
++- **Search/Filter**: Text search by name, filter by purok dropdown, filter by tags
++- **Form fields** (in slide-over panel):
++  - Personal Info section: First, Middle, Last Name, Suffix, Birth Date, Age (auto-calc), Gender
++  - Contact section: Contact Number
++  - Address section: Household (dropdown searchable), Purok (dropdown)
++  - Demographics section: Civil Status, Occupation, Nationality
++  - Tags section: Checkbox toggles for Voter, 4Ps, Senior, PWD
++  - Medical section: Blood Type
++  - Notes: Textarea
++- **Empty state**: "No residents yet. Add your first resident."
++- **Member count badge**: Shows household member count on household name
++
++#### Households Page (`/households`)
++- **List**: Table with columns Household #, Purok, Head, Members Count, Actions
++- **Search/Filter**: Text search, purok filter
++- **Form fields**: Household Number, Purok, Head Name, Address, Notes
++- **Expandable row** or separate section showing member residents list
++- **Empty state**: "No households yet."
++
++### Default Values
++- Nationality: "Filipino"
++- Suffix: " ?Co "
++- Blood Type: " ?Co "
++
++These are set as defaults in the form, not sent to the API if unchanged.
++
++---
++
++### PocketBase Migration JSON
++
++To be saved as `pocketbase/migrations/001_residents_households.json`:
++
++```json
++[
++  {
++    "name": "residents",
++    "type": "base",
++    "system": false,
++    "schema": [
++      { "name": "first_name", "type": "text", "required": true, "options": { "max": 255 } },
++      { "name": "last_name", "type": "text", "required": true, "options": { "max": 255 } },
++      { "name": "middle_name", "type": "text", "options": { "max": 255 } },
++      { "name": "suffix", "type": "select", "options": { "values": ["?Co", "Jr.", "Sr.", "II", "III", "IV"] } },
++      { "name": "birth_date", "type": "date" },
++      { "name": "age", "type": "number" },
++      { "name": "gender", "type": "select", "options": { "values": ["male", "female"] } },
++      { "name": "contact_number", "type": "text", "options": { "max": 20 } },
++      { "name": "household_id", "type": "relation", "options": { "collectionId": "", "maxSelect": 1 } },
++      { "name": "purok", "type": "text", "options": { "max": 100 } },
++      { "name": "civil_status", "type": "select", "options": { "values": ["single", "married", "widowed", "separated"] } },
++      { "name": "occupation", "type": "text", "options": { "max": 255 } },
++      { "name": "nationality", "type": "text", "options": { "max": 100 } },
++      { "name": "is_voter", "type": "bool" },
++      { "name": "is_4ps", "type": "bool" },
++      { "name": "is_senior", "type": "bool" },
++      { "name": "is_pwd", "type": "bool" },
++      { "name": "blood_type", "type": "select", "options": { "values": ["?Co", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] } },
++      { "name": "notes", "type": "text", "options": { "max": 2000 } }
++    ],
++    "indexes": ["CREATE INDEX idx_residents_name ON residents (last_name, first_name)", "CREATE INDEX idx_residents_purok ON residents (purok)", "CREATE INDEX idx_residents_household ON residents (household_id)"],
++    "listRule": "@request.auth.id != ''",
++    "viewRule": "@request.auth.id != ''",
++    "createRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "updateRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "deleteRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'"
++  },
++  {
++    "name": "households",
++    "type": "base",
++    "system": false,
++    "schema": [
++      { "name": "household_number", "type": "text", "required": true, "options": { "max": 50 } },
++      { "name": "purok", "type": "text", "options": { "max": 100 } },
++      { "name": "head_name", "type": "text", "required": true, "options": { "max": 255 } },
++      { "name": "address", "type": "text", "options": { "max": 500 } },
++      { "name": "notes", "type": "text", "options": { "max": 2000 } }
++    ],
++    "indexes": ["CREATE UNIQUE INDEX idx_households_number ON households (household_number)", "CREATE INDEX idx_households_purok ON households (purok)"],
++    "listRule": "@request.auth.id != ''",
++    "viewRule": "@request.auth.id != ''",
++    "createRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "updateRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'",
++    "deleteRule": "@request.auth.role = 'admin' || @request.auth.role = 'staff'"
++  }
++]
++```
++
++---
++
++### Implementation Order within Group A
++1. Create PocketBase migration JSON
++2. Create `src/api/residents.ts`
++3. Create `src/api/households.ts`
++4. Create `src/features/residents/ResidentsPage.tsx`
++5. Create `src/features/households/HouseholdsPage.tsx`
++6. Update `src/routes/index.tsx` with new routes
++7. Update `src/components/Sidebar.tsx` with new nav groups
++8. Verify build passes
+diff --git a/src/api/households.ts b/src/api/households.ts
+new file mode 100644
+index 0000000..c25baee
+--- /dev/null
++++ b/src/api/households.ts
+@@ -0,0 +1,63 @@
++import type { RecordModel } from 'pocketbase'
++import { getClient } from './client'
++import { handleApiError } from './errorHandler'
++
++const COLLECTION = 'households'
++
++export interface HouseholdData {
++  household_number: string
++  purok?: string
++  head_name: string
++  address?: string
++  notes?: string
++}
++
++export interface ApiHousehold extends RecordModel {
++  household_number: string
++  purok: string
++  head_name: string
++  address: string
++  notes: string
++  updated: string
++}
++
++export async function getHouseholds(): Promise<ApiHousehold[]> {
++  try {
++    return await getClient().collection(COLLECTION).getFullList<ApiHousehold>({ sort: 'household_number' })
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function getHousehold(id: string): Promise<ApiHousehold> {
++  try {
++    return await getClient().collection(COLLECTION).getOne<ApiHousehold>(id)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function createHousehold(data: HouseholdData): Promise<ApiHousehold> {
++  try {
++    return await getClient().collection(COLLECTION).create<ApiHousehold>(data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function updateHousehold(id: string, data: Partial<HouseholdData>): Promise<ApiHousehold> {
++  try {
++    return await getClient().collection(COLLECTION).update<ApiHousehold>(id, data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function deleteHousehold(id: string): Promise<boolean> {
++  try {
++    await getClient().collection(COLLECTION).delete(id)
++    return true
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
+diff --git a/src/api/residents.ts b/src/api/residents.ts
+new file mode 100644
+index 0000000..01c1c51
+--- /dev/null
++++ b/src/api/residents.ts
+@@ -0,0 +1,109 @@
++import type { RecordModel } from 'pocketbase'
++import { getClient } from './client'
++import { handleApiError } from './errorHandler'
++
++const COLLECTION = 'residents'
++
++export interface ResidentData {
++  first_name: string
++  last_name: string
++  middle_name?: string
++  suffix?: string
++  birth_date?: string
++  age?: number
++  gender?: string
++  contact_number?: string
++  household_id?: string
++  purok?: string
++  civil_status?: string
++  occupation?: string
++  nationality?: string
++  is_voter?: boolean
++  is_4ps?: boolean
++  is_senior?: boolean
++  is_pwd?: boolean
++  blood_type?: string
++  notes?: string
++}
++
++export interface ApiResident extends RecordModel {
++  first_name: string
++  last_name: string
++  middle_name: string
++  suffix: string
++  birth_date: string
++  age: number
++  gender: string
++  contact_number: string
++  household_id: string
++  purok: string
++  civil_status: string
++  occupation: string
++  nationality: string
++  is_voter: boolean
++  is_4ps: boolean
++  is_senior: boolean
++  is_pwd: boolean
++  blood_type: string
++  notes: string
++  updated: string
++}
++
++export async function getResidents(params?: { household_id?: string }): Promise<ApiResident[]> {
++  try {
++    const query: Record<string, unknown> = { sort: '-updated' }
++    if (params?.household_id) {
++      query.filter = `household_id = '${params.household_id}'`
++    }
++    return await getClient().collection(COLLECTION).getFullList<ApiResident>(query)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function getResident(id: string): Promise<ApiResident> {
++  try {
++    return await getClient().collection(COLLECTION).getOne<ApiResident>(id)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function createResident(data: ResidentData): Promise<ApiResident> {
++  try {
++    return await getClient().collection(COLLECTION).create<ApiResident>(data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function updateResident(id: string, data: Partial<ResidentData>): Promise<ApiResident> {
++  try {
++    return await getClient().collection(COLLECTION).update<ApiResident>(id, data)
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function deleteResident(id: string): Promise<boolean> {
++  try {
++    await getClient().collection(COLLECTION).delete(id)
++    return true
++  } catch (err) {
++    throw handleApiError(err)
++  }
++}
++
++export async function getResidentsSummary(): Promise<{ total: number; voters: number; seniors: number; pwd: number }> {
++  try {
++    const all = await getClient().collection(COLLECTION).getFullList<ApiResident>({ requestKey: 'residents-summary' })
++    return {
++      total: all.length,
++      voters: all.filter((r) => r.is_voter).length,
++      seniors: all.filter((r) => r.is_senior).length,
++      pwd: all.filter((r) => r.is_pwd).length,
++    }
++  } catch {
++    return { total: 0, voters: 0, seniors: 0, pwd: 0 }
++  }
++}
+

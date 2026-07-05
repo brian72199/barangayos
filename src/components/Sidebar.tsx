@@ -7,6 +7,8 @@ import {
   PanelRightClose,
   PanelRightOpen,
   LogOut,
+  Users,
+  Home,
 } from 'lucide-react'
 import { getCurrentUser, logout, type Role } from '@/auth/session'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -26,6 +28,13 @@ const navGroups: { label: string; items: NavItem[] }[] = [
     label: 'Overview',
     items: [
       { to: '/', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'staff', 'viewer'] },
+    ],
+  },
+  {
+    label: 'Residents',
+    items: [
+      { to: '/residents', label: 'Resident Profiles', icon: Users, roles: ['admin', 'staff', 'viewer'] },
+      { to: '/households', label: 'Households', icon: Home, roles: ['admin', 'staff'] },
     ],
   },
   {

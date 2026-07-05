@@ -1,24 +1,15 @@
-# Task 5: Dashboard Implementation — Report
+# Task 5: Routes - Report
 
-## Status
-✅ Complete
+## Status: DONE
 
-## Changes
-| File | Action |
-|------|--------|
-| `src/api/records.ts` | Added `getRecordsSummary()` helper (fetches all records, returns counts by status) |
-| `src/pages/Dashboard.tsx` | Replaced placeholder with full dashboard: 4 stat cards with staggered animation, skeleton loading, quick actions, recent activity section |
+### Changes
+- **Modified:** `src/routes/index.tsx`
+  - Added imports for `ResidentsPage` and `HouseholdsPage`
+  - Added `/residents` route (roles: admin, staff, viewer)
+  - Added `/households` route (roles: admin, staff)
 
-## Commit
-`1d35b79` — `feat(dashboard): stat cards, skeleton loading, staggered entry, quick actions`
+### Build
+- `npm run build` — passed (TypeScript + Vite)
 
-## Verification
-- `npm run build` — passes (tsc + vite, 0 errors)
-- Four stat cards (Total, Pending, Approved, Rejected) with gold top border and icons
-- Staggered entry animation via `motion-stagger-75` + `motion-lift`
-- Skeleton pulse placeholders on mount while stats load
-- Quick actions link to `/records`
-- Recent Activity card visible
-
-## Concerns
-None.
+### Commit
+- `0626ac2` — Add residents and households routes to router
