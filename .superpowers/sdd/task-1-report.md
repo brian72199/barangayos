@@ -1,45 +1,24 @@
-# Task 1: Design Tokens & Animation Utility Foundation
+# Task 1 Report: PocketBase Migration JSON
 
-## What Was Implemented
+## What was implemented
+- Created `pocketbase/migrations/001_residents_households.json` with PocketBase collection definitions for `residents` and `households`
+- File format matches the task brief specification exactly: `schema` array format (as per spec), with indexes, rules, and field definitions
 
-All 8 steps from the task brief were applied to `src/index.css`:
+## What was verified
+- JSON is syntactically valid (parsed by `ConvertFrom-Json`, confirms 2 collections)
+- File path and naming convention matches the spec and task brief
+- All fields match the brief: 18 fields on `residents`, 5 fields on `households`
+- Relation field `household_id` uses `"collectionId": "households"` per task brief (spec had empty string)
+- Indexes match: 3 on residents, 2 on households (household_number has UNIQUE)
+- Rules match: list/view require auth, create/update/delete restricted to admin/staff
 
-1. **Added surface and text tokens to `@theme`**: `--color-surface-raised`, `--color-surface-overlay`, `--color-text-subtle` mapped to CSS custom properties.
+## Files changed
+- `pocketbase/migrations/001_residents_households.json` (new, 59 lines)
 
-2. **Defined new custom properties in `:root`**: `--surface-raised: #FFFFFF`, `--surface-overlay: rgba(0,0,0,0.4)`, `--text-subtle: #A09688`.
+## Self-review findings
+- **Schema format vs fields format**: The migration uses `"schema"` array (the format specified in the brief and spec), while the existing `pb_schema.json` uses `"fields"` (PocketBase v0.23+ export format). This is intentional per the spec's explicit format.
+- **collectionId**: Task brief uses `"collectionId": "households"` — this resolves by collection name during import. The spec had `""` but task brief takes precedence.
+- **Branch context**: Committed to `dark-mode-redesign` branch (current branch). This may need to be merged/rebased to the correct feature branch if different.
 
-3. **Defined dark mode overrides**: `--surface-raised: #1C1917`, `--surface-overlay: rgba(0,0,0,0.6)`, `--text-subtle: #7A7064`.
-
-4. **Warmed dark mode base**: Changed `.dark { --bg }` from `#0B0A09` to `#12100E`.
-
-5. **Removed universal `* { transition }`** and replaced with targeted `a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])` selector (with reduced-motion guard).
-
-6. **Replaced `--animate-*` keyframes with `@utility` motion classes**: `motion-fade-in`, `motion-slide-up`, `motion-scale-in`, `motion-lift`, `motion-press`, `motion-stagger-50/75/100`, plus `@keyframes` backing them.
-
-7. **Preserved `.theme-icon-enter`** with `@keyframes theme-swirl` and added reduced-motion support.
-
-8. **Removed duplicate reduced-motion block** around `body { transition: none }`.
-
-## Files Changed
-
-- `src/index.css` — 91 insertions, 41 deletions
-
-## Testing
-
-- `npm run build` (tsc + vite build) — **passes cleanly** (1865 modules, 403ms)
-
-## Self-Review
-
-| Check | Status |
-|---|---|
-| All new tokens added (surface-raised, surface-overlay, text-subtle) | ✅ |
-| Dark mode base warmed (#12100E) | ✅ |
-| Universal `* { transition }` removed, targeted selector added | ✅ |
-| All 8 motion utilities present (fade-in, slide-up, scale-in, lift, press, stagger-50/75/100) | ✅ |
-| `.theme-icon-enter` preserved with reduced-motion support | ✅ |
-| Duplicate reduced-motion block removed | ✅ |
-| `npm run build` passes | ✅ |
-
-## Issues or Concerns
-
-None.
+## Issues or concerns
+- The `"schema"` format in this migration differs from the `"fields"` format in `pb_schema.json`. If PocketBase v0.39 expects the `"fields"` format for JSON migrations, this may need conversion. The spec explicitly defines the format, so this is alignment with the spec.

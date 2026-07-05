@@ -1,8 +1,2 @@
-﻿Task 1: complete (commits bb0cc77..6a9e441, review clean)
-Task 2: complete (commits 6a9e441..c8cb3b1, review clean)
-Task 3: complete (commits c8cb3b1..ac3c2a5, review clean)
-Task 4: complete (commits ac3c2a5..d80f01c, review clean)
-Task 5: complete (commits d80f01c..1d35b79, review clean)
-Task 6: complete (commits 1d35b79..5c5e821, review clean)
-Task 7: complete (commits 5c5e821..b0b0734, review clean)
-Fix pass: complete (commits b0b0734..793e2e4, all findings addressed, build clean)
+﻿# Group A: Resident Profiles & Household Mapping
+
