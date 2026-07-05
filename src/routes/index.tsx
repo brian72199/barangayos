@@ -6,7 +6,9 @@ import Dashboard from '@/pages/Dashboard'
 import { RecordsPage } from '@/features/records'
 import { ResidentsPage } from '@/features/residents'
 import { HouseholdsPage } from '@/features/households'
+import { DocumentsPage, ReleasePage } from '@/features/documents'
 import { SystemSettings } from '@/features/settings'
+import { ActivityPage } from '@/features/logs'
 
 export default function AppRoutes() {
   return (
@@ -49,6 +51,30 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={['admin', 'staff']}>
               <HouseholdsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="documents"
+          element={
+            <ProtectedRoute roles={['admin', 'staff']}>
+              <DocumentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="documents/release"
+          element={
+            <ProtectedRoute roles={['admin', 'staff']}>
+              <ReleasePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="activity-log"
+          element={
+            <ProtectedRoute roles={['admin', 'staff', 'viewer']}>
+              <ActivityPage />
             </ProtectedRoute>
           }
         />

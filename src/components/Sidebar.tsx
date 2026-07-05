@@ -9,6 +9,9 @@ import {
   LogOut,
   Users,
   Home,
+  ClipboardList,
+  CheckSquare,
+  Activity,
 } from 'lucide-react'
 import { getCurrentUser, logout, type Role } from '@/auth/session'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -38,6 +41,13 @@ const navGroups: { label: string; items: NavItem[] }[] = [
     ],
   },
   {
+    label: 'Documents',
+    items: [
+      { to: '/documents', label: 'Document Queue', icon: ClipboardList, roles: ['admin', 'staff'] },
+      { to: '/documents/release', label: 'Document Release', icon: CheckSquare, roles: ['admin', 'staff'] },
+    ],
+  },
+  {
     label: 'Records',
     items: [
       { to: '/records', label: 'Blotter Records', icon: FileText, roles: ['admin', 'staff', 'viewer'] },
@@ -47,6 +57,7 @@ const navGroups: { label: string; items: NavItem[] }[] = [
     label: 'Administration',
     items: [
       { to: '/settings', label: 'System Settings', icon: Settings, roles: ['admin'] },
+      { to: '/activity-log', label: 'Activity Log', icon: Activity, roles: ['admin', 'staff', 'viewer'] },
     ],
   },
 ]

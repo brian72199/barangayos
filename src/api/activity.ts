@@ -35,9 +35,14 @@ export async function getActivities(
   page = 1,
   perPage = 25,
   sort = '-created',
+  collection?: string,
 ): Promise<{ items: ApiActivity[]; totalItems: number; totalPages: number }> {
   try {
-    const result = await getClient().collection('activity_logs').getList<ApiActivity>(page, perPage, { sort })
+    const options: Record<string, unknown> = { sort }
+    if (collection) {
+      options.filter = `collection = "${collection}"`
+    }
+    const result = await getClient().collection('activity_logs').getList<ApiActivity>(page, perPage, options)
     return {
       items: result.items,
       totalItems: result.totalItems,
