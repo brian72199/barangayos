@@ -4,6 +4,8 @@ import { ProtectedRoute } from '@/components/ProtectedRoute'
 import LoginPage from '@/auth/LoginPage'
 import Dashboard from '@/pages/Dashboard'
 import { RecordsPage } from '@/features/records'
+import { ResidentsPage } from '@/features/residents'
+import { HouseholdsPage } from '@/features/households'
 import { SystemSettings } from '@/features/settings'
 
 export default function AppRoutes() {
@@ -31,6 +33,22 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={['admin']}>
               <SystemSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="residents"
+          element={
+            <ProtectedRoute roles={['admin', 'staff', 'viewer']}>
+              <ResidentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="households"
+          element={
+            <ProtectedRoute roles={['admin', 'staff']}>
+              <HouseholdsPage />
             </ProtectedRoute>
           }
         />
