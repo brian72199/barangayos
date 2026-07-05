@@ -37,32 +37,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-capiz px-4">
-      <div className="w-full max-w-sm">
-        {/* Seal */}
-        <div className="flex justify-center animate-scale-in">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-capiz px-4 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,color-mix(in_srgb,var(--gold)_6%,transparent)_0%,transparent_70%)]" aria-hidden="true" />
+      <div className="relative w-full max-w-sm">
+        <div className="flex justify-center motion-scale-in">
           <div className="flex size-16 items-center justify-center rounded-full border-2 border-gold/30 bg-gold/5">
             <span className="text-2xl font-bold tracking-tight text-gold">B</span>
           </div>
         </div>
 
-        {/* Greeting */}
-        <div className="mt-5 text-center animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+        <div className="mt-5 text-center motion-fade-in motion-slide-up" style={{ animationDelay: '100ms' }}>
           <p className="text-sm font-medium tracking-[0.15em] text-narra uppercase">
             {greeting}
           </p>
+          <div className="mx-auto mt-2 h-0.5 w-8 rounded-full bg-gold/60" aria-hidden="true" />
         </div>
 
-        {/* Gold rule */}
-        <div
-          className="mx-auto mt-5 h-px w-12 rounded-full bg-gold/50 animate-fade-in"
-          style={{ animationDelay: '200ms' }}
-          aria-hidden="true"
-        />
-
-        {/* Form */}
-        <div className="mt-6 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-          <div className="rounded-xl border border-bamboo bg-card p-6 shadow-sm sm:p-8">
+        <div className="mt-8 motion-fade-in motion-slide-up" style={{ animationDelay: '200ms' }}>
+          <div className="rounded-2xl border border-bamboo bg-card p-6 shadow-sm ring-1 ring-transparent transition-shadow duration-200 focus-within:shadow-md focus-within:ring-gold/20 sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -91,7 +83,7 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <div className="flex items-start gap-2 rounded-lg border border-red-pinoy/20 bg-red-pinoy/5 px-3.5 py-2.5 text-sm text-red-pinoy animate-fade-in">
+                <div className="flex items-start gap-2 rounded-lg border border-red-pinoy/20 bg-red-pinoy/5 px-3.5 py-2.5 text-sm text-red-pinoy motion-scale-in">
                   <AlertCircle className="mt-0.5 size-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -101,7 +93,8 @@ export default function LoginPage() {
                 type="submit"
                 disabled={loading}
                 size="lg"
-                className="w-full gap-2 text-base"
+                className="w-full gap-2 text-base transition-all duration-200"
+                style={{ width: loading ? '10rem' : undefined }}
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -119,11 +112,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Footer */}
-        <p
-          className="mt-8 text-center text-[11px] text-muted-foreground/30 animate-fade-in"
-          style={{ animationDelay: '500ms' }}
-        >
+        <p className="mt-8 text-center text-[11px] text-muted-foreground/30 motion-fade-in" style={{ animationDelay: '400ms' }}>
           Barangay System
         </p>
       </div>
