@@ -12,6 +12,7 @@ import { ActivityPage, VisitorLogPage } from '@/features/logs'
 import { AssetsPage } from '@/features/assets'
 import { CalendarPage } from '@/features/calendar'
 import { AgendaPage } from '@/features/agenda'
+import { ReportsPage } from '@/features/reports'
 
 export default function AppRoutes() {
   return (
@@ -108,6 +109,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={['admin', 'staff']}>
               <AgendaPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="reports"
+          element={
+            <ProtectedRoute roles={['admin', 'staff']}>
+              <ReportsPage />
             </ProtectedRoute>
           }
         />

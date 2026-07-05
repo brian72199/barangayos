@@ -15,6 +15,7 @@ import {
   DoorOpen,
   Package,
   Calendar,
+  BarChart3,
 } from 'lucide-react'
 import { getCurrentUser, logout, type Role } from '@/auth/session'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -75,6 +76,12 @@ const navGroups: { label: string; items: NavItem[] }[] = [
     items: [
       { to: '/assets', label: 'Assets', icon: Package, roles: ['admin'] },
       { to: '/settings', label: 'System Settings', icon: Settings, roles: ['admin'] },
+    ],
+  },
+  {
+    label: 'Reports',
+    items: [
+      { to: '/reports', label: 'Reports Dashboard', icon: BarChart3, roles: ['admin', 'staff'] },
     ],
   },
 ]
