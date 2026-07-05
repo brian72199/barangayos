@@ -1,19 +1,31 @@
-# Task 1 Report: PocketBase Migration JSON
+# Task 1 Report: Migration JSON + Cloudinary utility
 
-## What I Implemented
-Created `pocketbase/migrations/003_blotter_activity_visitors.json` containing three new PocketBase collection definitions:
-- **blotter_records**: Case management with incident type (select), complainant/respondent details, status tracking, and relation to user who created it
-- **activity_logs**: Audit trail with action, collection, record_id, details, user_name, and auto-timestamp
-- **visitor_logs**: Visitor tracking with name, contact, purpose, person_to_visit, time_in (auto), and time_out
+**Status:** DONE
 
-## Files Changed
-- Created: `pocketbase/migrations/003_blotter_activity_visitors.json` (76 insertions)
+## Files Created/Modified
 
-## Self-Review Findings
-- JSON validated successfully with `ConvertFrom-Json`
-- Format consistent with existing migration files `001_residents_households.json` and `002_document_requests.json`
-- The `created_by` field on `blotter_records` has an empty `collectionId` — this is expected as the PocketBase admin panel resolves the actual collection ID at runtime when applied
-- All access rules follow the same pattern as existing migrations
+| File | Action |
+|------|--------|
+| `pocketbase/migrations/004_assets_calendar_agenda.json` | Created — 4 collections: assets, calendar_events, meetings, agenda_items |
+| `src/api/upload.ts` | Created — `uploadImage(file: File): Promise<string>` |
+| `.env.local` | Modified — added `VITE_CLOUDINARY_CLOUD_NAME`, `VITE_CLOUDINARY_UPLOAD_PRESET` |
+| `.env.local.example` | Modified — same additions |
+| `.env.production` | Modified — same additions |
+| `.env.production.example` | Modified — same additions |
 
-## Issues or Concerns
-None.
+## Migration Details
+
+- **assets**: 13 fields (name, asset_type, description, serial_number, purchase_date, purchase_cost, current_value, condition, status, assigned_to, location, image_url, notes). Indexes on asset_type, condition, status. Admin-only access.
+- **calendar_events**: 9 fields (title, description, event_type, start_datetime, end_datetime, all_day, location, agenda_ref, notes). Indexes on start_datetime, event_type. Authenticated list/view; admin/staff write.
+- **meetings**: 6 fields (title, meeting_date, location, meeting_type, status, notes). Indexes on meeting_date, status. Admin/staff only.
+- **agenda_items**: 8 fields (meeting_id with cascade delete, title, description, sort_order, status, minutes, submitted_by, submitted_at). Indexes on meeting_id, sort_order. Admin/staff only.
+
+## Build Result
+
+`npm run build` — passed (tsc + vite, 1880 modules, 418ms)
+
+## Commit
+
+```
+3e94967 feat: add Group D migration for assets/calendar/agenda + Cloudinary upload utility
+```

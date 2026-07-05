@@ -1,23 +1,33 @@
-# Fix Report — Group A (Resident Profiles & Household Mapping)
+# Fix Report
 
-**Status:** DONE
+## Issues Fixed
 
-## Commits
-- `1ab56ba` — `fix: address review findings — gender/civil_status casing, suffix select, defaults, filters, error handling`
+### I1 — PocketBase filter quoting in `src/api/activity.ts`
+- Changed line 43 from double quotes to single quotes: `collection = "${collection}"` → `collection = '${collection}'`
+- PocketBase requires single quotes for string filter values; double quotes are for identifiers.
 
-## Build Verification
-- `npm run build` — passed (tsc + vite build, 0 errors)
+### I2 — Missing stat cards in `src/pages/Dashboard.tsx`
+- Added `Escalated` and `Dismissed` stat cards to the `statCards` array (lines 44-45)
+- Icons `ArrowUpCircle` and `XCircle` were already imported
+- Updated grid layout from `lg:grid-cols-4` to `lg:grid-cols-3 xl:grid-cols-6` to accommodate 6 cards
 
-## Summary of Fixes
+### I4 — Dashboard error handling inconsistency in `src/pages/Dashboard.tsx`
+- Changed line 36 from `.catch(console.error)` to `.catch(() => setRecentRecords([]))`
+- Now consistent with the stats fetch pattern which falls back to empty state on error
 
-| # | Issue | File(s) | Change |
-|---|-------|---------|--------|
-| 1 | Gender values mismatch | `ResidentsPage.tsx:403-404` | Changed `value="Male"/"Female"` → `value="male"/"female"`, labels kept as "Male"/"Female" |
-| 2 | Civil status mismatch | `ResidentsPage.tsx:427-432` | Changed values to lowercase (`single`, `married`, `widowed`, `separated`), removed "Divorced" option |
-| 3 | Suffix field type | `ResidentsPage.tsx:382-393` | Replaced `<Input>` with `<Select>` using values `["—", "Jr.", "Sr.", "II", "III", "IV"]` |
-| 4 | Nationality default | `ResidentsPage.tsx:53` | Changed `nationality: ''` → `nationality: 'Filipino'` |
-| 5 | Blood type missing "—" | `ResidentsPage.tsx:456` | Added `<option value="—">—</option>` as first option |
-| 6 | Empty state text | `ResidentsPage.tsx:257`, `HouseholdsPage.tsx:205` | "No residents found." → "No residents yet. Add your first resident." / "No households found." → "No households yet." |
-| 7 | HouseholdsPage missing purok filter | `HouseholdsPage.tsx:56,186-196` | Added `purokFilter` state + `<Select>` dropdown + filter logic in `filteredHouseholds` |
-| 8 | Error handling in data fetch | `ResidentsPage.tsx:79`, `HouseholdsPage.tsx:81` | Changed `.catch(console.error)` → `.catch((err) => setError(...))` |
-| 9 | Safe filter query | `src/api/residents.ts:56` | Added `.trim()` guard to `household_id` interpolation |
+## Build Result
+
+`npm run build` passed successfully (TypeScript + Vite):
+- 1880 modules transformed
+- No errors or warnings
+
+## Files Changed
+
+| File | Lines Changed |
+|------|--------------|
+| `src/api/activity.ts` | 1 (filter quoting) |
+| `src/pages/Dashboard.tsx` | 3 (stat cards + grid + error handling) |
+
+## Commit
+
+`0e304c6` — fix: PocketBase filter quoting in activity.ts, missing stat cards and error handling in Dashboard

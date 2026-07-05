@@ -205,12 +205,15 @@ export default function DocumentsPage() {
       </PageHeader>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <Input
-          placeholder="Search by queue # or name..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="h-9 w-60 max-w-full text-sm"
-        />
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search by queue # or name..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-9 w-60 max-w-full pl-8 text-sm"
+          />
+        </div>
         <Select
           value={statusFilter}
           onValueChange={(v) => setStatusFilter(v)}

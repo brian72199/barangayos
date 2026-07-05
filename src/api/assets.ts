@@ -21,22 +21,7 @@ export interface AssetData {
   notes?: string
 }
 
-export interface ApiAsset extends RecordModel {
-  name: string
-  asset_type: string
-  description: string
-  serial_number: string
-  purchase_date: string
-  purchase_cost: number
-  current_value: number
-  condition: string
-  status: string
-  assigned_to: string
-  location: string
-  image_url: string
-  notes: string
-  updated: string
-}
+export interface ApiAsset extends RecordModel, AssetData {}
 
 export interface AssetSummary {
   total: number
@@ -102,7 +87,8 @@ export async function getAssetSummary(): Promise<AssetSummary> {
     for (const a of all) {
       byType[a.asset_type] = (byType[a.asset_type] || 0) + 1
       byCondition[a.condition] = (byCondition[a.condition] || 0) + 1
-      byStatus[a.status] = (byStatus[a.status] || 0) + 1
+      const s = a.status ?? 'unknown'
+      byStatus[s] = (byStatus[s] || 0) + 1
     }
     return { total: all.length, byType, byCondition, byStatus }
   } catch {

@@ -37,7 +37,7 @@ export default function Dashboard() {
   }, [])
 
   const statCards: Stat[] = [
-    { label: 'Total Records', value: stats?.total ?? 0, icon: FileText, color: 'text-barangay' },
+    { label: 'Total Cases', value: stats?.total ?? 0, icon: FileText, color: 'text-barangay' },
     { label: 'Pending', value: stats?.pending ?? 0, icon: Clock, color: 'text-amber-500' },
     { label: 'Hearing', value: stats?.hearing ?? 0, icon: Scale, color: 'text-blue-500' },
     { label: 'Settled', value: stats?.settled ?? 0, icon: CheckCircle2, color: 'text-emerald-500' },

@@ -1,25 +1,20 @@
-# Task 7: Settings Page Refinement
+# Task 7: Routes + Sidebar
 
-**Status:** Complete
-**Commit:** `b0b0734` - `feat(settings): tighter spacing, skeleton loading, refined toast, tag animations`
-**Build:** ✅ Passed (`npm run build` — tsc + vite build clean)
+## What I implemented
 
-## Changes
+### `src/routes/index.tsx`
+- Updated import to include `VisitorLogPage` alongside `ActivityPage`
+- Changed `path="activity-log"` → `path="logs/activity"` with roles `['admin', 'staff']`
+- Added new route for `path="logs/visitors"` with roles `['admin', 'staff']`
 
-- **Skeleton loading:** Replaced spinner with 4 animated skeleton card blocks (`SkeletonBlock` component) using `animate-pulse` with staggered `motion-fade-in` delays
-- **Tighter spacing:** All section content areas changed from `p-4` to `p-3`
-- **Animation classes:** Migrated from `animate-fade-in`/`animate-fade-in-up` to `motion-fade-in`/`motion-slide-up` CSS motion classes. Tags now use `motion-scale-in` on add
-- **Toast refinement:** Repositioned to `bottom-4 right-4` with `motion-slide-up` animation (was `top-4` with `animate-slide-in-right`)
-- **Error state:** Now includes `PageHeader` title/subtitle matching loading state layout
-- **Auto-save indicator:** Uses `motion-fade-in` instead of `animate-fade-in`
-- **Misc:** Removed JSX comments; added `focus:border-ring` to field inputs for better focus state
+### `src/components/Sidebar.tsx`
+- Removed `Activity` from lucide-react imports, added `ClipboardCheck` and `DoorOpen`
+- Removed old "Activity Log" item from Administration group
+- Added new "Logs" group after "Records" with Activity Log and Visitor Log items
 
-## Files Modified
+## Build result
+**SUCCESS** — `npm run build` passed cleanly (tsc + vite).
 
-- `src/features/settings/SystemSettings.tsx` (full replace)
-
-## Concerns
-
-- `SkeletonBlock` uses `animate-pulse` which requires Tailwind's animation utilities to be enabled (verified — builds fine)
-- `motion-*` classes assume custom CSS keyframe utilities are defined in the project (they are, from the motion system used elsewhere)
-- No new tests — Settings page is a configuration UI with no test coverage currently
+## Files changed
+- `src/routes/index.tsx`
+- `src/components/Sidebar.tsx`

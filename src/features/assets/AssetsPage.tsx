@@ -125,6 +125,12 @@ export default function AssetsPage() {
     ).slice(0, 10)
   }, [residents, residentSearch])
 
+  const residentMap = useMemo(() => {
+    const map: Record<string, string> = {}
+    residents.forEach((r) => { map[r.id] = `${r.first_name} ${r.last_name}` })
+    return map
+  }, [residents])
+
   function updateField(field: string, value: string | number) {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
@@ -178,17 +184,17 @@ export default function AssetsPage() {
     setForm({
       name: record.name,
       asset_type: record.asset_type,
-      description: record.description,
-      serial_number: record.serial_number,
-      purchase_date: record.purchase_date,
-      purchase_cost: record.purchase_cost,
-      current_value: record.current_value,
+      description: record.description ?? '',
+      serial_number: record.serial_number ?? '',
+      purchase_date: record.purchase_date ?? '',
+      purchase_cost: record.purchase_cost ?? 0,
+      current_value: record.current_value ?? 0,
       condition: record.condition,
-      status: record.status,
-      assigned_to: record.assigned_to,
-      location: record.location,
-      image_url: record.image_url,
-      notes: record.notes,
+      status: record.status ?? 'available',
+      assigned_to: record.assigned_to ?? '',
+      location: record.location ?? '',
+      image_url: record.image_url ?? '',
+      notes: record.notes ?? '',
     })
     setResidentSearch('')
     setPanelOpen(true)
@@ -323,7 +329,7 @@ export default function AssetsPage() {
                     <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Type</th>
                     <th className="px-4 py-3 sm:px-6">Condition</th>
                     <th className="px-4 py-3 sm:px-6">Status</th>
-                    <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Location</th>
+                    <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Assigned To</th>
                     <th className="px-4 py-3 sm:px-6 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -355,12 +361,12 @@ export default function AssetsPage() {
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                        <span className={cn('inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium', statusColors[a.status])}>
-                          {statusLabels[a.status]}
+                        <span className={cn('inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium', statusColors[a.status ?? ''])}>
+                          {statusLabels[a.status ?? '']}
                         </span>
                       </td>
                       <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell sm:px-6 text-sm text-muted-foreground">
-                        {a.location || '\u2014'}
+                        {a.assigned_to ? (residentMap[a.assigned_to] || '\u2014') : '\u2014'}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-right">
                         {isAdmin && (
@@ -577,7 +583,7 @@ export default function AssetsPage() {
                 <Label>Image</Label>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="fbold h-20 w-20 shrink-0">
+                    <div className="h-20 w-20 shrink-0">
                       {form.image_url ? (
                         <div className="relative">
                           <img src={form.image_url} alt="Preview" className="h-20 w-20 rounded object-cover" />
