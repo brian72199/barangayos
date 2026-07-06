@@ -135,17 +135,10 @@ jobs:
       - name: Deploy to server
         shell: powershell
         run: |
-          $ProjectRoot = "D:\BARANGAYCC\barangay-system"
           $ErrorActionPreference = "Stop"
-          Write-Host "Pulling latest code..."
-          Set-Location -LiteralPath $ProjectRoot
-          git pull origin main
-          Write-Host "Cleaning node_modules to avoid file lock issues..."
-          Remove-Item -LiteralPath "$ProjectRoot\node_modules" -Recurse -Force -ErrorAction SilentlyContinue
-          Write-Host "Installing dependencies..."
-          npm ci
+          $ProdPublic = "D:\BARANGAYCC\barangay-system\pb_public"
           Write-Host "Copying built artifacts to pb_public..."
-          Copy-Item -Path "$(Get-Location)\dist\*" -Destination "$ProjectRoot\pb_public\" -Recurse -Force
+          Copy-Item -Path "dist\*" -Destination "$ProdPublic" -Recurse -Force
           Write-Host "Restarting PocketBase..."
           Restart-Service -Name PocketBase -Force
       - name: Health check
