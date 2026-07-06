@@ -1,5 +1,6 @@
 import { getClient } from '@/api/client'
 import { peekAll, dequeue } from './queue'
+import { verifyAuth } from '@/auth/session'
 
 export type SyncStatus = 'idle' | 'syncing' | 'error' | 'complete'
 
@@ -26,6 +27,13 @@ export async function flushQueue(): Promise<void> {
   if (items.length === 0) {
     currentStatus = 'idle'
     remainingCount = 0
+    notify()
+    return
+  }
+
+  const sessionValid = await verifyAuth()
+  if (!sessionValid) {
+    currentStatus = 'error'
     notify()
     return
   }

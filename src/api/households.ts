@@ -1,7 +1,6 @@
 import type { RecordModel } from 'pocketbase'
 import { getClient } from './client'
 import { handleApiError } from './errorHandler'
-import { logActivity } from './activity'
 import type { PaginatedResult } from '@/lib/utils'
 
 const COLLECTION = 'households'
@@ -92,7 +91,6 @@ export async function getHousehold(id: string): Promise<ApiHousehold> {
 export async function createHousehold(data: HouseholdData): Promise<ApiHousehold> {
   try {
     const result = await getClient().collection(COLLECTION).create<ApiHousehold>(data)
-    logActivity('create', COLLECTION, result.id, `Created household: ${result.household_number}`)
     return result
   } catch (err) {
     throw handleApiError(err)
@@ -102,7 +100,6 @@ export async function createHousehold(data: HouseholdData): Promise<ApiHousehold
 export async function updateHousehold(id: string, data: Partial<HouseholdData>): Promise<ApiHousehold> {
   try {
     const result = await getClient().collection(COLLECTION).update<ApiHousehold>(id, data)
-    logActivity('update', COLLECTION, id, `Updated household: ${result.household_number}`)
     return result
   } catch (err) {
     throw handleApiError(err)
@@ -112,7 +109,6 @@ export async function updateHousehold(id: string, data: Partial<HouseholdData>):
 export async function deleteHousehold(id: string): Promise<boolean> {
   try {
     await getClient().collection(COLLECTION).delete(id)
-    logActivity('delete', COLLECTION, id, `Deleted household`)
     return true
   } catch (err) {
     throw handleApiError(err)

@@ -101,7 +101,9 @@ export default function AppRoutes() {
         <Route
           path="calendar"
           element={
-            <CalendarPage />
+            <ProtectedRoute roles={['admin', 'staff', 'viewer']}>
+              <CalendarPage />
+            </ProtectedRoute>
           }
         />
         <Route

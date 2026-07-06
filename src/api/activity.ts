@@ -11,26 +11,6 @@ export interface ApiActivity extends RecordModel {
   created: string
 }
 
-export async function logActivity(
-  action: 'create' | 'update' | 'delete',
-  collection: string,
-  recordId: string,
-  details: string,
-): Promise<void> {
-  try {
-    const user = getClient().authStore.model as { name?: string; email?: string } | null
-    await getClient().collection('activity_logs').create({
-      action,
-      collection,
-      record_id: recordId,
-      details,
-      user_name: user?.name ?? user?.email ?? 'System',
-    })
-  } catch {
-    // Silently fail — logging never breaks main operations
-  }
-}
-
 export async function getActivities(
   page = 1,
   perPage = 25,

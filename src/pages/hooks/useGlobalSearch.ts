@@ -19,7 +19,7 @@ const COLLECTIONS: CollectionConfig[] = [
   { name: 'households', label: 'Households', roles: ['admin', 'staff'], searchFields: ['head_name', 'household_number'], titleField: 'head_name', subtitleField: 'household_number', link: '/households' },
   { name: 'visitor_logs', label: 'Visitor Log', roles: ['admin', 'staff'], searchFields: ['visitor_name', 'purpose'], titleField: 'visitor_name', subtitleField: 'purpose', link: '/logs/visitors' },
   { name: 'assets', label: 'Assets', roles: ['admin'], searchFields: ['name', 'serial_number'], titleField: 'name', subtitleField: 'asset_type', link: '/assets' },
-  { name: 'meetings', label: 'Meetings', roles: ['admin', 'staff', 'viewer'], searchFields: ['title'], titleField: 'title', subtitleField: 'meeting_date', link: '/agenda' },
+  { name: 'meetings', label: 'Meetings', roles: ['admin', 'staff'], searchFields: ['title'], titleField: 'title', subtitleField: 'meeting_date', link: '/agenda' },
 ]
 
 export interface SearchResultItem {

@@ -1,7 +1,6 @@
 import type { RecordModel } from 'pocketbase'
 import { getClient } from './client'
 import { handleApiError } from './errorHandler'
-import { logActivity } from './activity'
 
 const COLLECTION = 'calendar_events'
 
@@ -54,7 +53,6 @@ export async function getEvent(id: string): Promise<ApiCalendarEvent> {
 export async function createEvent(data: CalendarEventData): Promise<ApiCalendarEvent> {
   try {
     const result = await getClient().collection(COLLECTION).create<ApiCalendarEvent>(data)
-    logActivity('create', COLLECTION, result.id, `Created calendar event: ${data.title}`)
     return result
   } catch (err) {
     throw handleApiError(err)
@@ -64,7 +62,6 @@ export async function createEvent(data: CalendarEventData): Promise<ApiCalendarE
 export async function updateEvent(id: string, data: Partial<CalendarEventData>): Promise<ApiCalendarEvent> {
   try {
     const result = await getClient().collection(COLLECTION).update<ApiCalendarEvent>(id, data)
-    logActivity('update', COLLECTION, id, `Updated calendar event: ${result.title}`)
     return result
   } catch (err) {
     throw handleApiError(err)
@@ -73,10 +70,8 @@ export async function updateEvent(id: string, data: Partial<CalendarEventData>):
 
 export async function deleteEvent(id: string): Promise<boolean> {
   try {
-    const event = await getClient().collection(COLLECTION).getOne<ApiCalendarEvent>(id)
-    const title = event.title
+    await getClient().collection(COLLECTION).getOne<ApiCalendarEvent>(id)
     await getClient().collection(COLLECTION).delete(id)
-    logActivity('delete', COLLECTION, id, `Deleted calendar event: ${title}`)
     return true
   } catch (err) {
     throw handleApiError(err)

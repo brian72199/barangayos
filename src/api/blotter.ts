@@ -1,7 +1,6 @@
 import type { RecordModel } from 'pocketbase'
 import { getClient } from './client'
 import { handleApiError } from './errorHandler'
-import { logActivity } from './activity'
 import type { PaginatedResult } from '@/lib/utils'
 
 const COLLECTION = 'blotter_records'
@@ -57,7 +56,6 @@ export async function getBlotter(id: string): Promise<ApiBlotter> {
 export async function createBlotter(data: BlotterData): Promise<ApiBlotter> {
   try {
     const result = await getClient().collection(COLLECTION).create<ApiBlotter>(data)
-    logActivity('create', COLLECTION, result.id, `Created blotter case: ${result.case_number}`)
     return result
   } catch (err) {
     throw handleApiError(err)
@@ -67,7 +65,6 @@ export async function createBlotter(data: BlotterData): Promise<ApiBlotter> {
 export async function updateBlotter(id: string, data: Partial<BlotterData>): Promise<ApiBlotter> {
   try {
     const result = await getClient().collection(COLLECTION).update<ApiBlotter>(id, data)
-    logActivity('update', COLLECTION, id, `Updated blotter case: ${result.case_number}`)
     return result
   } catch (err) {
     throw handleApiError(err)
@@ -77,7 +74,6 @@ export async function updateBlotter(id: string, data: Partial<BlotterData>): Pro
 export async function deleteBlotter(id: string): Promise<boolean> {
   try {
     await getClient().collection(COLLECTION).delete(id)
-    logActivity('delete', COLLECTION, id, `Deleted blotter case`)
     return true
   } catch (err) {
     throw handleApiError(err)
