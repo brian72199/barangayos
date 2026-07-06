@@ -15,7 +15,9 @@ import { hasRole } from '@/auth/session'
 import { cn, formatDate, formatDateTime } from '@/lib/utils'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { SortSelect } from '@/components/ui/SortSelect'
-import Pagination from '@/components/ui/Pagination'
+import { DataTable, type Column } from '@/components/ui/data-table'
+import { EmptyState } from '@/components/ui/empty-state'
+import { assetConditionColors, assetStatusColors } from '@/lib/statusStyles'
 
 const assetTypeOptions = [
   { value: 'equipment', label: 'Equipment' },
@@ -263,6 +265,33 @@ export default function AssetsPage() {
     setFlyoutAsset(null)
   }
 
+  const sortKey = sortBy.startsWith('-') ? sortBy.slice(1) : sortBy
+  const sortDir = sortBy.startsWith('-') ? 'desc' as const : 'asc' as const
+
+  const assetColumns: Column<ApiAsset>[] = [
+    { key: 'name', label: 'Asset Name', sortable: true,
+      render: (a) => (
+        <div className="flex items-center gap-3">
+          {a.image_url ? (
+            <img src={a.image_url} alt="" className="size-8 rounded object-cover" />
+          ) : (
+            <div className="size-8 rounded bg-muted flex items-center justify-center text-muted-foreground text-xs">NA</div>
+          )}
+          <span>{a.name}</span>
+        </div>
+      ) },
+    { key: 'asset_type', label: 'Type', sortable: true, hideBelow: 'sm' },
+    { key: 'condition', label: 'Condition',
+      render: (a) => (
+        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${assetConditionColors[a.condition] ?? ''}`}>{a.condition}</span>
+      ) },
+    { key: 'status', label: 'Status',
+      render: (a) => (
+        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${assetStatusColors[a.status] ?? ''}`}>{a.status}</span>
+      ) },
+    { key: 'assigned_to', label: 'Assigned To', render: (a) => a.assigned_to ?? '—', hideBelow: 'sm' },
+  ]
+
   return (
     <>
       <PageHeader title="Assets" subtitle="Manage barangay equipment, furniture, vehicles, and other assets.">
@@ -328,91 +357,26 @@ export default function AssetsPage() {
           <CardTitle>Asset Inventory</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
-            <div className="space-y-2 p-4 sm:p-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-4 rounded border p-3 motion-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
-                  <div className="size-10 shrink-0 animate-pulse rounded bg-muted" />
-                  <div className="h-4 w-32 flex-1 animate-pulse rounded bg-muted" />
-                  <div className="h-4 w-20 animate-pulse rounded bg-muted" />
-                  <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
-                  <div className="h-5 w-20 animate-pulse rounded-full bg-muted" />
-                  <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-                  <div className="h-8 w-14 animate-pulse rounded bg-muted" />
-                </div>
-              ))}
-            </div>
-          ) : assets.length === 0 ? (
-            <div className="flex flex-col items-center py-12 text-center">
-              <p className="text-sm text-muted-foreground">No assets yet. Add your first asset.</p>
-              {isAdmin && (
-                <Button variant="outline" size="sm" className="mt-3 gap-1.5" onClick={openCreatePanel}>
-                  <Plus className="size-3.5" />
-                  Add first asset
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b text-left text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">
-                    <th className="px-4 py-3 sm:px-6">Image</th>
-                    <th className="px-4 py-3 sm:px-6">Name</th>
-                    <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Type</th>
-                    <th className="px-4 py-3 sm:px-6">Condition</th>
-                    <th className="px-4 py-3 sm:px-6">Status</th>
-                    <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Assigned To</th>
-                  </tr>
-                </thead>
-                <tbody className={paginatedAssets.length === 0 ? 'hidden' : ''}>
-                  {paginatedAssets.map((a, i) => (
-                    <tr
-                      key={a.id}
-                      className="cursor-pointer border-b last:border-b-0 even:bg-muted/20 motion-fade-in motion-slide-up hover:bg-muted/30"
-                      style={{ '--stagger-index': i } as React.CSSProperties}
-                      onClick={() => openFlyout(a)}
-                    >
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                        {a.image_url ? (
-                          <img src={a.image_url} alt="" className="size-10 shrink-0 rounded object-cover" />
-                        ) : (
-                          <div className="flex size-10 shrink-0 items-center justify-center rounded bg-muted text-muted-foreground">
-                            <Camera className="size-4" />
-                          </div>
-                        )}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-sm font-medium text-foreground">
-                        {a.name}
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell sm:px-6 text-sm text-muted-foreground">
-                        {assetTypeOptions.find((t) => t.value === a.asset_type)?.label || a.asset_type}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                        <span className={cn('inline-flex rounded-md px-3.5 py-0.5 text-xs font-bold', conditionColors[a.condition])}>
-                          {conditionLabels[a.condition]}
-                        </span>
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                        <span className={cn('inline-flex rounded-md px-3.5 py-0.5 text-xs font-bold', statusColors[a.status ?? ''])}>
-                          {statusLabels[a.status ?? '']}
-                        </span>
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell sm:px-6 text-sm text-muted-foreground">
-                        {a.assigned_to || '\u2014'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredAssets.length === 0 && assets.length > 0 && (
-                <div className="flex flex-col items-center py-12 text-center">
-                  <p className="text-sm text-muted-foreground">No assets match your filters.</p>
-                </div>
-              )}
-              <Pagination page={page} totalPages={totalPages} totalItems={filteredAssets.length} onPageChange={setPage} pageSize={PAGE_SIZE} />
-            </div>
-          )}
+          <DataTable
+            columns={assetColumns}
+            data={paginatedAssets}
+            loading={loading}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onRowClick={(a) => openFlyout(a)}
+            emptyState={
+              <EmptyState
+                title={assets.length === 0 ? "No assets yet. Add your first asset." : "No assets match your filters."}
+                action={isAdmin && assets.length === 0 ? { label: "Add first asset", onClick: openCreatePanel } : undefined}
+              />
+            }
+            page={page}
+            totalPages={totalPages}
+            totalItems={filteredAssets.length}
+            onPageChange={setPage}
+            pageSize={PAGE_SIZE}
+            rowKey={(a) => a.id}
+          />
         </CardContent>
       </Card>
 

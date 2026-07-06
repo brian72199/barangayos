@@ -14,7 +14,9 @@ import { hasRole } from '@/auth/session'
 import { cn, formatDate, formatDateTime } from '@/lib/utils'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { SortSelect } from '@/components/ui/SortSelect'
-import Pagination from '@/components/ui/Pagination'
+import { DataTable, type Column } from '@/components/ui/data-table'
+import { EmptyState } from '@/components/ui/empty-state'
+import { documentStatusColors } from '@/lib/statusStyles'
 
 const documentTypeOptions = [
   { value: 'barangay_clearance', label: 'Barangay Clearance' },
@@ -217,6 +219,24 @@ export default function DocumentsPage() {
     setFlyoutDoc(null)
   }
 
+  const sortKey = sortBy.startsWith('-') ? sortBy.slice(1) : sortBy
+  const sortDir = sortBy.startsWith('-') ? 'desc' as const : 'asc' as const
+
+  const documentsColumns: Column<ApiDocument>[] = [
+    { key: 'control_number', label: 'Queue #', sortable: true, render: (d) => `#${d.queue_number}` },
+    { key: 'resident_name', label: 'Resident', sortable: true,
+      render: (d) => `${d.last_name ?? ''}, ${d.first_name ?? ''}` },
+    { key: 'document_type', label: 'Document Type', sortable: true, hideBelow: 'sm' },
+    { key: 'status', label: 'Status',
+      render: (d) => (
+        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${documentStatusColors[d.status] ?? ''}`}>
+          {d.status.replace(/_/g, ' ')}
+        </span>
+      ) },
+    { key: 'payment_status', label: 'Payment', hideBelow: 'sm' },
+    { key: 'created', label: 'Requested', render: (d) => d.created ? new Date(d.created).toLocaleDateString() : '', hideBelow: 'md' },
+  ]
+
   return (
     <>
       <PageHeader title="Document Queue" subtitle="Manage document requests and track processing status.">
@@ -266,86 +286,26 @@ export default function DocumentsPage() {
           <CardTitle>Request Queue</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
-            <div className="space-y-2 p-4 sm:p-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-4 rounded border p-3 motion-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
-                  <div className="h-4 w-16 flex-1 animate-pulse rounded bg-muted" />
-                  <div className="h-4 flex-1 animate-pulse rounded bg-muted" />
-                  <div className="h-5 w-24 animate-pulse rounded-full bg-muted" />
-                  <div className="h-8 w-20 animate-pulse rounded bg-muted" />
-                </div>
-              ))}
-            </div>
-          ) : docs.length === 0 ? (
-            <div className="flex flex-col items-center py-12 text-center">
-              <p className="text-sm text-muted-foreground">No document requests yet.</p>
-              {canModify && (
-                <Button variant="outline" size="sm" className="mt-3 gap-1.5" onClick={openCreatePanel}>
-                  <Plus className="size-3.5" />
-                  Create first request
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b text-left text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">
-                    <th className="px-4 py-3 sm:px-6">Queue #</th>
-                    <th className="px-4 py-3 sm:px-6">Resident</th>
-                    <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Document Type</th>
-                    <th className="px-4 py-3 sm:px-6">Status</th>
-                    <th className="hidden px-4 py-3 lg:table-cell sm:px-6">Payment</th>
-                    <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Requested</th>
-                  </tr>
-                </thead>
-                <tbody className={paginatedDocs.length === 0 ? 'hidden' : ''}>
-                  {paginatedDocs.map((d, i) => (
-                    <tr
-                      key={d.id}
-                      className="cursor-pointer border-b last:border-b-0 even:bg-muted/20 motion-fade-in motion-slide-up hover:bg-muted/30"
-                      style={{ '--stagger-index': i } as React.CSSProperties}
-                      onClick={() => setFlyoutDoc(d)}
-                    >
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-sm font-medium text-foreground">
-                        #{d.queue_number}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-sm text-foreground">
-                        {d.resident_name}
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell sm:px-6 text-sm text-muted-foreground capitalize">
-                        {d.document_type.replace(/_/g, ' ')}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                        <span className={cn('inline-flex rounded-md px-3.5 py-0.5 text-xs font-bold', statusColors[d.status])}>
-                          {statusLabels[d.status]}
-                        </span>
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 lg:table-cell sm:px-6">
-                        <span className={cn('inline-flex rounded-md px-3 py-0.5 text-xs font-bold', {
-                          'bg-amber-100 text-amber-800': d.payment_status === 'unpaid',
-                          'bg-emerald-100 text-emerald-800': d.payment_status === 'paid',
-                          'bg-muted text-muted-foreground': d.payment_status === 'waived' || !d.payment_status,
-                        })}>
-                          {d.payment_status === 'unpaid' ? 'Unpaid' : d.payment_status === 'paid' ? 'Paid' : 'Waived'}
-                        </span>
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell sm:px-6 text-sm text-muted-foreground">
-                        {formatDate(d.requested_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredDocs.length === 0 && docs.length > 0 && (
-                <div className="flex flex-col items-center py-12 text-center">
-                  <p className="text-sm text-muted-foreground">No requests match your filters.</p>
-                </div>
-              )}
-              <Pagination page={page} totalPages={totalPages} totalItems={filteredDocs.length} onPageChange={setPage} pageSize={PAGE_SIZE} />
-            </div>
-          )}
+          <DataTable
+            columns={documentsColumns}
+            data={paginatedDocs}
+            loading={loading}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onRowClick={(d) => setFlyoutDoc(d)}
+            emptyState={
+              <EmptyState
+                title={docs.length === 0 ? "No document requests yet." : "No requests match your filters."}
+                action={canModify && docs.length === 0 ? { label: "Create first request", onClick: openCreatePanel } : undefined}
+              />
+            }
+            page={page}
+            totalPages={totalPages}
+            totalItems={filteredDocs.length}
+            onPageChange={setPage}
+            pageSize={PAGE_SIZE}
+            rowKey={(d) => d.id}
+          />
         </CardContent>
       </Card>
 

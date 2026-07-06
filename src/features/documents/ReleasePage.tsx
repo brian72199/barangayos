@@ -9,7 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { cn } from '@/lib/utils'
+import { DataTable, type Column } from '@/components/ui/data-table'
+import { EmptyState } from '@/components/ui/empty-state'
+import { documentStatusColors } from '@/lib/statusStyles'
 
 const statusColors: Record<string, string> = {
   pending: 'bg-amber-200 text-amber-900 border border-amber-400 dark:bg-amber-900/50 dark:text-amber-300 dark:border-amber-800/30',
@@ -144,6 +146,27 @@ export default function ReleasePage() {
     }
   }
 
+  const releaseColumns: Column<ApiDocument>[] = [
+    { key: 'control_number', label: 'Control #', sortable: true, render: (d) => `#${d.queue_number}` },
+    { key: 'resident_name', label: 'Resident', sortable: true,
+      render: (d) => `${d.last_name ?? ''}, ${d.first_name ?? ''}` },
+    { key: 'document_type', label: 'Type', hideBelow: 'sm' },
+    { key: 'purpose', label: 'Purpose' },
+    { key: 'status', label: 'Status',
+      render: (d) => (
+        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${documentStatusColors[d.status] ?? ''}`}>
+          {d.status.replace(/_/g, ' ')}
+        </span>
+      ) },
+    { key: 'actions', label: '', className: 'w-24 text-right',
+      render: (d) => (
+        <Button size="sm" className="gap-1.5" onClick={(e) => { e.stopPropagation(); openReleaseDialog(d) }}>
+          {d.payment_status === 'unpaid' ? <DollarSign className="size-3.5" /> : <Check className="size-3.5" />}
+          {d.payment_status === 'unpaid' ? 'Collect' : 'Release'}
+        </Button>
+      ) },
+  ]
+
   return (
     <>
       <PageHeader title="Document Release" subtitle="Release completed documents to residents." />
@@ -180,85 +203,18 @@ export default function ReleasePage() {
           <CardTitle>For Release</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
-            <div className="space-y-2 p-4 sm:p-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-4 rounded border p-3 motion-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
-                  <div className="h-4 w-16 animate-pulse rounded bg-muted" />
-                  <div className="h-4 flex-1 animate-pulse rounded bg-muted" />
-                  <div className="h-8 w-20 animate-pulse rounded bg-muted" />
-                </div>
-              ))}
-            </div>
-          ) : forRelease.length === 0 ? (
-            <div className="flex flex-col items-center py-12 text-center">
-              <p className="text-sm text-muted-foreground">No documents ready for release.</p>
-              <p className="mt-1 text-xs text-muted-foreground/70">Documents marked as "For Release" in the Document Queue will appear here.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b text-left text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">
-                    <th className="px-4 py-3 sm:px-6">Queue #</th>
-                    <th className="px-4 py-3 sm:px-6">Resident</th>
-                    <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Document Type</th>
-                    <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Status</th>
-                    <th className="hidden px-4 py-3 lg:table-cell sm:px-6">Payment</th>
-                    <th className="px-4 py-3 sm:px-6 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className={filteredRelease.length === 0 ? 'hidden' : ''}>
-                  {filteredRelease.map((d, i) => (
-                    <tr
-                      key={d.id}
-                      className="border-b last:border-b-0 even:bg-muted/20 motion-fade-in motion-slide-up"
-                      style={{ '--stagger-index': i } as React.CSSProperties}
-                    >
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-sm font-medium text-foreground">
-                        #{d.queue_number}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-sm text-foreground">
-                        {d.resident_name}
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell sm:px-6 text-sm capitalize text-muted-foreground">
-                        {d.document_type.replace(/_/g, ' ')}
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell sm:px-6">
-                        <span className={cn('inline-flex rounded-md px-3.5 py-0.5 text-xs font-bold', statusColors[d.status])}>
-                          {statusLabels[d.status]}
-                        </span>
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 lg:table-cell sm:px-6">
-                        <span className={cn('inline-flex rounded-md px-3 py-0.5 text-xs font-bold', {
-                          'bg-amber-100 text-amber-800': d.payment_status === 'unpaid',
-                          'bg-emerald-100 text-emerald-800': d.payment_status === 'paid',
-                          'bg-muted text-muted-foreground': d.payment_status === 'waived' || !d.payment_status,
-                        })}>
-                          {d.payment_status === 'unpaid' ? 'Unpaid' : d.payment_status === 'paid' ? 'Paid' : 'Waived'}
-                        </span>
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-right">
-                        <Button
-                          size="sm"
-                          className="gap-1.5"
-                          onClick={() => openReleaseDialog(d)}
-                        >
-                          {d.payment_status === 'unpaid' ? <DollarSign className="size-3.5" /> : <Check className="size-3.5" />}
-                          {d.payment_status === 'unpaid' ? 'Collect' : 'Release'}
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredRelease.length === 0 && forRelease.length > 0 && (
-                <div className="flex flex-col items-center py-12 text-center">
-                  <p className="text-sm text-muted-foreground">No documents match your search.</p>
-                </div>
-              )}
-            </div>
-          )}
+          <DataTable
+            columns={releaseColumns}
+            data={filteredRelease}
+            loading={loading}
+            emptyState={
+              <EmptyState
+                title={forRelease.length === 0 ? "No documents ready for release." : "No documents match your search."}
+                description={forRelease.length === 0 ? 'Documents marked as "For Release" in the Document Queue will appear here.' : undefined}
+              />
+            }
+            rowKey={(d) => d.id}
+          />
         </CardContent>
       </Card>
 

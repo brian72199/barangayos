@@ -12,6 +12,9 @@ import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { hasRole } from '@/auth/session'
 import { cn, formatDate } from '@/lib/utils'
+import { DataTable, type Column } from '@/components/ui/data-table'
+import { EmptyState } from '@/components/ui/empty-state'
+import { meetingStatusColors, agendaStatusColors } from '@/lib/statusStyles'
 
 const meetingTypeOptions = [
   { value: 'regular', label: 'Regular' },
@@ -47,11 +50,7 @@ const agendaStatusLabels: Record<string, string> = {
   deferred: 'Deferred',
 }
 
-const agendaStatusColors: Record<string, string> = {
-  pending: 'bg-amber-200 text-amber-900 border border-amber-400 dark:bg-amber-900/50 dark:text-amber-300 dark:border-amber-800/30',
-  discussed: 'bg-emerald-200 text-emerald-900 border border-emerald-400 dark:bg-emerald-900/50 dark:text-emerald-300 dark:border-emerald-800/30',
-  deferred: 'bg-blue-200 text-blue-900 border border-blue-400 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-800/30',
-}
+
 
 function minutesStatus(items: ApiAgendaItem[]) {
   const filled = items.filter((i) => i.minutes && i.minutes.trim()).length
@@ -323,6 +322,33 @@ export default function AgendaPage() {
 
   const isAdmin = hasRole('admin')
 
+  const meetingColumns: Column<ApiMeeting>[] = [
+    { key: 'title', label: 'Title', sortable: true },
+    { key: 'date', label: 'Date', sortable: true, render: (m) => m.meeting_date ? new Date(m.meeting_date).toLocaleDateString() : '', hideBelow: 'sm' },
+    { key: 'meeting_type', label: 'Type' },
+    { key: 'status', label: 'Status',
+      render: (m) => (
+        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${meetingStatusColors[m.status] ?? ''}`}>{m.status}</span>
+      ) },
+  ]
+
+  const agendaItemColumns: Column<ApiAgendaItem>[] = [
+    { key: 'sort_order', label: '#' },
+    { key: 'title', label: 'Title' },
+    { key: 'status', label: 'Status',
+      render: (a) => (
+        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${agendaStatusColors[a.status] ?? ''}`}>{a.status}</span>
+      ) },
+    { key: 'minutes', label: 'Minutes', render: (a) => a.minutes ?? '—', hideBelow: 'sm' },
+    { key: 'actions', label: '', className: 'w-16',
+      render: (a) => (isAdmin ? (
+        <div className="flex items-center gap-1">
+          <button onClick={(e) => { e.stopPropagation(); openEditItemPanel(a) }} className="p-1 rounded hover:bg-muted" title="Edit"><Pencil className="size-3.5" /></button>
+          <button onClick={(e) => { e.stopPropagation(); handleDeleteItem(a.id) }} className="p-1 rounded hover:bg-muted" title="Delete"><Trash2 className="size-3.5" /></button>
+        </div>
+      ) : null) },
+  ]
+
   return (
     <>
       {selectedMeeting ? (
@@ -384,105 +410,18 @@ export default function AgendaPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            {detailLoading ? (
-              <div className="space-y-2 p-4 sm:p-6">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-4 rounded border p-3 motion-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
-                    <div className="h-4 w-8 animate-pulse rounded bg-muted" />
-                    <div className="h-4 w-40 flex-1 animate-pulse rounded bg-muted" />
-                    <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
-                    <div className="h-4 w-32 animate-pulse rounded bg-muted" />
-                    <div className="h-8 w-14 animate-pulse rounded bg-muted" />
-                  </div>
-                ))}
-              </div>
-            ) : selectedMeeting.agendaItems.length === 0 ? (
-              <div className="flex flex-col items-center py-12 text-center">
-                <p className="text-sm text-muted-foreground">No agenda items yet. Add the first item.</p>
-                {isAdmin && (
-                  <Button variant="outline" size="sm" className="mt-3 gap-1.5" onClick={openCreateItemPanel}>
-                    <Plus className="size-3.5" />
-                    Add first item
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b text-left text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">
-                      <th className="w-12 px-4 py-3 sm:px-6">#</th>
-                      <th className="px-4 py-3 sm:px-6">Title</th>
-                      <th className="px-4 py-3 sm:px-6">Status</th>
-                      <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Minutes</th>
-                      <th className="px-4 py-3 sm:px-6 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedMeeting.agendaItems.map((item, i) => (
-                      <tr
-                        key={item.id}
-                        className="border-b last:border-b-0 even:bg-muted/20 motion-fade-in motion-slide-up"
-                        style={{ '--stagger-index': i } as React.CSSProperties}
-                      >
-                        <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-sm text-muted-foreground">
-                          {item.sort_order ?? i + 1}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                          <div className="text-sm font-medium text-foreground">{item.title}</div>
-                          {item.description && (
-                            <div className="mt-0.5 text-xs text-muted-foreground">{item.description}</div>
-                          )}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                          <span className={cn('inline-flex rounded-md px-3.5 py-0.5 text-xs font-bold', agendaStatusColors[item.status])}>
-                            {agendaStatusLabels[item.status]}
-                          </span>
-                        </td>
-                        <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell sm:px-6 text-sm text-muted-foreground">
-                          {item.minutes && item.minutes.trim() ? (
-                            <span title={item.minutes}>
-                              {item.minutes.length > 60 ? item.minutes.slice(0, 60) + '...' : item.minutes}
-                              {item.submitted_by && (
-                                <span className="ml-1 text-xs text-muted-foreground/60">&mdash; {item.submitted_by}</span>
-                              )}
-                            </span>
-                          ) : selectedMeeting.status === 'scheduled' ? (
-                            <span className="italic text-muted-foreground/50">Pending meeting</span>
-                          ) : (
-                            <span className="italic text-muted-foreground/50">Fill minutes</span>
-                          )}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-right">
-                          {isAdmin && (
-                            <div className="flex justify-end gap-1">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="size-7 p-0"
-                                onClick={() => openEditItemPanel(item)}
-                                aria-label="Edit"
-                              >
-                                <Pencil className="size-3" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="size-7 p-0 text-muted-foreground hover:text-destructive"
-                                onClick={() => handleDeleteItem(item.id)}
-                                aria-label="Delete"
-                              >
-                                <Trash2 className="size-3" />
-                              </Button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <DataTable
+              columns={agendaItemColumns}
+              data={selectedMeeting.agendaItems}
+              loading={detailLoading}
+              emptyState={
+                <EmptyState
+                  title="No agenda items yet. Add the first item."
+                  action={isAdmin ? { label: "Add first item", onClick: openCreateItemPanel } : undefined}
+                />
+              }
+              rowKey={(a) => a.id}
+            />
           </CardContent>
         </Card>
 
@@ -530,75 +469,19 @@ export default function AgendaPage() {
           <CardTitle>All Meetings</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
-            <div className="space-y-2 p-4 sm:p-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-4 rounded border p-3 motion-fade-in" style={{ animationDelay: `${i * 50}ms` }}>
-                  <div className="h-4 w-48 flex-1 animate-pulse rounded bg-muted" />
-                  <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-                  <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
-                  <div className="h-5 w-20 animate-pulse rounded-full bg-muted" />
-                </div>
-              ))}
-            </div>
-          ) : meetings.length === 0 ? (
-            <div className="flex flex-col items-center py-12 text-center">
-              <p className="text-sm text-muted-foreground">No meetings yet. Schedule your first meeting.</p>
-              {isAdmin && (
-                <Button variant="outline" size="sm" className="mt-3 gap-1.5" onClick={openCreateMeetingPanel}>
-                  <Plus className="size-3.5" />
-                  Schedule first meeting
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b text-left text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">
-                    <th className="px-4 py-3 sm:px-6">Title</th>
-                    <th className="hidden px-4 py-3 sm:table-cell sm:px-6">Date</th>
-                    <th className="px-4 py-3 sm:px-6">Type</th>
-                    <th className="px-4 py-3 sm:px-6">Status</th>
-
-                  </tr>
-                </thead>
-                <tbody className={filteredMeetings.length === 0 ? 'hidden' : ''}>
-                  {filteredMeetings.map((m, i) => (
-                    <tr
-                      key={m.id}
-                      className="cursor-pointer border-b last:border-b-0 even:bg-muted/20 motion-fade-in motion-slide-up hover:bg-muted/40"
-                      style={{ '--stagger-index': i } as React.CSSProperties}
-                      onClick={() => openMeetingDetail(m.id)}
-                    >
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6 text-sm font-medium text-foreground">
-                        {m.title}
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell sm:px-6 text-sm text-muted-foreground">
-                        {fmtDate(m.meeting_date)}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                        <span className={cn('inline-flex rounded-md px-3.5 py-0.5 text-xs font-bold', meetingTypeColors[m.meeting_type])}>
-                          {meetingTypeOptions.find((t) => t.value === m.meeting_type)?.label || m.meeting_type}
-                        </span>
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 sm:px-6">
-                        <span className={cn('inline-flex rounded-md px-3.5 py-0.5 text-xs font-bold', statusColors[m.status])}>
-                          {statusLabels[m.status]}
-                        </span>
-                      </td>
-
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredMeetings.length === 0 && meetings.length > 0 && (
-                <div className="flex flex-col items-center py-12 text-center">
-                  <p className="text-sm text-muted-foreground">No meetings match your filters.</p>
-                </div>
-              )}
-            </div>
-          )}
+          <DataTable
+            columns={meetingColumns}
+            data={filteredMeetings}
+            loading={loading}
+            onRowClick={(m) => openMeetingDetail(m.id)}
+            emptyState={
+              <EmptyState
+                title={meetings.length === 0 ? "No meetings yet. Schedule your first meeting." : "No meetings match your filters."}
+                action={isAdmin && meetings.length === 0 ? { label: "Schedule first meeting", onClick: openCreateMeetingPanel } : undefined}
+              />
+            }
+            rowKey={(m) => m.id}
+          />
         </CardContent>
       </Card>
 
