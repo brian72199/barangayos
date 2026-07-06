@@ -56,6 +56,8 @@ export const tagColors: Record<string, string> = {
 }
 
 export const appropriationStatusColors: Record<string, string> = {
-  active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-  closed: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300',
+  pending: 'bg-amber-200 text-amber-900 border border-amber-400 dark:bg-amber-900/50 dark:text-amber-300 dark:border-amber-800/30',
+  obligated: 'bg-blue-200 text-blue-900 border border-blue-400 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/30',
+  partially_disbursed: 'bg-purple-200 text-purple-900 border border-purple-400 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800/30',
+  fully_disbursed: 'bg-emerald-200 text-emerald-900 border border-emerald-400 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800/30',
 }
