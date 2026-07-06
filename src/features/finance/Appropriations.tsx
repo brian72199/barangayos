@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, DollarSign, BookOpen, Calendar, FileText, Building, Receipt, Database, ArrowRight, Download } from 'lucide-react'
+import { DollarSign, BookOpen, Calendar, FileText, Building, Receipt, Database, ArrowRight, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

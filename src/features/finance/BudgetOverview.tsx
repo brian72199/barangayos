@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { DollarSign } from 'lucide-react'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Breadcrumb } from '@/components/ui/breadcrumb'
 import { FiscalYearSelector } from '@/components/finance/FiscalYearSelector'
@@ -7,7 +6,6 @@ import { ExpenseClassCard } from '@/components/finance/ExpenseClassCard'
 import { ComplianceWarning } from '@/components/finance/ComplianceWarning'
 import { KpiChart } from '@/components/finance/KpiChart'
 import { getAppropriations, type ApiAppropriation } from '@/api/appropriations'
-import { getFundSources, type ApiFundSource } from '@/api/fundSources'
 import { getIncomeAccounts, type ApiIncomeAccount } from '@/api/incomeAccounts'
 import { getDisbursements, type ApiDisbursement } from '@/api/disbursements'
 import { getRevenues, type ApiRevenue } from '@/api/revenues'
@@ -38,25 +36,20 @@ function aggregateDaily<T extends { amount: number }>(
 export function BudgetOverview() {
   const [year, setYear] = useState(new Date().getFullYear())
   const [appropriations, setAppropriations] = useState<ApiAppropriation[]>([])
-  const [fundSources, setFundSources] = useState<ApiFundSource[]>([])
   const [incomeAccounts, setIncomeAccounts] = useState<ApiIncomeAccount[]>([])
   const [disbursements, setDisbursements] = useState<ApiDisbursement[]>([])
   const [revenues, setRevenues] = useState<ApiRevenue[]>([])
-  const [loading, setLoading] = useState(true)
   const [complianceWarnings, setComplianceWarnings] = useState<ComplianceWarningItem[]>([])
 
   async function load() {
-    setLoading(true)
     try {
-      const [apprs, funds, accts, disc, revs] = await Promise.all([
+      const [apprs, accts, disc, revs] = await Promise.all([
         getAppropriations(year),
-        getFundSources(year),
         getIncomeAccounts(year),
         getDisbursements(),
         getRevenues(),
       ])
       setAppropriations(apprs)
-      setFundSources(funds)
       setIncomeAccounts(accts)
       setDisbursements(disc)
       setRevenues(revs)
@@ -67,7 +60,6 @@ export function BudgetOverview() {
         setComplianceWarnings([])
       }
     } catch (_) {}
-    setLoading(false)
   }
 
   useEffect(() => { load() }, [year])
@@ -77,24 +69,20 @@ export function BudgetOverview() {
   const coItems = appropriations.filter((a) => a.expense_class === 'CO')
 
   const psAppropriated = psItems.reduce((s, a) => s + a.appropriated_amount, 0)
-  const psObligated = psItems.reduce((s, a) => s + (a.obligated_amount || 0), 0)
   const psDisbursed = psItems.reduce((s, a) => s + (a.disbursed_amount || 0), 0)
   const mooeAppropriated = mooeItems.reduce((s, a) => s + a.appropriated_amount, 0)
-  const mooeObligated = mooeItems.reduce((s, a) => s + (a.obligated_amount || 0), 0)
   const mooeDisbursed = mooeItems.reduce((s, a) => s + (a.disbursed_amount || 0), 0)
   const coAppropriated = coItems.reduce((s, a) => s + a.appropriated_amount, 0)
-  const coObligated = coItems.reduce((s, a) => s + (a.obligated_amount || 0), 0)
   const coDisbursed = coItems.reduce((s, a) => s + (a.disbursed_amount || 0), 0)
 
   const totalAppropriated = psAppropriated + mooeAppropriated + coAppropriated
-  const totalObligated = psObligated + mooeObligated + coObligated
   const totalDisbursed = psDisbursed + mooeDisbursed + coDisbursed
   const totalIncome = incomeAccounts.reduce((s, a) => s + a.budgeted_amount, 0)
 
   const disbursementTrend = aggregateDaily(disbursements, 'disbursement_date')
   const revenueTrend = aggregateDaily(revenues, 'revenue_date')
   const utilizationData = buildDateRange(30).map((date) => {
-    const rate = totalDisbursed > 0 && totalObligated > 0 ? Math.round((totalDisbursed / totalObligated) * 100) : 0
+    const rate = totalAppropriated > 0 ? Math.round((totalDisbursed / totalAppropriated) * 100) : 0
     return { date, value: rate }
   })
 
@@ -113,7 +101,6 @@ export function BudgetOverview() {
         {[
           { label: 'Total Income', value: totalIncome },
           { label: 'Appropriated', value: totalAppropriated },
-          { label: 'Obligated', value: totalObligated },
           { label: 'Disbursed', value: totalDisbursed },
           { label: 'Balance', value: totalAppropriated - totalDisbursed },
         ].map((s) => (
@@ -125,9 +112,9 @@ export function BudgetOverview() {
       </div>
       <ComplianceWarning warnings={complianceWarnings} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <ExpenseClassCard title="PS (Personnel Services)" appropriated={psAppropriated} obligated={psObligated} disbursed={psDisbursed} itemCount={psItems.length} />
-        <ExpenseClassCard title="MOOE (Maintenance & Other Operating Expenses)" appropriated={mooeAppropriated} obligated={mooeObligated} disbursed={mooeDisbursed} itemCount={mooeItems.length} />
-        <ExpenseClassCard title="CO (Capital Outlay)" appropriated={coAppropriated} obligated={coObligated} disbursed={coDisbursed} itemCount={coItems.length} />
+        <ExpenseClassCard title="PS (Personnel Services)" appropriated={psAppropriated} obligated={psDisbursed} disbursed={psDisbursed} itemCount={psItems.length} />
+        <ExpenseClassCard title="MOOE (Maintenance & Other Operating Expenses)" appropriated={mooeAppropriated} obligated={mooeDisbursed} disbursed={mooeDisbursed} itemCount={mooeItems.length} />
+        <ExpenseClassCard title="CO (Capital Outlay)" appropriated={coAppropriated} obligated={coDisbursed} disbursed={coDisbursed} itemCount={coItems.length} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <KpiChart title="Disbursements (30 days)" type="bar" data={disbursementTrend} color="#C9953E" format="currency" />

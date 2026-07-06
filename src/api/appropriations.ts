@@ -12,7 +12,6 @@ export interface AppropriationData {
   expense_class?: 'PS' | 'MOOE' | 'CO'
   item_name?: string
   appropriated_amount?: number
-  obligated_amount?: number
   disbursed_amount?: number
   payee?: string
   obligated_date?: string
@@ -27,7 +26,6 @@ export interface ApiAppropriation extends RecordModel {
   expense_class: 'PS' | 'MOOE' | 'CO'
   item_name: string
   appropriated_amount: number
-  obligated_amount: number
   disbursed_amount: number
   payee: string
   obligated_date: string
@@ -42,7 +40,7 @@ export interface ApiAppropriation extends RecordModel {
 export async function getAppropriations(fiscalYear?: number): Promise<ApiAppropriation[]> {
   try {
     const filter = fiscalYear ? `fiscal_year=${fiscalYear}` : ''
-    return await getClient().collection(COLLECTION).getFullList({ filter, sort: '-created', expand: 'fund_source' })
+    return await getClient().collection(COLLECTION).getFullList({ filter, sort: '-id', expand: 'fund_source' })
   } catch (e) { throw handleApiError(e) }
 }
 
@@ -68,7 +66,6 @@ export async function createAppropriation(data: AppropriationData): Promise<ApiA
   try {
     const result = await getClient().collection<ApiAppropriation>(COLLECTION).create({
       ...data,
-      obligated_amount: 0,
       disbursed_amount: 0,
     })
     createFinanceAuditLog('create', COLLECTION, result.id, `created appropriations: ${result.item_name}`, result.appropriated_amount)

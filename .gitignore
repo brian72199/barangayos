@@ -49,6 +49,7 @@ pb_out.txt
 
 # AI agent / tooling artifacts
 .superpowers/
+.opencode/
 
 # Infrastructure config
 litestream.yml

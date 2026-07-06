@@ -28,6 +28,12 @@ self.addEventListener('fetch', (e) => {
   const { request } = e
   const url = new URL(request.url)
 
+  // Only cache GET requests
+  if (request.method !== 'GET') {
+    e.respondWith(fetch(request).catch(() => new Response(null, { status: 503 })))
+    return
+  }
+
   // API calls — network first, fallback to cache
   if (url.pathname.startsWith('/api/') || url.port === '8090') {
     e.respondWith(

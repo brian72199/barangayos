@@ -10,7 +10,6 @@ import { createEvent } from '@/api/calendar'
 import { createIncomeAccount } from '@/api/incomeAccounts'
 import { createFundSource } from '@/api/fundSources'
 import { createAppropriation } from '@/api/appropriations'
-import { createObligation } from '@/api/obligations'
 import { createDisbursement } from '@/api/disbursements'
 import { createRevenue } from '@/api/revenues'
 import { getClient } from '@/api/client'
@@ -33,7 +32,6 @@ export const AVAILABLE_COLLECTIONS: CollectionDef[] = [
   { id: 'income_accounts', label: 'Income Accounts' },
   { id: 'fund_sources', label: 'Fund Sources' },
   { id: 'appropriations', label: 'Appropriations' },
-  { id: 'obligations', label: 'Obligations' },
   { id: 'disbursements', label: 'Disbursements' },
   { id: 'revenues', label: 'Revenues' },
 ]
@@ -591,9 +589,7 @@ export async function seedCollections(
           expense_class: item.class,
           item_name: item.name,
           appropriated_amount: item.amount,
-          obligated_amount: 0,
           disbursed_amount: 0,
-          status: 'active',
         })
         appropriationIds.push(created.id)
         total++
@@ -603,47 +599,21 @@ export async function seedCollections(
     }
   }
 
-  if (seedSet.has('obligations') && appropriationIds.length > 0) {
-    onProgress('Seeding obligations...')
-    const obligationCount = Math.min(15, appropriationIds.length * 2)
-    for (let i = 0; i < obligationCount; i++) {
-      try {
-        const apprId = pick(appropriationIds)
-        const amt = Math.floor(2000 + Math.random() * 50000)
-        await createObligation({
-          appropriation: apprId,
-          obligation_date: randomDate(60),
-          payee: pick(PAYEES),
-          particulars: `Obligation for barangay expenses — ${pick(MOOE_ITEMS)}`,
-          amount: amt,
-          disbursed_amount: 0,
-          status: 'pending',
-        })
-        total++
-      } catch (e) {
-        errors.push(`Obligation ${i + 1}: ${extractError(e)}`)
-      }
-    }
-  }
-
-  if (seedSet.has('disbursements')) {
+  if (seedSet.has('disbursements') && appropriationIds.length > 0) {
     onProgress('Seeding disbursements...')
-    const pb = getClient()
-    let obligationRecords: { id: string; amount: number }[] = []
-    try {
-      obligationRecords = await pb.collection('obligations').getFullList<{ id: string; amount: number }>({ requestKey: null })
-    } catch { }
-    const dispCount = Math.min(10, obligationRecords.length)
+    const dispCount = Math.min(15, appropriationIds.length)
     for (let i = 0; i < dispCount; i++) {
       try {
-        const obl = obligationRecords[i]
+        const apprId = pick(appropriationIds)
+        const dispAmt = Math.floor(2000 + Math.random() * 30000)
         await createDisbursement({
-          obligation: obl.id,
+          appropriation: apprId,
+          payee: pick(PAYEES),
           disbursement_date: randomDate(30),
-          amount: Math.floor(obl.amount * 0.5),
+          amount: dispAmt,
           check_no: `CKB-${String(i + 1).padStart(5, '0')}`,
           or_no: `OR-${String(i + 1).padStart(5, '0')}`,
-          particular: 'Partial disbursement for obligated expense',
+          particular: 'Disbursement for barangay expenses',
         })
         total++
       } catch (e) {
@@ -693,7 +663,6 @@ export async function eraseCollections(
     { id: 'calendar', collection: 'calendar_events' },
     { id: 'revenues', collection: 'revenues' },
     { id: 'disbursements', collection: 'disbursements' },
-    { id: 'obligations', collection: 'obligations' },
     { id: 'appropriations', collection: 'appropriations' },
     { id: 'fund_sources', collection: 'fund_sources' },
     { id: 'income_accounts', collection: 'income_accounts' },

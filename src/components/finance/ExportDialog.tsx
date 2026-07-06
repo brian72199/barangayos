@@ -67,7 +67,7 @@ export function ExportDialog({ open, onClose, title, columns, fetchData, filenam
       })
 
       if (data.length > 0) {
-        sheet.autoFilter = { from: { row: 1, col: 1 }, to: { row: data.length + 1, col: columns.length } }
+        sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: data.length + 1, column: columns.length } }
       }
 
       const buffer = await workbook.xlsx.writeBuffer()

@@ -24,7 +24,7 @@ export function KpiChart({ title, type, data, color = '#C9953E', format }: KpiCh
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} stroke="hsl(var(--muted-foreground))" />
               <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => formatVal(v, format)} stroke="hsl(var(--muted-foreground))" />
-              <Tooltip formatter={(v: number) => [formatVal(v, format), title]} labelFormatter={(l) => l} />
+              <Tooltip formatter={(v) => [formatVal(v as number, format), title]} labelFormatter={(l) => l} />
               <Bar dataKey="value" fill={color} radius={[4, 4, 0, 0]} />
             </BarChart>
           ) : (
@@ -32,7 +32,7 @@ export function KpiChart({ title, type, data, color = '#C9953E', format }: KpiCh
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} stroke="hsl(var(--muted-foreground))" />
               <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => formatVal(v, format)} stroke="hsl(var(--muted-foreground))" />
-              <Tooltip formatter={(v: number) => [formatVal(v, format), title]} labelFormatter={(l) => l} />
+              <Tooltip formatter={(v) => [formatVal(v as number, format), title]} labelFormatter={(l) => l} />
               <Line type="monotone" dataKey="value" stroke={color} strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
           )}
