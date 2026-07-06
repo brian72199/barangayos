@@ -5,16 +5,18 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
+import { DataTable, type Column } from '@/components/ui/data-table'
 import { FiscalYearSelector } from '@/components/finance/FiscalYearSelector'
 import { ExpenseClassCard } from '@/components/finance/ExpenseClassCard'
 import { ComplianceWarning } from '@/components/finance/ComplianceWarning'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
-import Pagination from '@/components/ui/Pagination'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { getAppropriations, createAppropriation, updateAppropriation, deleteAppropriation, type ApiAppropriation, type AppropriationData } from '@/api/appropriations'
 import { getFundSources, type ApiFundSource } from '@/api/fundSources'
 import { getIncomeAccounts, type ApiIncomeAccount } from '@/api/incomeAccounts'
 import { getFinanceConfig, type ComplianceWarningItem } from '@/api/settings'
+import { appropriationStatusColors } from '@/lib/statusStyles'
 
 export function BudgetOverview() {
   const [year, setYear] = useState(new Date().getFullYear())
@@ -113,6 +115,26 @@ export function BudgetOverview() {
   const totalPages = Math.ceil(allItems.length / PAGE_SIZE)
   const paginatedItems = allItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
+  const columns: Column<ApiAppropriation>[] = [
+    { key: 'item_name', label: 'Item Name', sortable: true },
+    { key: 'fund_source', label: 'Fund Source', sortable: true, hideBelow: 'sm',
+      render: (a) => a.expand?.fund_source?.name ?? a.fund_source ?? '—' },
+    { key: 'classification', label: 'Class', hideBelow: 'sm',
+      render: (a) => <span className="text-xs bg-primary/10 px-2 py-0.5 rounded">{a.expense_class}</span> },
+    { key: 'appropriated_amount', label: 'Appropriated',
+      render: (a) => `₱${Number(a.appropriated_amount).toLocaleString()}` },
+    { key: 'obligated_amount', label: 'Obligated',
+      render: (a) => `₱${Number(a.obligated_amount).toLocaleString()}` },
+    { key: 'disbursed_amount', label: 'Disbursed',
+      render: (a) => `₱${Number(a.disbursed_amount).toLocaleString()}` },
+    { key: 'balance', label: 'Balance',
+      render: (a) => `₱${(Number(a.appropriated_amount) - Number(a.disbursed_amount)).toLocaleString()}` },
+    { key: 'status', label: 'Status',
+      render: (a) => (
+        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${appropriationStatusColors[a.status] ?? ''}`}>{a.status ?? 'active'}</span>
+      ) },
+  ]
+
   return (
     <div>
       <PageHeader title="Budget Overview">
@@ -121,6 +143,10 @@ export function BudgetOverview() {
           <Button onClick={() => { setEditId(null); setForm({ fiscal_year: year, fund_source: '', expense_class: 'MOOE', item_name: '', appropriated_amount: 0, status: 'active', notes: '' }); setShowForm(true) }}>+ Add Appropriation</Button>
         </div>
       </PageHeader>
+      <Breadcrumb items={[
+        { href: '/finance/budget', label: 'Finance' },
+        { label: 'Budget Overview' },
+      ]} className="mb-4" />
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
         {[
           { label: 'Total Income', value: totalIncome },
@@ -136,51 +162,26 @@ export function BudgetOverview() {
         ))}
       </div>
       <ComplianceWarning warnings={complianceWarnings} />
-      {loading ? (
-        <p className="text-muted-foreground">Loading...</p>
-      ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <ExpenseClassCard title="PS (Personnel Services)" appropriated={psAppropriated} obligated={psObligated} disbursed={psDisbursed} itemCount={psItems.length} />
-            <ExpenseClassCard title="MOOE (Maintenance & Other Operating Expenses)" appropriated={mooeAppropriated} obligated={mooeObligated} disbursed={mooeDisbursed} itemCount={mooeItems.length} />
-            <ExpenseClassCard title="CO (Capital Outlay)" appropriated={coAppropriated} obligated={coObligated} disbursed={coDisbursed} itemCount={coItems.length} />
-          </div>
-          <div className="border rounded-lg overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50">
-                <tr className="text-left text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">
-                  <th className="p-3">Item Name</th>
-                  <th className="p-3">Fund Source</th>
-                  <th className="p-3">Class</th>
-                  <th className="text-right p-3">Appropriated</th>
-                  <th className="text-right p-3">Obligated</th>
-                  <th className="text-right p-3">Disbursed</th>
-                  <th className="text-right p-3">Balance</th>
-                  <th className="p-3">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedItems.map((a) => (
-                  <tr key={a.id} className="cursor-pointer border-b last:border-b-0 even:bg-muted/20 motion-fade-in motion-slide-up hover:bg-muted/30" onClick={() => setFlyout(a)}>
-                    <td className="p-3 font-medium">{a.item_name}</td>
-                    <td className="p-3 text-muted-foreground">{a.expand?.fund_source?.name || '—'}</td>
-                    <td className="p-3"><span className="text-xs bg-primary/10 px-2 py-0.5 rounded">{a.expense_class}</span></td>
-                    <td className="p-3 text-right">₱{a.appropriated_amount.toLocaleString()}</td>
-                    <td className="p-3 text-right">₱{a.obligated_amount.toLocaleString()}</td>
-                    <td className="p-3 text-right">₱{a.disbursed_amount.toLocaleString()}</td>
-                    <td className="p-3 text-right">₱{(a.appropriated_amount - a.disbursed_amount).toLocaleString()}</td>
-                    <td className="p-3">
-                      <span className={`text-xs px-2 py-0.5 rounded ${a.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}>{a.status}</span>
-                    </td>
-                  </tr>
-                ))}
-                {allItems.length === 0 && <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">No appropriations for {year}</td></tr>}
-              </tbody>
-            </table>
-          </div>
-          <Pagination page={page} totalPages={totalPages} totalItems={allItems.length} onPageChange={setPage} pageSize={PAGE_SIZE} />
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <ExpenseClassCard title="PS (Personnel Services)" appropriated={psAppropriated} obligated={psObligated} disbursed={psDisbursed} itemCount={psItems.length} />
+          <ExpenseClassCard title="MOOE (Maintenance & Other Operating Expenses)" appropriated={mooeAppropriated} obligated={mooeObligated} disbursed={mooeDisbursed} itemCount={mooeItems.length} />
+          <ExpenseClassCard title="CO (Capital Outlay)" appropriated={coAppropriated} obligated={coObligated} disbursed={coDisbursed} itemCount={coItems.length} />
         </div>
-      )}
+        <DataTable
+          columns={columns}
+          data={paginatedItems}
+          loading={loading}
+          onRowClick={(a) => setFlyout(a)}
+          emptyState={<p className="text-center text-muted-foreground py-6">No appropriations for {year}</p>}
+          page={page}
+          totalPages={totalPages}
+          totalItems={allItems.length}
+          onPageChange={setPage}
+          pageSize={PAGE_SIZE}
+          rowKey={(a) => a.id}
+        />
+      </div>
       <DetailPanel
         open={!!flyout}
         onClose={() => setFlyout(null)}

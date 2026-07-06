@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
+import { DataTable, type Column } from '@/components/ui/data-table'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
-import Pagination from '@/components/ui/Pagination'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { getDisbursements, createDisbursement, deleteDisbursement, type ApiDisbursement, type DisbursementData } from '@/api/disbursements'
 import { getObligations, type ApiObligation } from '@/api/obligations'
@@ -66,11 +67,31 @@ export function Disbursements() {
   const obligationMap = Object.fromEntries(obligations.map((o) => [o.id, o]))
   const appropriationMap = Object.fromEntries(appropriations.map((a) => [a.id, a]))
 
+  const columns: Column<ApiDisbursement>[] = [
+    { key: 'date', label: 'Date', sortable: true, render: (d) => d.disbursement_date ? new Date(d.disbursement_date).toLocaleDateString() : '' },
+    { key: 'payee', label: 'Payee', sortable: true,
+      render: (d) => {
+        const obl = d.expand?.obligation || obligationMap[d.obligation]
+        return obl?.payee || '—'
+      } },
+    { key: 'particulars', label: 'Particulars', render: (d) => d.particular ?? '—', hideBelow: 'sm' },
+    { key: 'amount', label: 'Amount', className: 'text-right',
+      render: (d) => `₱${Number(d.amount).toLocaleString()}` },
+    { key: 'check_number', label: 'Check #', hideBelow: 'sm',
+      render: (d) => <span className="font-mono text-xs">{d.check_no || '—'}</span> },
+    { key: 'reference_number', label: 'OR #', hideBelow: 'sm',
+      render: (d) => <span className="font-mono text-xs">{d.or_no || '—'}</span> },
+  ]
+
   return (
     <div>
       <PageHeader title="Disbursements">
         <Button onClick={() => setShowForm(true)}><Plus className="h-4 w-4 mr-1" /> Record Disbursement</Button>
       </PageHeader>
+      <Breadcrumb items={[
+        { href: '/finance/budget', label: 'Finance' },
+        { label: 'Disbursements' },
+      ]} className="mb-4" />
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="flex items-center gap-2">
           <Label className="text-xs">From</Label>
@@ -82,46 +103,19 @@ export function Disbursements() {
         </div>
         <div className="text-sm text-muted-foreground ml-auto">Total Disbursed: <span className="font-semibold">₱{totalDisbursed.toLocaleString()}</span></div>
       </div>
-      {loading ? (
-        <p className="text-muted-foreground">Loading...</p>
-      ) : (
-        <>
-          <div className="border rounded-lg overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50">
-                <tr className="text-left text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">
-                  <th className="p-3">Date</th>
-                  <th className="p-3">Payee</th>
-                  <th className="p-3">Particular</th>
-                  <th className="p-3">Appropriation</th>
-                  <th className="text-right p-3">Amount</th>
-                  <th className="p-3">Check #</th>
-                  <th className="p-3">OR #</th>
-                </tr>
-              </thead>
-              <tbody>
-                {disbursements.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((d) => {
-                  const obl = d.expand?.obligation || obligationMap[d.obligation]
-                  const appr = obl ? appropriationMap[(obl as any).appropriation] : null
-                  return (
-                    <tr key={d.id} className="cursor-pointer border-b last:border-b-0 even:bg-muted/20 motion-fade-in motion-slide-up hover:bg-muted/30" onClick={() => setFlyout(d)}>
-                      <td className="p-3">{d.disbursement_date}</td>
-                      <td className="p-3">{obl?.payee || '—'}</td>
-                      <td className="p-3 text-muted-foreground">{d.particular}</td>
-                      <td className="p-3 text-xs text-muted-foreground">{appr?.item_name || '—'}</td>
-                      <td className="p-3 text-right font-medium">₱{d.amount.toLocaleString()}</td>
-                      <td className="p-3 font-mono text-xs">{d.check_no || '—'}</td>
-                      <td className="p-3 font-mono text-xs">{d.or_no || '—'}</td>
-                    </tr>
-                  )
-                })}
-                {disbursements.length === 0 && <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No disbursements found</td></tr>}
-              </tbody>
-            </table>
-          </div>
-          <Pagination page={page} totalPages={totalPages} totalItems={disbursements.length} onPageChange={setPage} />
-        </>
-      )}
+      <DataTable
+        columns={columns}
+        data={disbursements.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)}
+        loading={loading}
+        onRowClick={(d) => setFlyout(d)}
+        emptyState={<p className="text-center text-muted-foreground py-6">No disbursements found</p>}
+        page={page}
+        totalPages={totalPages}
+        totalItems={disbursements.length}
+        onPageChange={setPage}
+        pageSize={PAGE_SIZE}
+        rowKey={(d) => d.id}
+      />
       <DetailPanel
         open={!!flyout}
         onClose={() => setFlyout(null)}

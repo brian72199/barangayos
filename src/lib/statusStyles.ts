@@ -54,3 +54,8 @@ export const tagColors: Record<string, string> = {
   is_pwd: 'bg-purple-200 text-purple-900 border border-purple-400 dark:bg-purple-900/50 dark:text-purple-300 dark:border-purple-800/30',
   is_deceased: 'bg-gray-300 text-gray-900 border border-gray-400 dark:bg-gray-800/70 dark:text-gray-400 dark:border-gray-700/50',
 }
+
+export const appropriationStatusColors: Record<string, string> = {
+  active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+  closed: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300',
+}

@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
+import { DataTable, type Column } from '@/components/ui/data-table'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
-import Pagination from '@/components/ui/Pagination'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { FiscalYearSelector } from '@/components/finance/FiscalYearSelector'
 import { getFundSources, createFundSource, updateFundSource, deleteFundSource, type ApiFundSource, type FundSourceData } from '@/api/fundSources'
@@ -76,6 +77,18 @@ export function FundSources() {
   const totalPages = Math.ceil(sources.length / PAGE_SIZE)
   const paginatedSources = sources.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
+  const columns: Column<ApiFundSource>[] = [
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'code', label: 'Code', sortable: true, hideBelow: 'sm' },
+    { key: 'statutory_rule', label: 'Statutory Rule', render: (f) => f.statutory_rule ?? '—' },
+    { key: 'balance', label: 'Balance', className: 'text-right',
+      render: (f) => `₱${Number(f.current_balance).toLocaleString()}` },
+    { key: 'status', label: 'Status',
+      render: (f) => (
+        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${f.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'}`}>{f.is_active ? 'active' : 'inactive'}</span>
+      ) },
+  ]
+
   return (
     <div>
       <PageHeader title="Fund Sources">
@@ -90,48 +103,23 @@ export function FundSources() {
           </Button>
         </div>
       </PageHeader>
-      {loading ? (
-        <p className="text-muted-foreground">Loading...</p>
-      ) : (
-        <>
-        <div className="border rounded-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr className="text-left text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">
-                <th className="p-3">Name</th>
-                <th className="p-3">Code</th>
-                <th className="p-3">Statutory Rule</th>
-                <th className="text-right p-3">Balance</th>
-                <th className="p-3">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedSources.map((s) => (
-                <tr key={s.id} className="cursor-pointer border-b last:border-b-0 even:bg-muted/20 motion-fade-in motion-slide-up hover:bg-muted/30" onClick={() => setFlyout(s)}>
-                  <td className="p-3 font-medium">{s.name}</td>
-                  <td className="p-3 font-mono text-xs text-muted-foreground">{s.code}</td>
-                  <td className="p-3">
-                    {s.statutory_rule !== 'none' ? (
-                      <span className="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded">{STATUTORY_LABELS[s.statutory_rule]}</span>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">General</span>
-                    )}
-                  </td>
-                  <td className="p-3 text-right font-semibold">₱{s.current_balance?.toLocaleString()}</td>
-                  <td className="p-3">
-                    <span className={`text-xs px-2 py-0.5 rounded ${s.is_active ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}>
-                      {s.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {sources.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">No fund sources for {year}. Create one to get started.</td></tr>}
-            </tbody>
-          </table>
-        </div>
-        <Pagination page={page} totalPages={totalPages} totalItems={sources.length} onPageChange={setPage} pageSize={PAGE_SIZE} />
-        </>
-      )}
+      <Breadcrumb items={[
+        { href: '/finance/budget', label: 'Finance' },
+        { label: 'Fund Sources' },
+      ]} className="mb-4" />
+      <DataTable
+        columns={columns}
+        data={paginatedSources}
+        loading={loading}
+        onRowClick={(s) => setFlyout(s)}
+        emptyState={<p className="text-center text-muted-foreground py-6">No fund sources for {year}. Create one to get started.</p>}
+        page={page}
+        totalPages={totalPages}
+        totalItems={sources.length}
+        onPageChange={setPage}
+        pageSize={PAGE_SIZE}
+        rowKey={(s) => s.id}
+      />
       <DetailPanel
         open={!!flyout}
         onClose={() => setFlyout(null)}
