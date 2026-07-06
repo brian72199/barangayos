@@ -155,9 +155,11 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
         )}>
           {(pinned || mobileOpen) ? (
             <>
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[#C9953E] text-xs font-bold text-white">
-                B
-              </div>
+              <img
+                src="/logo.png"
+                alt="BarangayOS"
+                className="size-8 shrink-0 rounded-md object-contain"
+              />
               <span className="font-display min-w-0 flex-1 truncate text-sm font-semibold">
                 BarangayOS
               </span>
@@ -174,15 +176,22 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
               <PanelRightClose className="size-4" />
             </button>
           ) : !pinned && !mobileOpen ? (
-            <button
-              type="button"
-              onClick={onTogglePin}
-              className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-              aria-label="Expand sidebar"
-              title="Expand sidebar"
-            >
-              <PanelRightOpen className="size-4" />
-            </button>
+            <>
+              <img
+                src="/logo.png"
+                alt=""
+                className="size-6 shrink-0 object-contain"
+              />
+              <button
+                type="button"
+                onClick={onTogglePin}
+                className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                aria-label="Expand sidebar"
+                title="Expand sidebar"
+              >
+                <PanelRightOpen className="size-4" />
+              </button>
+            </>
           ) : null}
         </div>
 

@@ -41,9 +41,11 @@ export default function LoginPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,color-mix(in_srgb,var(--gold)_6%,transparent)_0%,transparent_70%)]" aria-hidden="true" />
       <div className="relative w-full max-w-sm">
         <div className="flex justify-center motion-scale-in">
-          <div className="flex size-16 items-center justify-center rounded-full border-2 border-gold/30 bg-gold/5">
-            <span className="text-2xl font-bold tracking-tight text-gold">B</span>
-          </div>
+          <img
+            src="/logo.png"
+            alt="BarangayOS"
+            className="size-48 object-contain"
+          />
         </div>
 
         <div className="mt-5 text-center motion-fade-in motion-slide-up" style={{ animationDelay: '100ms' }}>

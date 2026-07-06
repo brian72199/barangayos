@@ -34,9 +34,11 @@ export default function Layout() {
         >
           <Menu className="size-5" />
         </button>
-        <div className="flex size-8 items-center justify-center rounded-md bg-[#C9953E] text-xs font-bold text-white">
-          B
-        </div>
+        <img
+          src="/logo.png"
+          alt="BarangayOS"
+          className="size-8 shrink-0 rounded-md object-contain"
+        />
         <span className="font-display text-sm font-semibold">BarangayOS</span>
       </header>
 
