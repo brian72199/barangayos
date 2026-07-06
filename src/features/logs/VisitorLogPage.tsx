@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router'
-import { Plus, Pencil, Trash2, ChevronDown, DoorOpen, Circle, Clock, User, LogOut } from 'lucide-react'
+import { Plus, ChevronDown, DoorOpen, Circle, Clock, User, LogOut } from 'lucide-react'
 import { getVisitors, createVisitor, updateVisitor, deleteVisitor, checkOutVisitor, type ApiVisitor, type VisitorData } from '@/api/visitors'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'

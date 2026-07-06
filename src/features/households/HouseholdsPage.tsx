@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router'
-import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Home, Users } from 'lucide-react'
+import { Plus, ChevronDown, ChevronRight, Home, Users } from 'lucide-react'
 import Pagination from '@/components/ui/Pagination'
 import { getHouseholds, getNextHouseholdNumber, createHousehold, updateHousehold, deleteHousehold, type ApiHousehold } from '@/api/households'
 import { getResidents, type ApiResident } from '@/api/residents'

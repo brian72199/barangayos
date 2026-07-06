@@ -4,8 +4,6 @@ import { Clock, ChevronDown, FileText, Users, DoorOpen, Package, Calendar } from
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { ApiActivity } from '@/api/activity'
-import type { Role } from '@/auth/session'
-
 const collectionIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   blotter_records: FileText,
   residents: Users,
@@ -17,7 +15,6 @@ const collectionIcons: Record<string, React.ComponentType<{ className?: string }
 
 interface DashboardActivityProps {
   activities: ApiActivity[]
-  role: Role
 }
 
 const INITIAL_SHOW = 5
@@ -36,7 +33,7 @@ function timeAgo(dateStr: string): string {
   return `${days} araw ang nakalipas`
 }
 
-export default function DashboardActivity({ activities, role }: DashboardActivityProps) {
+export default function DashboardActivity({ activities }: DashboardActivityProps) {
   const [visibleCount, setVisibleCount] = useState(INITIAL_SHOW)
   const visible = activities.slice(0, visibleCount)
   const hasMore = visibleCount < activities.length

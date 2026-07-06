@@ -154,7 +154,7 @@ export function useDashboardData(): DashboardData {
       const stats: DashboardStats = {
         residents: res.total,
         voters: res.voters,
-        pendingDocuments: docs.byStatus['pending'] ?? 0,
+        pendingDocuments: (docs.byStatus as Record<string, number>)['pending'] ?? 0,
         blotterActive: (blot.pending ?? 0) + (blot.hearing ?? 0),
         blotterTotal: blot.total,
         visitorsToday: vis.total,

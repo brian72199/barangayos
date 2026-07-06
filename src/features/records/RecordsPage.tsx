@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router'
-import { Plus, Pencil, Trash2, ChevronDown, Calendar, Users, BookOpen, FileText } from 'lucide-react'
+import { Plus, ChevronDown, Calendar, Users, BookOpen, FileText } from 'lucide-react'
 import { getBlotters, createBlotter, updateBlotter, deleteBlotter, getNextCaseNumber, type ApiBlotter, type BlotterData } from '@/api/blotter'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'

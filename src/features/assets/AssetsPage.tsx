@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router'
-import { Plus, Pencil, Trash2, ChevronDown, Search, Camera, X, ClipboardList, Tag, MapPin } from 'lucide-react'
+import { Plus, ChevronDown, Search, Camera, X, ClipboardList, Tag, MapPin } from 'lucide-react'
 import { getAssets, createAsset, updateAsset, deleteAsset, type ApiAsset } from '@/api/assets'
 
 import { uploadImage } from '@/api/upload'
@@ -196,7 +196,6 @@ export default function AssetsPage() {
     setError(null)
     setEditingId(null)
     setForm(emptyForm())
-    setResidentSearch('')
     setPanelOpen(true)
   }
 
@@ -217,7 +216,6 @@ export default function AssetsPage() {
       image_url: record.image_url ?? '',
       notes: record.notes ?? '',
     })
-    setResidentSearch('')
     setPanelOpen(true)
     setError(null)
   }

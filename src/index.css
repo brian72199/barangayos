@@ -147,7 +147,6 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
 }
 
 :root {
-  scrollbar-gutter: stable;
   color-scheme: light;
 
   --bg: #F8F5F0;
@@ -237,7 +236,31 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
+html {
+  scrollbar-gutter: stable both-edges;
+  scrollbar-width: thin;
+}
+
+html::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--text-subtle);
+}
+
 .sidebar-scroll {
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
 }

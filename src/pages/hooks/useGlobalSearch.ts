@@ -57,7 +57,7 @@ export function useGlobalSearch(): UseGlobalSearchReturn {
   const [results, setResults] = useState<SearchResultGroup[]>([])
   const [searching, setSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
-  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current)

@@ -110,15 +110,6 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
     onMobileOpenChange(false)
   }, [location.pathname])
 
-  useEffect(() => {
-    if (mobileOpen) {
-      document.documentElement.classList.add('overflow-hidden')
-    } else {
-      document.documentElement.classList.remove('overflow-hidden')
-    }
-    return () => { document.documentElement.classList.remove('overflow-hidden') }
-  }, [mobileOpen])
-
   function handleLogout() {
     setShowLogoutConfirm(true)
   }

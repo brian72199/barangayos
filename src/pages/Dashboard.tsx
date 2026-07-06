@@ -32,7 +32,7 @@ export default function Dashboard() {
         <DashboardQuickActions role={role} />
         <div className="grid gap-5 lg:grid-cols-2">
           <DashboardTasks tasks={tasks} />
-          <DashboardActivity activities={recentActivity} role={role} />
+          <DashboardActivity activities={recentActivity} />
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
           <DashboardChart title="Document Status Distribution" items={documentItems} total={stats.documentTotal} />

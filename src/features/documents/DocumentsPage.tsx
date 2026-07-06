@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router'
-import { Plus, Pencil, Trash2, ChevronDown, Search, FileText, Clock, User, CheckCircle2, RotateCcw, Ban } from 'lucide-react'
+import { Plus, ChevronDown, Search, FileText, Clock, User, CheckCircle2, RotateCcw, Ban } from 'lucide-react'
 import { getDocuments, createDocument, updateDocument, deleteDocument, getDailyQueueNumber, type ApiDocument } from '@/api/documents'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'

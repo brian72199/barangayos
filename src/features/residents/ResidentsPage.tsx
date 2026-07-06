@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useSearchParams } from 'react-router'
-import { Plus, Pencil, Trash2, ChevronDown, Search, Home, FileText, BookOpen, Activity } from 'lucide-react'
+import { Plus, ChevronDown, Search, Home, FileText, BookOpen, Activity } from 'lucide-react'
 import { getResidents, createResident, updateResident, deleteResident, type ApiResident } from '@/api/residents'
 import { searchHouseholds, getHousehold, type ApiHousehold } from '@/api/households'
 import { getDocuments, type ApiDocument } from '@/api/documents'

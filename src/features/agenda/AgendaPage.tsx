@@ -277,10 +277,6 @@ export default function AgendaPage() {
     setError(null)
   }
 
-  function handleDeleteMeeting(id: string) {
-    setDeletingMeetingId(id)
-  }
-
   async function confirmDeleteMeeting() {
     if (!deletingMeetingId) return
     try {

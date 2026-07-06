@@ -15,11 +15,17 @@ interface DetailPanelProps {
 export function DetailPanel({ open, onClose, title, onEdit, onDelete, loading, children }: DetailPanelProps) {
   useEffect(() => {
     if (open) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
       document.body.style.overflow = 'hidden'
+      document.body.style.paddingRight = scrollbarWidth + 'px'
     } else {
       document.body.style.overflow = ''
+      document.body.style.paddingRight = ''
     }
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.paddingRight = ''
+    }
   }, [open])
 
   if (!open) return null
