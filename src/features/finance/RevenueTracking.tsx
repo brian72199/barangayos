@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, DollarSign, Calendar, Tag, FileText, Receipt } from 'lucide-react'
+import { Plus, DollarSign, Calendar, Tag, FileText, Receipt, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +11,8 @@ import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { getRevenues, createRevenue, deleteRevenue, type ApiRevenue, type RevenueData } from '@/api/revenues'
 import { getIncomeAccounts, type ApiIncomeAccount } from '@/api/incomeAccounts'
+import { ExportDialog } from '@/components/finance/ExportDialog'
+import { getCurrentUser } from '@/auth/session'
 
 const CATEGORIES = [
   { value: 'all', label: 'All Categories' },
@@ -42,6 +44,7 @@ export function RevenueTracking() {
   const [showForm, setShowForm] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
+  const [showExport, setShowExport] = useState(false)
   const [form, setForm] = useState<RevenueData>({ revenue_date: today(), income_account: '', category: 'document_fee', source: '', amount: 0, or_no: '', remarks: '' })
 
   async function load() {
@@ -93,7 +96,14 @@ export function RevenueTracking() {
   return (
     <div>
       <PageHeader title="Revenue Tracking">
-        <Button onClick={() => setShowForm(true)}><Plus className="h-4 w-4 mr-1" /> Add Revenue</Button>
+        <div className="flex items-center gap-2">
+          {getCurrentUser()?.role === 'admin' && (
+            <Button variant="outline" onClick={() => setShowExport(true)}>
+              <Download className="h-4 w-4 mr-1" /> Export
+            </Button>
+          )}
+          <Button onClick={() => setShowForm(true)}><Plus className="h-4 w-4 mr-1" /> Add Revenue</Button>
+        </div>
       </PageHeader>
       <Breadcrumb items={[
         { href: '/finance/budget', label: 'Finance' },
@@ -244,6 +254,29 @@ export function RevenueTracking() {
         </div>
       )}
       <ConfirmDialog open={!!deleteId} title="Delete Revenue" message="Are you sure? This cannot be undone." confirmLabel="Delete" onCancel={() => setDeleteId(null)} onConfirm={handleDelete} />
+      <ExportDialog
+        open={showExport}
+        onClose={() => setShowExport(false)}
+        title="Revenues"
+        columns={[
+          { header: 'Date', key: 'revenue_date', format: 'date' as const },
+          { header: 'Source', key: 'source' },
+          { header: 'Category', key: 'category' },
+          { header: 'Amount', key: 'amount', format: 'currency' as const },
+          { header: 'OR #', key: 'or_no' },
+        ]}
+        fetchData={async (from, to) => {
+          const data = await getRevenues(from || undefined, to || undefined)
+          return data.map((r) => ({
+            revenue_date: r.revenue_date,
+            source: r.source,
+            category: r.category,
+            amount: r.amount,
+            or_no: r.or_no,
+          }))
+        }}
+        filename="revenues"
+      />
     </div>
   )
 }

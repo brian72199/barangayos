@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, DollarSign, BookOpen, Calendar, FileText, Building, Receipt, Database, ArrowRight } from 'lucide-react'
+import { Plus, DollarSign, BookOpen, Calendar, FileText, Building, Receipt, Database, ArrowRight, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,6 +15,8 @@ import { getFundSources, type ApiFundSource } from '@/api/fundSources'
 import { getDisbursements, type ApiDisbursement } from '@/api/disbursements'
 import { getFinanceAuditLogs, type ApiFinanceAudit } from '@/api/financeAudit'
 import { appropriationStatusColors } from '@/lib/statusStyles'
+import { ExportDialog } from '@/components/finance/ExportDialog'
+import { getCurrentUser } from '@/auth/session'
 
 function getComputedStatus(a: ApiAppropriation): string {
   if (!a.payee) return 'pending'
@@ -35,6 +37,7 @@ export function Appropriations() {
   const [editId, setEditId] = useState<string | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
+  const [showExport, setShowExport] = useState(false)
   const [form, setForm] = useState<AppropriationData>({ fiscal_year: year, fund_source: '', expense_class: 'MOOE', item_name: '', appropriated_amount: 0, notes: '' })
   const [obligateTarget, setObligateTarget] = useState<ApiAppropriation | null>(null)
   const [obligateForm, setObligateForm] = useState({ payee: '', obligated_date: new Date().toISOString().split('T')[0], obligation_notes: '' })
@@ -146,6 +149,11 @@ export function Appropriations() {
       <PageHeader title="Appropriations">
         <div className="flex items-center gap-4">
           <FiscalYearSelector value={year} onChange={setYear} />
+          {getCurrentUser()?.role === 'admin' && (
+            <Button variant="outline" onClick={() => setShowExport(true)}>
+              <Download className="h-4 w-4 mr-1" /> Export
+            </Button>
+          )}
           <Button onClick={() => { setEditId(null); setForm({ fiscal_year: year, fund_source: '', expense_class: 'MOOE', item_name: '', appropriated_amount: 0, notes: '' }); setShowForm(true) }}>+ Add Appropriation</Button>
         </div>
       </PageHeader>
@@ -370,6 +378,34 @@ export function Appropriations() {
         </div>
       )}
       <ConfirmDialog open={!!deleteId} title="Delete Appropriation" message="Are you sure? This will also remove related disbursements and restore fund source balance." confirmLabel="Delete" destructive onCancel={() => setDeleteId(null)} onConfirm={handleDelete} />
+      <ExportDialog
+        open={showExport}
+        onClose={() => setShowExport(false)}
+        title="Appropriations"
+        columns={[
+          { header: 'Item Name', key: 'item_name' },
+          { header: 'Expense Class', key: 'expense_class' },
+          { header: 'Appropriated', key: 'appropriated_amount', format: 'currency' as const },
+          { header: 'Disbursed', key: 'disbursed_amount', format: 'currency' as const },
+          { header: 'Payee', key: 'payee' },
+          { header: 'Status', key: 'status' },
+        ]}
+        fetchData={async () => {
+          const data = await getAppropriations()
+          return data.map((a) => {
+            const s = !a.payee ? 'pending' : a.disbursed_amount <= 0 ? 'obligated' : a.disbursed_amount < a.appropriated_amount ? 'partially_disbursed' : 'fully_disbursed'
+            return {
+              item_name: a.item_name,
+              expense_class: a.expense_class,
+              appropriated_amount: a.appropriated_amount,
+              disbursed_amount: a.disbursed_amount,
+              payee: a.payee || '',
+              status: s,
+            }
+          })
+        }}
+        filename="appropriations"
+      />
     </div>
   )
 }

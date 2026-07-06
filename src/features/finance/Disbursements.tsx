@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Calendar, DollarSign, FileText, Building, Receipt } from 'lucide-react'
+import { Plus, Calendar, DollarSign, FileText, Building, Receipt, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +11,8 @@ import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { getDisbursements, createDisbursement, deleteDisbursement, type ApiDisbursement, type DisbursementData } from '@/api/disbursements'
 import { getAppropriations, type ApiAppropriation } from '@/api/appropriations'
+import { ExportDialog } from '@/components/finance/ExportDialog'
+import { getCurrentUser } from '@/auth/session'
 
 const PAGE_SIZE = 25
 
@@ -25,6 +27,7 @@ export function Disbursements() {
   const [showForm, setShowForm] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
+  const [showExport, setShowExport] = useState(false)
   const [form, setForm] = useState<DisbursementData>({ appropriation: '', payee: '', disbursement_date: today(), amount: 0, check_no: '', or_no: '', particular: '' })
 
   async function load() {
@@ -78,7 +81,14 @@ export function Disbursements() {
   return (
     <div>
       <PageHeader title="Disbursements">
-        <Button onClick={() => setShowForm(true)}><Plus className="h-4 w-4 mr-1" /> Record Disbursement</Button>
+        <div className="flex items-center gap-2">
+          {getCurrentUser()?.role === 'admin' && (
+            <Button variant="outline" onClick={() => setShowExport(true)}>
+              <Download className="h-4 w-4 mr-1" /> Export
+            </Button>
+          )}
+          <Button onClick={() => setShowForm(true)}><Plus className="h-4 w-4 mr-1" /> Record Disbursement</Button>
+        </div>
       </PageHeader>
       <Breadcrumb items={[
         { href: '/finance/budget', label: 'Finance' },
@@ -236,6 +246,31 @@ export function Disbursements() {
         </div>
       )}
       <ConfirmDialog open={!!deleteId} title="Delete Disbursement" message="Are you sure? This cannot be undone." confirmLabel="Delete" onCancel={() => setDeleteId(null)} onConfirm={handleDelete} />
+      <ExportDialog
+        open={showExport}
+        onClose={() => setShowExport(false)}
+        title="Disbursements"
+        columns={[
+          { header: 'Date', key: 'disbursement_date', format: 'date' as const },
+          { header: 'Payee', key: 'payee' },
+          { header: 'Particular', key: 'particular' },
+          { header: 'Amount', key: 'amount', format: 'currency' as const },
+          { header: 'Check #', key: 'check_no' },
+          { header: 'OR #', key: 'or_no' },
+        ]}
+        fetchData={async (from, to) => {
+          const data = await getDisbursements(from || undefined, to || undefined)
+          return data.map((d) => ({
+            disbursement_date: d.disbursement_date,
+            payee: d.payee,
+            particular: d.particular,
+            amount: d.amount,
+            check_no: d.check_no,
+            or_no: d.or_no,
+          }))
+        }}
+        filename="disbursements"
+      />
     </div>
   )
 }

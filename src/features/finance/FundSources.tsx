@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Landmark, DollarSign, Calendar, FileText, Scale } from 'lucide-react'
+import { Plus, Landmark, DollarSign, Calendar, FileText, Scale, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,6 +12,8 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { FiscalYearSelector } from '@/components/finance/FiscalYearSelector'
 import { getFundSources, createFundSource, updateFundSource, deleteFundSource, type ApiFundSource, type FundSourceData } from '@/api/fundSources'
 import { getFinanceAuditLogs, type ApiFinanceAudit } from '@/api/financeAudit'
+import { ExportDialog } from '@/components/finance/ExportDialog'
+import { getCurrentUser } from '@/auth/session'
 
 const STATUTORY_LABELS: Record<string, string> = {
   none: 'General',
@@ -31,6 +33,7 @@ export function FundSources() {
   const [page, setPage] = useState(1)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [auditLogs, setAuditLogs] = useState<ApiFinanceAudit[]>([])
+  const [showExport, setShowExport] = useState(false)
   const PAGE_SIZE = 25
   const [form, setForm] = useState<FundSourceData>({
     name: '', code: '', statutory_rule: 'none', current_balance: 0, fiscal_year: year, is_active: true, description: '', notes: '',
@@ -103,9 +106,14 @@ export function FundSources() {
       <PageHeader title="Fund Sources">
         <div className="flex items-center gap-4">
           <FiscalYearSelector value={year} onChange={setYear} />
+          {getCurrentUser()?.role === 'admin' && (
+            <Button variant="outline" onClick={() => setShowExport(true)}>
+              <Download className="h-4 w-4 mr-1" /> Export
+            </Button>
+          )}
           <Button onClick={() => {
             setEditing(null)
-            setForm({ name: '', code: '', statutory_rule: 'none', current_balance: 0, fiscal_year: year, is_active: true, description: '', notes: '' })
+            setForm({ name: '', code: '', statutory_rule: 'none', current_balance: 0, original_balance: 0, fiscal_year: year, is_active: true, description: '', notes: '' })
             setShowForm(true)
           }}>
             <Plus className="h-4 w-4 mr-1" /> Add Fund Source
@@ -261,6 +269,30 @@ export function FundSources() {
         </div>
       )}
       <ConfirmDialog open={!!deleteId} title="Delete Fund Source" message="Are you sure? This cannot be undone." confirmLabel="Delete" onCancel={() => setDeleteId(null)} onConfirm={handleDelete} />
+      <ExportDialog
+        open={showExport}
+        onClose={() => setShowExport(false)}
+        title="Fund Sources"
+        columns={[
+          { header: 'Name', key: 'name' },
+          { header: 'Code', key: 'code' },
+          { header: 'Statutory Rule', key: 'statutory_rule' },
+          { header: 'Current Balance', key: 'current_balance', format: 'currency' as const },
+          { header: 'Status', key: 'status' },
+        ]}
+        fetchData={async () => {
+          const { getFundSources } = await import('@/api/fundSources')
+          const data = await getFundSources()
+          return data.map((f) => ({
+            name: f.name,
+            code: f.code,
+            statutory_rule: f.statutory_rule || 'none',
+            current_balance: f.current_balance,
+            status: f.is_active ? 'active' : 'inactive',
+          }))
+        }}
+        filename="fund-sources"
+      />
     </div>
   )
 }
