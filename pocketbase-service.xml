@@ -1,7 +1,7 @@
 <service>
   <id>PocketBase</id>
   <name>PocketBase</name>
-  <description>PocketBase backend for Barangay Records System</description>
+  <description>PocketBase backend for BarangayOS</description>
   <executable>D:\BARANGAYCC\barangay-system\pocketbase.exe</executable>
   <arguments>serve --http=localhost:8090 --dir="D:\BARANGAYCC\barangay-system\pb_data" --migrationsDir="D:\BARANGAYCC\barangay-system\pocketbase\pb_migrations"</arguments>
   <startmode>Automatic</startmode>

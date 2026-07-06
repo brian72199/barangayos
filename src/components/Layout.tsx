@@ -4,7 +4,7 @@ import { Menu } from 'lucide-react'
 import Sidebar from '@/components/Sidebar'
 import OfflineIndicator from '@/offline/OfflineIndicator'
 
-const STORAGE_KEY = 'barangay-sidebar-pinned'
+const STORAGE_KEY = 'barangayos-sidebar-pinned'
 
 export default function Layout() {
   const [pinned, setPinned] = useState(() => {
@@ -36,7 +36,7 @@ export default function Layout() {
         <div className="flex size-8 items-center justify-center rounded-md bg-[#C9953E] text-xs font-bold text-white">
           B
         </div>
-        <span className="text-sm font-semibold">Barangay System</span>
+        <span className="text-sm font-semibold">BarangayOS</span>
       </header>
 
       <Sidebar pinned={pinned} onTogglePin={togglePinned} mobileOpen={mobileOpen} onMobileOpenChange={setMobileOpen} />

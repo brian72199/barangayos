@@ -9,7 +9,7 @@ interface QueueItem {
   timestamp: number
 }
 
-const DB_NAME = 'barangay-offline-queue'
+const DB_NAME = 'barangayos-offline-queue'
 const DB_VERSION = 1
 const STORE_NAME = 'queue'
 

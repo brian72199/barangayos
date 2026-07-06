@@ -11,7 +11,7 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 function getInitialTheme(): Theme {
-  const stored = localStorage.getItem('barangay-theme')
+  const stored = localStorage.getItem('barangayos-theme')
   if (stored === 'light' || stored === 'dark') return stored
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
@@ -21,13 +21,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
-    localStorage.setItem('barangay-theme', theme)
+    localStorage.setItem('barangayos-theme', theme)
   }, [theme])
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     const handler = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('barangay-theme')) {
+      if (!localStorage.getItem('barangayos-theme')) {
         setThemeState(e.matches ? 'dark' : 'light')
       }
     }

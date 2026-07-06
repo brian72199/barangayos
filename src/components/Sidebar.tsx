@@ -144,7 +144,7 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
                 B
               </div>
               <span className="min-w-0 flex-1 truncate text-sm font-semibold">
-                Barangay System
+                BarangayOS
               </span>
             </>
           ) : null}

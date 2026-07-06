@@ -113,7 +113,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-8 text-center text-[11px] text-muted-foreground/30 motion-fade-in" style={{ animationDelay: '400ms' }}>
-          Barangay System
+          BarangayOS
         </p>
       </div>
     </div>

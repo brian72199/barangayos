@@ -1,14 +1,16 @@
-migrate((db) => {
-  const collection = dao.findCollectionByNameOrId("residents")
-  collection.schema.addField(new SchemaField({
+migrate((app) => {
+  const collection = app.findCollectionByNameOrId("residents")
+  if (collection.fields.find((f) => f.name === "is_deceased")) return
+  collection.fields.add(new Field({
     name: "is_deceased",
     type: "bool",
     required: false,
-    default: false,
+    defaultValue: false,
   }))
-  dao.saveCollection(collection)
-}, (db) => {
-  const collection = dao.findCollectionByNameOrId("residents")
-  collection.schema.removeField("is_deceased")
-  dao.saveCollection(collection)
+  app.save(collection)
+}, (app) => {
+  const collection = app.findCollectionByNameOrId("residents")
+  const field = collection.fields.find((f) => f.name === "is_deceased")
+  if (field) collection.fields.remove(field.id)
+  app.save(collection)
 })
