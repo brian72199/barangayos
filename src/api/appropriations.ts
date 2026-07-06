@@ -14,7 +14,10 @@ export interface AppropriationData {
   appropriated_amount?: number
   obligated_amount?: number
   disbursed_amount?: number
-  status?: 'active' | 'closed'
+  payee?: string
+  obligated_date?: string
+  fully_disbursed_date?: string
+  obligation_notes?: string
   notes?: string
 }
 
@@ -26,7 +29,10 @@ export interface ApiAppropriation extends RecordModel {
   appropriated_amount: number
   obligated_amount: number
   disbursed_amount: number
-  status: 'active' | 'closed'
+  payee: string
+  obligated_date: string
+  fully_disbursed_date: string
+  obligation_notes: string
   notes: string
   created: string
   updated: string
@@ -45,9 +51,26 @@ export async function getAppropriation(id: string): Promise<ApiAppropriation> {
   catch (e) { throw handleApiError(e) }
 }
 
+export async function markAppropriationAsObligated(id: string, data: { payee: string; obligated_date: string; obligation_notes?: string }): Promise<ApiAppropriation> {
+  try {
+    const result = await getClient().collection<ApiAppropriation>(COLLECTION).update(id, {
+      payee: data.payee,
+      obligated_date: data.obligated_date,
+      obligation_notes: data.obligation_notes || '',
+    })
+    createFinanceAuditLog('update', COLLECTION, id, `marked appropriation as obligated: ${result.item_name} → ${data.payee}`)
+    return result
+  }
+  catch (e) { throw handleApiError(e) }
+}
+
 export async function createAppropriation(data: AppropriationData): Promise<ApiAppropriation> {
   try {
-    const result = await getClient().collection<ApiAppropriation>(COLLECTION).create(data)
+    const result = await getClient().collection<ApiAppropriation>(COLLECTION).create({
+      ...data,
+      obligated_amount: 0,
+      disbursed_amount: 0,
+    })
     createFinanceAuditLog('create', COLLECTION, result.id, `created appropriations: ${result.item_name}`, result.appropriated_amount)
     return result
   }
