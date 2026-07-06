@@ -41,7 +41,7 @@ export default function DashboardActivity({ activities }: DashboardActivityProps
   return (
     <Card className="motion-fade-in motion-slide-up" style={{ animationDelay: '100ms' }}>
       <CardContent className="p-5">
-        <h2 className="text-sm font-semibold text-foreground">Mga Kamakailang Gawain</h2>
+        <h2 className="font-display text-sm font-semibold text-foreground">Mga Kamakailang Gawain</h2>
 
         {activities.length === 0 ? (
           <p className="mt-6 text-center text-sm text-muted-foreground/60">

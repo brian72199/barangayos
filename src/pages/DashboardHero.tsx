@@ -44,7 +44,7 @@ export default function DashboardHero({ userName, role, stats }: DashboardHeroPr
       <div className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+            <h1 className="font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
               {getTimeGreeting()}, {userName}!
             </h1>
             <p className="mt-0.5 text-sm text-muted-foreground">{formatDate()}</p>

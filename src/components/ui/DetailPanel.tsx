@@ -35,7 +35,7 @@ export function DetailPanel({ open, onClose, title, onEdit, onDelete, loading, c
       <div className="fixed inset-0 bg-black/40 motion-fade-in" onClick={onClose} />
       <div className="relative w-full bg-card shadow-xl motion-slide-up motion-fade-in overflow-y-auto md:max-w-lg md:border-l md:border-border max-md:max-h-[85vh] max-md:rounded-t-2xl">
         <div className="flex items-center justify-between border-b px-5 py-4">
-          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+          <h2 className="font-display text-sm font-semibold text-foreground">{title}</h2>
           <div className="flex items-center gap-1">
             {onEdit && (
               <button

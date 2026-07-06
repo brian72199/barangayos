@@ -19,7 +19,7 @@ export default function DashboardTasks({ tasks }: DashboardTasksProps) {
   return (
     <Card className="motion-fade-in motion-slide-up">
       <CardContent className="p-5">
-        <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+        <h2 className="font-display flex items-center gap-2 text-sm font-semibold text-foreground">
           Ang Iyong mga Gawain
           <span className="text-[10px] font-normal text-muted-foreground/60">Ngayong araw</span>
         </h2>

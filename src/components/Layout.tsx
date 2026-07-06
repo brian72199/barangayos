@@ -37,7 +37,7 @@ export default function Layout() {
         <div className="flex size-8 items-center justify-center rounded-md bg-[#C9953E] text-xs font-bold text-white">
           B
         </div>
-        <span className="text-sm font-semibold">BarangayOS</span>
+        <span className="font-display text-sm font-semibold">BarangayOS</span>
       </header>
 
       <Sidebar pinned={pinned} onTogglePin={togglePinned} mobileOpen={mobileOpen} onMobileOpenChange={setMobileOpen} />

@@ -21,7 +21,7 @@ export default function DashboardChart({ title, items, total }: DashboardChartPr
       <CardContent className="p-5">
         <div className="mb-3 flex items-center gap-2">
           <BarChart3 className="size-4 text-muted-foreground" />
-          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+          <h2 className="font-display text-sm font-semibold text-foreground">{title}</h2>
         </div>
         {items.length === 0 ? (
           <p className="py-4 text-center text-xs text-muted-foreground/60">No data available</p>

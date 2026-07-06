@@ -32,7 +32,7 @@ export default function DashboardQuickActions({ role }: DashboardQuickActionsPro
   return (
     <Card className="motion-fade-in motion-slide-up" style={{ animationDelay: '200ms' }}>
       <CardContent className="p-5">
-        <h2 className="text-sm font-semibold text-foreground">Mabilis na Access</h2>
+        <h2 className="font-display text-sm font-semibold text-foreground">Mabilis na Access</h2>
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {actions.map((action) => {
             const Icon = action.icon

@@ -222,7 +222,7 @@ export default function ReleasePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 motion-fade-in" onClick={closeReleaseDialog} aria-hidden="true" />
           <div className="relative w-full max-w-md rounded-lg bg-card p-6 shadow-xl motion-slide-up motion-fade-in max-h-[90vh] overflow-y-auto">
-            <h2 className="text-sm font-semibold text-foreground">
+            <h2 className="font-display text-sm font-semibold text-foreground">
               {releaseDoc.payment_status === 'unpaid' ? 'Collect Payment & Release' : 'Release Document'}
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">

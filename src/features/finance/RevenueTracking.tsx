@@ -199,7 +199,7 @@ export function RevenueTracking() {
           <div className="fixed inset-0 bg-black/40 motion-fade-in" onClick={() => setShowForm(false)} />
           <div className="relative w-full bg-card shadow-xl motion-slide-up motion-fade-in overflow-y-auto md:max-w-md md:border-l md:border-border max-md:max-h-[85vh] max-md:rounded-t-2xl">
             <div className="p-6">
-              <h2 className="text-sm font-semibold mb-4">Add Revenue</h2>
+              <h2 className="font-display text-sm font-semibold mb-4">Add Revenue</h2>
               <div className="space-y-4">
                 <div>
                   <Label>Date</Label>

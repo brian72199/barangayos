@@ -24,7 +24,7 @@ export function EmptyState({ variant = 'default', title, description, action, cl
       <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
         <Icon className={cn('size-6', variant === 'error' ? 'text-destructive' : 'text-muted-foreground')} />
       </div>
-      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <h3 className="font-display text-sm font-semibold text-foreground">{title}</h3>
       {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       {action && (
         <Button variant="outline" size="sm" onClick={action.onClick} className="mt-4">

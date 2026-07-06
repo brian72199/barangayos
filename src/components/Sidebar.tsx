@@ -158,7 +158,7 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
               <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[#C9953E] text-xs font-bold text-white">
                 B
               </div>
-              <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+              <span className="font-display min-w-0 flex-1 truncate text-sm font-semibold">
                 BarangayOS
               </span>
             </>
@@ -195,7 +195,7 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
               return (
                 <div key={group.label}>
                   {pinned && (
-                    <p className="mb-1.5 px-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/60">
+                    <p className="mb-1.5 px-1 font-display text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/60">
                       {group.label}
                     </p>
                   )}
@@ -209,7 +209,7 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
                           key={item.to}
                           to={item.to}
                           className={cn(
-                            'relative flex items-center rounded-md text-sm font-medium transition-colors',
+                            'relative flex items-center rounded-md font-display text-sm font-medium transition-colors',
                             pinned
                               ? 'h-9 gap-3 px-3'
                               : 'h-10 justify-center',
@@ -256,7 +256,7 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
                 </div>
                 {pinned && (
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-foreground">{user.name ?? user.email}</p>
+                    <p className="font-display truncate text-sm font-medium text-foreground">{user.name ?? user.email}</p>
                     <p className="truncate text-[11px] text-muted-foreground capitalize">{user.role}</p>
                   </div>
                 )}

@@ -53,7 +53,7 @@ export default function DashboardSystemStatus() {
   return (
     <Card className="motion-fade-in motion-slide-up" style={{ animationDelay: '200ms' }}>
       <CardContent className="p-5">
-        <h2 className="text-sm font-semibold text-foreground">System Status</h2>
+        <h2 className="font-display text-sm font-semibold text-foreground">System Status</h2>
         <div className="mt-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">

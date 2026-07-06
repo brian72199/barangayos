@@ -260,7 +260,7 @@ export default function CalendarPage() {
         <div className="flex flex-col gap-4 lg:flex-row">
           <div className="min-w-0 flex-1 rounded-lg border bg-card">
             <div className="flex items-center justify-between border-b px-4 py-3">
-              <h2 className="text-sm font-semibold text-foreground">
+              <h2 className="font-display text-sm font-semibold text-foreground">
                 {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </h2>
               <div className="flex gap-1">
@@ -348,7 +348,7 @@ export default function CalendarPage() {
 
           <div className="w-full rounded-lg border bg-card lg:w-80">
             <div className="border-b px-4 py-3">
-              <h3 className="text-sm font-semibold text-foreground">
+              <h3 className="font-display text-sm font-semibold text-foreground">
                 {selectedDate
                   ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', {
                       weekday: 'long',
@@ -421,7 +421,7 @@ export default function CalendarPage() {
           <div className="fixed inset-0 bg-black/40 motion-fade-in" onClick={closePanel} aria-hidden="true" />
           <div className="relative w-full bg-card shadow-xl motion-slide-up motion-fade-in overflow-y-auto md:max-w-md md:border-l md:border-border max-md:max-h-[85vh] max-md:rounded-t-2xl">
             <div className="flex items-center justify-between border-b px-5 py-4">
-              <h2 className="text-sm font-semibold text-foreground">{editingId ? 'Edit Event' : 'Add Event'}</h2>
+              <h2 className="font-display text-sm font-semibold text-foreground">{editingId ? 'Edit Event' : 'Add Event'}</h2>
               <button
                 type="button"
                 onClick={closePanel}

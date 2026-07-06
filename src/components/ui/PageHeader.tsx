@@ -13,7 +13,7 @@ export function PageHeader({ title, subtitle, children }: PageHeaderProps) {
         <div className="flex items-start gap-3">
           <div className="mt-1 w-1 h-8 shrink-0 rounded-full bg-gold" aria-hidden="true" />
           <div>
-            <h1 className="text-xl font-semibold text-foreground">{title}</h1>
+            <h1 className="font-display text-xl font-semibold text-foreground">{title}</h1>
             {subtitle && (
               <p className="mt-0.5 text-sm text-muted-foreground/70">{subtitle}</p>
             )}
