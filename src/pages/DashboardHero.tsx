@@ -60,7 +60,7 @@ export default function DashboardHero({ userName, role, stats }: DashboardHeroPr
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-3 gap-3">
+        <div className="mt-5 grid grid-cols-3 gap-3 motion-stagger-50">
           {pills.map((pill) => {
             const Icon = pill.icon
             return (

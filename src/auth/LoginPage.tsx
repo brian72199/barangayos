@@ -54,7 +54,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-8 motion-fade-in motion-slide-up" style={{ animationDelay: '200ms' }}>
-          <div className="rounded-2xl border border-bamboo bg-card p-6 shadow-sm ring-1 ring-transparent transition-shadow duration-200 focus-within:shadow-md focus-within:ring-gold/20 sm:p-8">
+          <div className="rounded-2xl border border-bamboo bg-card p-6 shadow-sm shadow-md ring-1 ring-transparent transition-shadow duration-200 focus-within:shadow-md focus-within:ring-gold/20 sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

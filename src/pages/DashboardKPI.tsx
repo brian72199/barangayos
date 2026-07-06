@@ -34,7 +34,7 @@ export default function DashboardKPI({ stats, role, loading }: DashboardKPIProps
   const visibleCards = allCards.filter((card) => card.roles.includes(role))
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 motion-stagger-75">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 motion-stagger-75">
       {visibleCards.map((card, i) => {
         const Icon = card.icon
         return (

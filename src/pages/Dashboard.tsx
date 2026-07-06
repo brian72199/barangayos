@@ -25,7 +25,7 @@ export default function Dashboard() {
   return (
     <>
       <PageHeader title="Dashboard" subtitle="Overview of barangay records and system activity" />
-      <div className="space-y-5">
+      <div className="space-y-6">
         <DashboardHero userName={userName} role={role} stats={stats} />
         <DashboardSearch />
         <DashboardKPI stats={stats} role={role} loading={loading} />
