@@ -1,6 +1,7 @@
 import type { RecordModel } from 'pocketbase'
 import { getClient } from './client'
 import { handleApiError } from './errorHandler'
+import { getCurrentUser } from '@/auth/session'
 import { createFinanceAuditLog } from './financeAudit'
 
 const COLLECTION = 'fund_sources'
@@ -27,6 +28,7 @@ export interface ApiFundSource extends RecordModel {
   fiscal_year: number
   is_active: boolean
   notes: string
+  created_by?: string
   created: string
   updated: string
 }
@@ -45,7 +47,7 @@ export async function getFundSource(id: string): Promise<ApiFundSource> {
 
 export async function createFundSource(data: FundSourceData): Promise<ApiFundSource> {
   try {
-    const payload = { ...data, original_balance: data.original_balance ?? data.current_balance ?? 0 }
+    const payload = { ...data, original_balance: data.original_balance ?? data.current_balance ?? 0, created_by: getCurrentUser()?.id }
     const result = await getClient().collection<ApiFundSource>(COLLECTION).create(payload)
     createFinanceAuditLog('create', COLLECTION, result.id, `created fund_sources: ${result.name}`)
     return result

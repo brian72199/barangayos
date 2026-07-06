@@ -11,6 +11,11 @@ const AUDITED_COLLECTIONS = [
   "calendar_events",
   "assets",
   "system_settings",
+  "income_accounts",
+  "revenues",
+  "fund_sources",
+  "appropriations",
+  "disbursements",
 ]
 
 function writeAuditLog(dao, e, action) {

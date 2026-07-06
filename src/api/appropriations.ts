@@ -2,6 +2,7 @@ import type { RecordModel } from 'pocketbase'
 import { getClient } from './client'
 import { handleApiError } from './errorHandler'
 import type { ApiFundSource } from './fundSources'
+import { getCurrentUser } from '@/auth/session'
 import { createFinanceAuditLog } from './financeAudit'
 
 const COLLECTION = 'appropriations'
@@ -32,6 +33,7 @@ export interface ApiAppropriation extends RecordModel {
   fully_disbursed_date: string
   obligation_notes: string
   notes: string
+  created_by?: string
   created: string
   updated: string
   expand?: { fund_source?: ApiFundSource }
@@ -67,6 +69,7 @@ export async function createAppropriation(data: AppropriationData): Promise<ApiA
     const result = await getClient().collection<ApiAppropriation>(COLLECTION).create({
       ...data,
       disbursed_amount: 0,
+      created_by: getCurrentUser()?.id,
     })
     createFinanceAuditLog('create', COLLECTION, result.id, `created appropriations: ${result.item_name}`, result.appropriated_amount)
     return result

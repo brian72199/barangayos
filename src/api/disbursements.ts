@@ -2,8 +2,7 @@ import type { RecordModel } from 'pocketbase'
 import { getClient } from './client'
 import { handleApiError } from './errorHandler'
 import type { ApiAppropriation } from './appropriations'
-import { getAppropriation, updateAppropriation } from './appropriations'
-import { deductFundSourceBalance, restoreFundSourceBalance } from './fundSources'
+import { getCurrentUser } from '@/auth/session'
 import { createFinanceAuditLog } from './financeAudit'
 
 const COLLECTION = 'disbursements'
@@ -28,6 +27,7 @@ export interface ApiDisbursement extends RecordModel {
   or_no: string
   particular: string
   notes: string
+  created_by?: string
   created: string
   updated: string
   expand?: { appropriation?: ApiAppropriation }
@@ -51,20 +51,12 @@ export async function getDisbursement(id: string): Promise<ApiDisbursement> {
 
 export async function createDisbursement(data: DisbursementData): Promise<ApiDisbursement> {
   try {
-    const result = await getClient().collection<ApiDisbursement>(COLLECTION).create(data)
-    const appr = await getAppropriation(data.appropriation || '')
-    const newDisbursed = (appr.disbursed_amount || 0) + (data.amount || 0)
-    await updateAppropriation(appr.id, {
-      disbursed_amount: newDisbursed,
-      fully_disbursed_date: newDisbursed >= appr.appropriated_amount ? new Date().toISOString().split('T')[0] : appr.fully_disbursed_date || '',
+    const result = await getClient().collection<ApiDisbursement>(COLLECTION).create({
+      ...data,
+      created_by: getCurrentUser()?.id,
     })
-    await deductFundSourceBalance(
-      appr.fund_source,
-      data.amount || 0,
-      `Disbursed ₱${(data.amount || 0).toLocaleString()} for ${appr.item_name}`,
-    )
     createFinanceAuditLog('create', COLLECTION, result.id, `created disbursements: ${data.particular || ''}`, data.amount)
-    return { ...result, expand: { appropriation: appr } }
+    return result
   }
   catch (e) { throw handleApiError(e) }
 }
@@ -80,18 +72,6 @@ export async function updateDisbursement(id: string, data: Partial<DisbursementD
 
 export async function deleteDisbursement(id: string): Promise<boolean> {
   try {
-    const existing = await getDisbursement(id)
-    const appr = await getAppropriation(existing.appropriation)
-    const newDisbursed = Math.max(0, (appr.disbursed_amount || 0) - existing.amount)
-    await updateAppropriation(appr.id, {
-      disbursed_amount: newDisbursed,
-      fully_disbursed_date: newDisbursed > 0 ? appr.fully_disbursed_date || '' : '',
-    })
-    await restoreFundSourceBalance(
-      appr.fund_source,
-      existing.amount,
-      `Restored ₱${existing.amount.toLocaleString()} from deleted disbursement for ${appr.item_name}`,
-    )
     await getClient().collection(COLLECTION).delete(id)
     createFinanceAuditLog('delete', COLLECTION, id, `deleted disbursements`)
     return true

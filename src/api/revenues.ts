@@ -2,6 +2,7 @@ import type { RecordModel } from 'pocketbase'
 import { getClient } from './client'
 import { handleApiError } from './errorHandler'
 import type { ApiIncomeAccount } from './incomeAccounts'
+import { getCurrentUser } from '@/auth/session'
 import { createFinanceAuditLog } from './financeAudit'
 
 const COLLECTION = 'revenues'
@@ -30,6 +31,7 @@ export interface ApiRevenue extends RecordModel {
   document_request: string
   or_no: string
   remarks: string
+  created_by?: string
   created: string
   updated: string
   expand?: { income_account?: ApiIncomeAccount; document_request?: RecordModel }
@@ -53,7 +55,10 @@ export async function getRevenue(id: string): Promise<ApiRevenue> {
 
 export async function createRevenue(data: RevenueData): Promise<ApiRevenue> {
   try {
-    const result = await getClient().collection<ApiRevenue>(COLLECTION).create(data)
+    const result = await getClient().collection<ApiRevenue>(COLLECTION).create({
+      ...data,
+      created_by: getCurrentUser()?.id,
+    })
     createFinanceAuditLog('create', COLLECTION, result.id, `created revenues: ${result.source || result.or_no || ''}`, result.amount)
     return result
   }
