@@ -10,7 +10,6 @@ import { DataTable, type Column } from '@/components/ui/data-table'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { getDisbursements, createDisbursement, deleteDisbursement, type ApiDisbursement, type DisbursementData } from '@/api/disbursements'
-import { getObligations, type ApiObligation } from '@/api/obligations'
 import { getAppropriations, type ApiAppropriation } from '@/api/appropriations'
 
 const PAGE_SIZE = 25
@@ -20,25 +19,22 @@ export function Disbursements() {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [disbursements, setDisbursements] = useState<ApiDisbursement[]>([])
-  const [obligations, setObligations] = useState<ApiObligation[]>([])
   const [appropriations, setAppropriations] = useState<ApiAppropriation[]>([])
   const [loading, setLoading] = useState(true)
   const [flyout, setFlyout] = useState<ApiDisbursement | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
-  const [form, setForm] = useState<DisbursementData>({ obligation: '', disbursement_date: today(), amount: 0, check_no: '', or_no: '', particular: '' })
+  const [form, setForm] = useState<DisbursementData>({ appropriation: '', payee: '', disbursement_date: today(), amount: 0, check_no: '', or_no: '', particular: '' })
 
   async function load() {
     setLoading(true)
     try {
-      const [disc, obls, apprs] = await Promise.all([
+      const [disc, apprs] = await Promise.all([
         getDisbursements(startDate || undefined, endDate || undefined),
-        getObligations(),
         getAppropriations(),
       ])
       setDisbursements(disc)
-      setObligations(obls)
       setAppropriations(apprs)
     } catch (_) {}
     setLoading(false)
@@ -49,7 +45,7 @@ export function Disbursements() {
   async function handleSave() {
     await createDisbursement(form)
     setShowForm(false)
-    setForm({ obligation: '', disbursement_date: today(), amount: 0, check_no: '', or_no: '', particular: '' })
+    setForm({ appropriation: '', payee: '', disbursement_date: today(), amount: 0, check_no: '', or_no: '', particular: '' })
     load()
   }
 
@@ -64,16 +60,12 @@ export function Disbursements() {
   const totalDisbursed = disbursements.reduce((s, d) => s + d.amount, 0)
   const totalPages = Math.ceil(disbursements.length / PAGE_SIZE)
 
-  const obligationMap = Object.fromEntries(obligations.map((o) => [o.id, o]))
   const appropriationMap = Object.fromEntries(appropriations.map((a) => [a.id, a]))
 
   const columns: Column<ApiDisbursement>[] = [
     { key: 'date', label: 'Date', sortable: true, render: (d) => d.disbursement_date ? new Date(d.disbursement_date).toLocaleDateString() : '' },
     { key: 'payee', label: 'Payee', sortable: true,
-      render: (d) => {
-        const obl = d.expand?.obligation || obligationMap[d.obligation]
-        return obl?.payee || '—'
-      } },
+      render: (d) => d.payee || (d.expand?.appropriation as any)?.payee || '—' },
     { key: 'particulars', label: 'Particulars', render: (d) => d.particular ?? '—', hideBelow: 'sm' },
     { key: 'amount', label: 'Amount', className: 'text-right',
       render: (d) => `₱${Number(d.amount).toLocaleString()}` },
@@ -123,8 +115,7 @@ export function Disbursements() {
         onDelete={flyout ? () => { setDeleteId(flyout.id); setFlyout(null) } : undefined}
       >
         {flyout && (() => {
-          const obl = flyout.expand?.obligation || obligationMap[flyout.obligation]
-          const appr = obl ? appropriationMap[(obl as any).appropriation] : null
+          const appr = flyout.expand?.appropriation || appropriationMap[flyout.appropriation]
           return (
             <>
               <DetailSection icon={<DollarSign className="size-3.5" />} title="Payment Info">
@@ -155,23 +146,23 @@ export function Disbursements() {
                   </div>
                 </div>
               </DetailSection>
-              <DetailSection icon={<Building className="size-3.5" />} title="Obligation">
+              <DetailSection icon={<Building className="size-3.5" />} title="Appropriation">
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Payee</span>
-                    <span>{obl?.payee || '—'}</span>
+                    <span>{flyout.payee || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Particulars</span>
-                    <span>{obl?.particulars || '—'}</span>
+                    <span className="text-muted-foreground">Particular</span>
+                    <span>{flyout.particular || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Appropriation</span>
+                    <span className="text-muted-foreground">Item</span>
                     <span>{appr?.item_name || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Obligation Status</span>
-                    <span className="text-xs px-2 py-0.5 rounded bg-primary/10">{obl?.status || '—'}</span>
+                    <span className="text-muted-foreground">Fund Source</span>
+                    <span>{appr?.expand?.fund_source?.name || '—'}</span>
                   </div>
                 </div>
               </DetailSection>
@@ -198,19 +189,22 @@ export function Disbursements() {
               <h2 className="font-display text-sm font-semibold mb-4">Record Disbursement</h2>
               <div className="space-y-4">
                 <div>
-                  <Label>Obligation</Label>
-                  <Select value={form.obligation || ''} onValueChange={(v) => setForm({ ...form, obligation: v })}>
-                    <option value="">Select obligation</option>
-                    {obligations.filter((o) => o.status !== 'fully_disbursed').map((o) => {
-                      const appr = appropriationMap[o.appropriation]
-                      const remaining = o.amount - o.disbursed_amount
+                  <Label>Appropriation</Label>
+                  <Select value={form.appropriation || ''} onValueChange={(v) => setForm({ ...form, appropriation: v })}>
+                    <option value="">Select appropriation</option>
+                    {appropriations.filter((a) => a.disbursed_amount < a.appropriated_amount).map((a) => {
+                      const remaining = a.appropriated_amount - a.disbursed_amount
                       return (
-                        <option key={o.id} value={o.id}>
-                          {appr?.item_name || '—'} — {o.payee} (₱{remaining.toLocaleString()} remaining)
+                        <option key={a.id} value={a.id}>
+                          {a.item_name} (₱{remaining.toLocaleString()} remaining)
                         </option>
                       )
                     })}
                   </Select>
+                </div>
+                <div>
+                  <Label>Payee</Label>
+                  <Input value={form.payee || ''} onChange={(e) => setForm({ ...form, payee: e.target.value })} />
                 </div>
                 <div>
                   <Label>Disbursement Date</Label>
