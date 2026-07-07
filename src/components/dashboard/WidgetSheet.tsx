@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { X, SlidersHorizontal } from 'lucide-react'
 import type { WidgetDefinition, ConfigField } from './widgetRegistry'
 import type { DashboardConfig, WidgetState } from './useWidgetConfig'
@@ -12,6 +13,13 @@ interface WidgetSheetProps {
 }
 
 export function WidgetSheet({ open, onClose, widgets, config, onUpdateWidget, onReset }: WidgetSheetProps) {
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden'
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [open])
+
   if (!open) return null
 
   return (
