@@ -20,10 +20,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius: 0.5rem;
 
   --color-surface-raised: var(--surface-raised);
-  --color-surface-overlay: var(--surface-overlay);
   --color-text-subtle: var(--text-subtle);
 
   --color-capiz: var(--capiz);
@@ -33,17 +31,23 @@
   --color-bamboo: var(--bamboo);
   --color-red-pinoy: var(--red-pinoy);
 
+  --color-accent: var(--accent-blue);
+  --color-accent-teal: var(--accent-teal);
+  --color-accent-rose: var(--accent-rose);
+  --color-accent-amber: var(--accent-amber);
+
   --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.08), 0 8px 10px rgba(0, 0, 0, 0.04);
+  --radius: 0.375rem;
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px rgba(15, 23, 42, 0.05), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px rgba(15, 23, 42, 0.06), 0 4px 6px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 20px 25px rgba(15, 23, 42, 0.08), 0 8px 10px rgba(15, 23, 42, 0.04);
   --shadow-ring: 0 0 0 1px var(--color-ring);
-  --shadow-elevated: 0 4px 24px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(201, 149, 62, 0.08);
 }
 
 @utility motion-fade-in {
@@ -178,71 +182,79 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
 :root {
   color-scheme: light;
 
-  --bg: #F6F2EB;
-  --fg: #1A1513;
+  --bg: #F1F5F9;
+  --fg: #0F172A;
   --card: #FFFFFF;
-  --card-fg: #1A1513;
+  --card-fg: #0F172A;
   --popover: #FFFFFF;
-  --popover-fg: #1A1513;
-  --primary: #1B3A4B;
+  --popover-fg: #0F172A;
+  --primary: #2563EB;
   --primary-fg: #FFFFFF;
-  --secondary: #F0EBE0;
-  --secondary-fg: #1A1513;
-  --muted: #F0EBE0;
-  --muted-fg: #7A6E62;
-  --accent: #F0EBE0;
-  --accent-fg: #1A1513;
-  --destructive: #CE1126;
+  --secondary: #F1F5F9;
+  --secondary-fg: #0F172A;
+  --muted: #F8FAFC;
+  --muted-fg: #64748B;
+  --accent: #EFF6FF;
+  --accent-fg: #1D4ED8;
+  --destructive: #E11D48;
   --destructive-fg: #FFFFFF;
-  --border: #E8DFD0;
-  --input: #E8DFD0;
-  --ring: #C9953E;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #2563EB;
 
   --capiz: #F8F5F0;
   --barangay: #1B3A4B;
-  --gold: #C9953E;
+  --gold: #D4A04A;
   --narra: #5C4033;
   --bamboo: #E8DFD0;
   --red-pinoy: #CE1126;
 
-  --surface-raised: #FFFFFF;
-  --surface-overlay: rgba(0, 0, 0, 0.4);
-  --text-subtle: #A09688;
+  --accent-blue: #2563EB;
+  --accent-teal: #0D9488;
+  --accent-rose: #E11D48;
+  --accent-amber: #D97706;
+
+  --surface-raised: #F8FAFC;
+  --text-subtle: #94A3B8;
 }
 
 .dark {
   color-scheme: dark;
 
-  --bg: #12100E;
-  --fg: #E5DCD0;
-  --card: #141211;
-  --card-fg: #E5DCD0;
-  --popover: #141211;
-  --popover-fg: #E5DCD0;
-  --primary: #6B9BAB;
-  --primary-fg: #0B0A09;
-  --secondary: #1C1917;
-  --secondary-fg: #E5DCD0;
-  --muted: #1A1714;
-  --muted-fg: #948A7E;
-  --accent: #1C1917;
-  --accent-fg: #E5DCD0;
-  --destructive: #D94A45;
+  --bg: #0B1120;
+  --fg: #F8FAFC;
+  --card: #131D2E;
+  --card-fg: #F8FAFC;
+  --popover: #131D2E;
+  --popover-fg: #F8FAFC;
+  --primary: #60A5FA;
+  --primary-fg: #0B1120;
+  --secondary: #1E293B;
+  --secondary-fg: #F8FAFC;
+  --muted: #1E293B;
+  --muted-fg: #94A3B8;
+  --accent: #1E3A5F;
+  --accent-fg: #93C5FD;
+  --destructive: #FB7185;
   --destructive-fg: #FFFFFF;
-  --border: #2A2622;
-  --input: #2A2622;
-  --ring: #C9953E;
+  --border: #1E293B;
+  --input: #1E293B;
+  --ring: #60A5FA;
 
   --capiz: #0B0A09;
   --barangay: #608B99;
-  --gold: #C9953E;
+  --gold: #E4B65E;
   --narra: #C4B4A0;
   --bamboo: #2A2622;
   --red-pinoy: #D94A45;
 
-  --surface-raised: #1C1917;
-  --surface-overlay: rgba(0, 0, 0, 0.6);
-  --text-subtle: #7A7064;
+  --accent-blue: #60A5FA;
+  --accent-teal: #2DD4BF;
+  --accent-rose: #FB7185;
+  --accent-amber: #FBBF24;
+
+  --surface-raised: #0F172A;
+  --text-subtle: #64748B;
 
   --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
