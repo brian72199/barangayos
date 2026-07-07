@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react'
-import { PageHeader } from '@/components/ui/PageHeader'
-import { Breadcrumb } from '@/components/ui/breadcrumb'
 import { FiscalYearSelector } from '@/components/finance/FiscalYearSelector'
 import { ExpenseClassCard } from '@/components/finance/ExpenseClassCard'
 import { ComplianceWarning } from '@/components/finance/ComplianceWarning'
@@ -10,6 +8,10 @@ import { getIncomeAccounts, type ApiIncomeAccount } from '@/api/incomeAccounts'
 import { getDisbursements, type ApiDisbursement } from '@/api/disbursements'
 import { getRevenues, type ApiRevenue } from '@/api/revenues'
 import { getFinanceConfig, type ComplianceWarningItem } from '@/api/settings'
+import { useWidgetConfig } from '@/components/dashboard/useWidgetConfig'
+import { BUDGET_WIDGETS } from '@/components/dashboard/widgetRegistry'
+import { WidgetSheet } from '@/components/dashboard/WidgetSheet'
+import { useAuth } from '@/auth/useAuth'
 
 function buildDateRange(days = 30): string[] {
   const dates: string[] = []
@@ -34,6 +36,11 @@ function aggregateDaily<T extends { amount: number }>(
 }
 
 export function BudgetOverview() {
+  const { user } = useAuth()
+  const role = user?.role ?? 'viewer'
+  const { config, updateWidget, resetToDefaults, isVisible, getWidgetConfig } = useWidgetConfig('budget', role)
+  const [sheetOpen, setSheetOpen] = useState(false)
+
   const [year, setYear] = useState(new Date().getFullYear())
   const [appropriations, setAppropriations] = useState<ApiAppropriation[]>([])
   const [incomeAccounts, setIncomeAccounts] = useState<ApiIncomeAccount[]>([])
@@ -86,38 +93,88 @@ export function BudgetOverview() {
     return { date, value: rate }
   })
 
+  const statConfig = getWidgetConfig('stat-cards') as { metrics?: string[] } | undefined
+  const selectedStats = statConfig?.metrics ?? ['income', 'appropriated', 'disbursed', 'balance', 'utilization']
+
+  const expenseConfig = getWidgetConfig('expense-cards') as { detailMode?: string } | undefined
+  const detailMode = (expenseConfig?.detailMode as 'detailed' | 'compact') ?? 'detailed'
+
+  const statMap: Record<string, { label: string; value: number }> = {
+    income: { label: 'Total Income', value: totalIncome },
+    appropriated: { label: 'Appropriated', value: totalAppropriated },
+    disbursed: { label: 'Disbursed', value: totalDisbursed },
+    balance: { label: 'Balance', value: totalAppropriated - totalDisbursed },
+    utilization: { label: 'Utilization Rate', value: totalAppropriated > 0 ? Math.round((totalDisbursed / totalAppropriated) * 100) : 0 },
+  }
+
   return (
     <div>
-      <PageHeader title="Budget Overview">
-        <div className="flex items-center gap-4">
-          <FiscalYearSelector value={year} onChange={setYear} />
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">Budget Overview</h1>
         </div>
-      </PageHeader>
-      
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-        {[
-          { label: 'Total Income', value: totalIncome },
-          { label: 'Appropriated', value: totalAppropriated },
-          { label: 'Disbursed', value: totalDisbursed },
-          { label: 'Balance', value: totalAppropriated - totalDisbursed },
-        ].map((s) => (
-          <div key={s.label} className="p-3 rounded-lg border bg-card text-center">
-            <p className="text-xs text-muted-foreground">{s.label}</p>
-            <p className="text-lg font-bold">₱{s.value.toLocaleString()}</p>
+        <div className="flex items-center gap-3">
+          <FiscalYearSelector value={year} onChange={setYear} />
+          <button
+            onClick={() => setSheetOpen(true)}
+            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          >
+            <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
+            Customize
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-5">
+        {isVisible('stat-cards') && (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {selectedStats.map((key: string) => {
+              const s = statMap[key]
+              if (!s) return null
+              const isUtil = key === 'utilization'
+              return (
+                <div key={key} className="rounded-lg border border-border bg-card p-3 text-center">
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                  <p className="text-lg font-bold text-foreground tabular-nums">
+                    {isUtil ? `${s.value}%` : `₱${s.value.toLocaleString()}`}
+                  </p>
+                </div>
+              )
+            })}
           </div>
-        ))}
+        )}
+
+        {isVisible('compliance-warnings') && <ComplianceWarning warnings={complianceWarnings} />}
+
+        {isVisible('expense-cards') && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <ExpenseClassCard title="PS (Personnel Services)" appropriated={psAppropriated} obligated={psDisbursed} disbursed={psDisbursed} itemCount={psItems.length} detailMode={detailMode} />
+            <ExpenseClassCard title="MOOE (Maintenance & Other Operating Expenses)" appropriated={mooeAppropriated} obligated={mooeDisbursed} disbursed={mooeDisbursed} itemCount={mooeItems.length} detailMode={detailMode} />
+            <ExpenseClassCard title="CO (Capital Outlay)" appropriated={coAppropriated} obligated={coDisbursed} disbursed={coDisbursed} itemCount={coItems.length} detailMode={detailMode} />
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {isVisible('disbursements-chart') && (
+            <KpiChart title="Disbursements (30 days)" type={(getWidgetConfig('disbursements-chart') as { chartType?: string })?.chartType ?? 'bar'} data={disbursementTrend} color="#C9953E" format="currency" />
+          )}
+          {isVisible('revenue-chart') && (
+            <KpiChart title="Revenue (30 days)" type={(getWidgetConfig('revenue-chart') as { chartType?: string })?.chartType ?? 'bar'} data={revenueTrend} color="#22C55E" format="currency" />
+          )}
+          {isVisible('utilization-chart') && (
+            <KpiChart title="Utilization Rate (30 days)" type={(getWidgetConfig('utilization-chart') as { chartType?: string })?.chartType ?? 'line'} data={utilizationData} color="#3B82F6" format="number" />
+          )}
+        </div>
       </div>
-      <ComplianceWarning warnings={complianceWarnings} />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <ExpenseClassCard title="PS (Personnel Services)" appropriated={psAppropriated} obligated={psDisbursed} disbursed={psDisbursed} itemCount={psItems.length} />
-        <ExpenseClassCard title="MOOE (Maintenance & Other Operating Expenses)" appropriated={mooeAppropriated} obligated={mooeDisbursed} disbursed={mooeDisbursed} itemCount={mooeItems.length} />
-        <ExpenseClassCard title="CO (Capital Outlay)" appropriated={coAppropriated} obligated={coDisbursed} disbursed={coDisbursed} itemCount={coItems.length} />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <KpiChart title="Disbursements (30 days)" type="bar" data={disbursementTrend} color="#C9953E" format="currency" />
-        <KpiChart title="Revenue (30 days)" type="bar" data={revenueTrend} color="#22C55E" format="currency" />
-        <KpiChart title="Utilization Rate (30 days)" type="line" data={utilizationData} color="#3B82F6" format="number" />
-      </div>
+
+      <WidgetSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        widgets={BUDGET_WIDGETS}
+        config={config}
+        onUpdateWidget={updateWidget}
+        onReset={resetToDefaults}
+      />
     </div>
   )
 }

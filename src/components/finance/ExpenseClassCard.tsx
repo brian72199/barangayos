@@ -6,12 +6,29 @@ interface ExpenseClassCardProps {
   obligated: number
   disbursed: number
   itemCount: number
+  detailMode?: 'detailed' | 'compact'
 }
 
-export function ExpenseClassCard({ title, appropriated, obligated, disbursed, itemCount }: ExpenseClassCardProps) {
+export function ExpenseClassCard({ title, appropriated, obligated, disbursed, itemCount, detailMode = 'detailed' }: ExpenseClassCardProps) {
   const obligatedPct = appropriated > 0 ? Math.round((obligated / appropriated) * 100) : 0
   const disbursedPct = appropriated > 0 ? Math.round((disbursed / appropriated) * 100) : 0
   const f = (n: number) => '₱' + n.toLocaleString()
+
+  if (detailMode === 'compact') {
+    return (
+      <Card>
+        <CardContent className="p-4">
+          <p className="text-xs font-medium text-muted-foreground">{title}</p>
+          <p className="mt-1 text-lg font-bold text-foreground tabular-nums">{f(appropriated)}</p>
+          <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+            <div className="h-full rounded-full bg-gold transition-all" style={{ width: `${Math.min(obligatedPct, 100)}%` }} />
+          </div>
+          <p className="mt-1 text-[10px] text-muted-foreground">{obligatedPct}% utilized</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader className="pb-2">
