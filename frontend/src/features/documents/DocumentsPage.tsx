@@ -184,7 +184,14 @@ export default function DocumentsPage() {
       filterValue: (d) => `#${d.queue_number}`,
       render: (d) => `#${d.queue_number}` },
     { key: 'resident_name', label: 'Resident', sortable: true, filterType: 'text',
-      render: (d) => d.resident_name },
+      render: (d) => (
+        <div className="flex items-center gap-2">
+          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-3.5" />
+          </div>
+          <span className="font-medium">{d.resident_name}</span>
+        </div>
+      ) },
     { key: 'document_type', label: 'Type', sortable: true, filterType: 'select',
       filterOptions: [
         { label: 'Barangay Clearance', value: 'barangay_clearance' },

@@ -1,7 +1,7 @@
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock'
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router'
-import { Plus, ChevronDown, Home, Users } from 'lucide-react'
+import { Plus, ChevronDown, Home, User, Users } from 'lucide-react'
 import { getHouseholds, getNextHouseholdNumber, createHousehold, updateHousehold, deleteHousehold, type ApiHousehold } from '@/api/households'
 import { getResidents, type ApiResident } from '@/api/residents'
 import { ResidentCombobox } from '@/components/ui/ResidentCombobox'
@@ -175,7 +175,15 @@ export default function HouseholdsPage() {
 
   const columns: Column<ApiHousehold>[] = [
     { key: 'household_number', label: 'Household #', sortable: true, filterType: 'text' },
-    { key: 'head_name', label: 'Head of Household', sortable: true, filterType: 'text' },
+    { key: 'head_name', label: 'Head of Household', sortable: true, filterType: 'text',
+      render: (h) => (
+        <div className="flex items-center gap-2">
+          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-3.5" />
+          </div>
+          <span className="font-medium">{h.head_name}</span>
+        </div>
+      ) },
     { key: 'address', label: 'Address', filterType: 'text',
       render: (h) => h.address || '—' },
     { key: 'purok', label: 'Purok', sortable: true, filterType: 'select',

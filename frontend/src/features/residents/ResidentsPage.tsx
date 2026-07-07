@@ -1,7 +1,7 @@
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock'
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router'
-import { Plus, ChevronDown, Search, Home, FileText, BookOpen, Activity } from 'lucide-react'
+import { Plus, ChevronDown, Search, Home, FileText, BookOpen, Activity, User } from 'lucide-react'
 import { getResidents, createResident, updateResident, deleteResident, type ApiResident } from '@/api/residents'
 import { searchHouseholds, getHousehold, type ApiHousehold } from '@/api/households'
 import { getDocuments, type ApiDocument } from '@/api/documents'
@@ -356,7 +356,14 @@ export default function ResidentsPage() {
   const columns: Column<ApiResident>[] = [
     { key: 'last_name', label: 'Name', sortable: true, filterType: 'text',
       filterValue: (r) => `${r.last_name}, ${r.first_name}${r.middle_name ? ' ' + r.middle_name : ''}`,
-      render: (r) => `${r.last_name}, ${r.first_name}${r.middle_name ? ' ' + r.middle_name : ''}` },
+      render: (r) => (
+        <div className="flex items-center gap-2">
+          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-3.5" />
+          </div>
+          <span className="font-medium">{r.last_name}, {r.first_name}{r.middle_name ? ' ' + r.middle_name : ''}</span>
+        </div>
+      ) },
     { key: 'purok', label: 'Purok', sortable: true, filterType: 'select',
       filterOptions: purokOptions.map(p => ({ label: p, value: p })) },
     { key: 'gender', label: 'Gender', filterType: 'select',
