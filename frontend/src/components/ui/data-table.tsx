@@ -49,6 +49,7 @@ interface DataTableProps<T> {
   loading?: boolean
   emptyState?: ReactNode
   rowKey: (item: T) => string
+  rowClassName?: (item: T) => string | undefined
   onRowClick?: (item: T) => void
   onSelectionChange?: (selectedKeys: string[]) => void
   dense?: boolean
@@ -65,7 +66,7 @@ interface DataTableProps<T> {
 }
 
 function DataTableInner<T>({
-  columns, data, loading, emptyState, rowKey, onRowClick,
+  columns, data, loading, emptyState, rowKey, rowClassName, onRowClick,
   onSelectionChange, dense = true, toolbar = true,
   sortKey: externalSortKey, sortDir: externalSortDir, onSort: externalOnSort,
   page: externalPage, totalPages: externalTotalPages, totalItems: externalTotalItems,
@@ -420,6 +421,7 @@ function DataTableInner<T>({
                       'hover:bg-accent/40',
                       row.getIsSelected() && 'bg-gold/10 ring-1 ring-inset ring-gold/30',
                       (onRowClick || onSelectionChange) && 'cursor-pointer',
+                      rowClassName?.(row.original),
                     )}
                   >
                     {row.getVisibleCells().map(cell => {

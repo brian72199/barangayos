@@ -316,6 +316,8 @@ export default function AgendaPage() {
     { key: 'date', label: 'Date', sortable: true,
       render: (m) => m.meeting_date ? new Date(m.meeting_date).toLocaleDateString() : '',
       hideBelow: 'sm', filterType: 'date' },
+    { key: 'location', label: 'Location', filterType: 'text',
+      render: (m) => m.location || '—' },
     { key: 'meeting_type', label: 'Type', filterType: 'select',
       filterOptions: meetingTypeOptions.map(t => ({ label: t.label, value: t.value })) },
     { key: 'status', label: 'Status',

@@ -66,12 +66,12 @@ export function Disbursements() {
     { key: 'date', label: 'Date', sortable: true, filterType: 'date', render: (d) => d.disbursement_date ? new Date(d.disbursement_date).toLocaleDateString() : '' },
     { key: 'payee', label: 'Payee', sortable: true, filterType: 'text',
       render: (d) => d.payee || (d.expand?.appropriation as any)?.payee || '—' },
-    { key: 'particulars', label: 'Particulars', filterType: 'text', render: (d) => d.particular ?? '—', hideBelow: 'sm' },
+    { key: 'particulars', label: 'Item', filterType: 'text', render: (d) => d.particular ?? '—' },
     { key: 'amount', label: 'Amount', className: 'text-right', filterType: 'text',
       render: (d) => `₱${Number(d.amount).toLocaleString()}` },
-    { key: 'check_number', label: 'Check #', hideBelow: 'sm', filterType: 'text',
+    { key: 'check_number', label: 'Check #', filterType: 'text',
       render: (d) => <span className="font-mono text-xs">{d.check_no || '—'}</span> },
-    { key: 'reference_number', label: 'OR #', hideBelow: 'sm', filterType: 'text',
+    { key: 'reference_number', label: 'OR Number', filterType: 'text',
       render: (d) => <span className="font-mono text-xs">{d.or_no || '—'}</span> },
   ]
 
@@ -182,7 +182,7 @@ export function Disbursements() {
                   <Label>Appropriation</Label>
                   <Select value={form.appropriation || ''} onValueChange={(v) => setForm({ ...form, appropriation: v })}>
                     <option value="">Select appropriation</option>
-                    {appropriations.filter((a) => a.disbursed_amount < a.appropriated_amount).map((a) => {
+                    {appropriations.filter((a) => a.obligated_date && a.disbursed_amount < a.appropriated_amount).map((a) => {
                       const remaining = a.appropriated_amount - a.disbursed_amount
                       return (
                         <option key={a.id} value={a.id}>

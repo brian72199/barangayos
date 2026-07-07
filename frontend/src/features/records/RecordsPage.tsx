@@ -181,12 +181,14 @@ export default function RecordsPage() {
   const blotterColumns: Column<ApiBlotter>[] = [
     { key: 'case_number', label: 'Case #', sortable: true, filterType: 'text' },
     { key: 'complainant_name', label: 'Complainant', sortable: true, filterType: 'text' },
-    { key: 'respondent_name', label: 'Respondent', sortable: true, hideBelow: 'sm', filterType: 'text' },
+    { key: 'respondent_name', label: 'Respondent', sortable: true, filterType: 'text' },
     { key: 'incident_type', label: 'Incident Type', hideBelow: 'sm', filterType: 'select',
       filterOptions: [
         { label: 'Blotter', value: 'blotter' }, { label: 'Complaint', value: 'complaint' },
         { label: 'Dispute', value: 'dispute' }, { label: 'Other', value: 'other' },
       ] },
+    { key: 'incident_location', label: 'Location', filterType: 'text',
+      render: (b) => b.incident_location || '—' },
     { key: 'status', label: 'Status',
       render: (b) => (
         <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${blotterStatusColors[b.status] ?? ''}`}>

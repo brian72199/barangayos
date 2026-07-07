@@ -176,6 +176,8 @@ export default function HouseholdsPage() {
   const columns: Column<ApiHousehold>[] = [
     { key: 'household_number', label: 'Household #', sortable: true, filterType: 'text' },
     { key: 'head_name', label: 'Head of Household', sortable: true, filterType: 'text' },
+    { key: 'address', label: 'Address', filterType: 'text',
+      render: (h) => h.address || '—' },
     { key: 'purok', label: 'Purok', sortable: true, filterType: 'select',
       filterOptions: purokOptions.map(p => ({ label: p, value: p })) },
     { key: 'member_count', label: 'Members',

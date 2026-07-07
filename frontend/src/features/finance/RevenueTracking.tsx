@@ -83,7 +83,7 @@ export function RevenueTracking() {
   const columns: Column<ApiRevenue>[] = [
     { key: 'date', label: 'Date', sortable: true, filterType: 'date', render: (r) => r.revenue_date ? new Date(r.revenue_date).toLocaleDateString() : '' },
     { key: 'source', label: 'Source', sortable: true, filterType: 'text' },
-    { key: 'category', label: 'Category', sortable: true, hideBelow: 'sm', filterType: 'select',
+    { key: 'category', label: 'Category', sortable: true, filterType: 'select',
       filterOptions: CATEGORIES.filter((c) => c.value !== 'all').map((c) => ({ label: c.label, value: c.value })),
       render: (r) => <span className="text-xs bg-primary/10 px-2 py-0.5 rounded">{CATEGORY_LABELS[r.category] || r.category}</span> },
     { key: 'income_account', label: 'Income Account', hideBelow: 'sm',
@@ -92,7 +92,7 @@ export function RevenueTracking() {
       render: (r) => r.expand?.fund_source?.name ?? '—' },
     { key: 'amount', label: 'Amount', className: 'text-right', filterType: 'text',
       render: (r) => `₱${Number(r.amount).toLocaleString()}` },
-    { key: 'reference_number', label: 'OR #', hideBelow: 'sm', filterType: 'text',
+    { key: 'reference_number', label: 'Reference #', filterType: 'text',
       render: (r) => <span className="font-mono text-xs">{r.or_no || '—'}</span> },
   ]
 

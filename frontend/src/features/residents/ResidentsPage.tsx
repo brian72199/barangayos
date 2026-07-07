@@ -357,7 +357,7 @@ export default function ResidentsPage() {
     { key: 'last_name', label: 'Name', sortable: true, filterType: 'text',
       filterValue: (r) => `${r.last_name}, ${r.first_name}${r.middle_name ? ' ' + r.middle_name : ''}`,
       render: (r) => `${r.last_name}, ${r.first_name}${r.middle_name ? ' ' + r.middle_name : ''}` },
-    { key: 'purok', label: 'Purok', sortable: true, hideBelow: 'sm', filterType: 'select',
+    { key: 'purok', label: 'Purok', sortable: true, filterType: 'select',
       filterOptions: purokOptions.map(p => ({ label: p, value: p })) },
     { key: 'gender', label: 'Gender', filterType: 'select',
       filterOptions: [{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }] },

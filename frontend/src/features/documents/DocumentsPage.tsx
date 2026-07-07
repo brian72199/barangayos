@@ -185,7 +185,7 @@ export default function DocumentsPage() {
       render: (d) => `#${d.queue_number}` },
     { key: 'resident_name', label: 'Resident', sortable: true, filterType: 'text',
       render: (d) => d.resident_name },
-    { key: 'document_type', label: 'Document Type', sortable: true, hideBelow: 'sm', filterType: 'select',
+    { key: 'document_type', label: 'Type', sortable: true, filterType: 'select',
       filterOptions: [
         { label: 'Barangay Clearance', value: 'barangay_clearance' },
         { label: 'Business Permit', value: 'business_permit' },
@@ -195,6 +195,8 @@ export default function DocumentsPage() {
         { label: 'Cedula', value: 'cedula' },
         { label: 'Other', value: 'other' },
       ] },
+    { key: 'purpose', label: 'Purpose', filterType: 'text',
+      render: (d) => d.purpose || '—' },
     { key: 'status', label: 'Status',
       render: (d) => (
         <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${documentStatusColors[d.status] ?? ''}`}>
@@ -207,7 +209,7 @@ export default function DocumentsPage() {
         { label: 'For Release', value: 'for_release' }, { label: 'Released', value: 'released' },
         { label: 'Cancelled', value: 'cancelled' },
       ] },
-    { key: 'payment_status', label: 'Payment', hideBelow: 'sm', filterType: 'select',
+    { key: 'payment_status', label: 'Payment', filterType: 'select',
       filterOptions: [
         { label: 'Paid', value: 'paid' }, { label: 'Unpaid', value: 'unpaid' },
         { label: 'Waived', value: 'waived' },
@@ -234,6 +236,7 @@ export default function DocumentsPage() {
             data={docs}
             loading={loading}
             onRowClick={(d) => setFlyoutDoc(d)}
+            rowClassName={(d) => d.status === 'released' || d.status === 'cancelled' ? 'opacity-40' : undefined}
             emptyState={
               <EmptyState
                 title="No document requests yet."
@@ -341,8 +344,8 @@ export default function DocumentsPage() {
         open={flyoutDoc !== null}
         onClose={closeFlyout}
         title={flyoutDoc ? `#${flyoutDoc.queue_number} - ${flyoutDoc.resident_name}` : ''}
-        onEdit={canModify && flyoutDoc ? () => { openEditPanel(flyoutDoc); closeFlyout() } : undefined}
-        onDelete={canModify && flyoutDoc ? () => handleDelete(flyoutDoc.id) : undefined}
+        onEdit={canModify && flyoutDoc && flyoutDoc.status !== 'released' && flyoutDoc.status !== 'cancelled' ? () => { openEditPanel(flyoutDoc); closeFlyout() } : undefined}
+        onDelete={canModify && flyoutDoc && flyoutDoc.status !== 'released' && flyoutDoc.status !== 'cancelled' ? () => handleDelete(flyoutDoc.id) : undefined}
       >
         {flyoutDoc && (
           <>
