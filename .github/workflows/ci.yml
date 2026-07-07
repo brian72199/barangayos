@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   E2E_ADMIN_EMAIL: admin@e2e.local
   E2E_ADMIN_PASSWORD: E2eAdmin123!
