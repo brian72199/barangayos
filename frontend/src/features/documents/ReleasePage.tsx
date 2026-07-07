@@ -159,7 +159,7 @@ export default function ReleasePage() {
 
   return (
     <>
-      <PageHeader title="Document Release" subtitle="Release completed documents to residents." />
+      <PageHeader title="Document Release"/>
 
       {successMsg && (
         <div className="mb-4 rounded-md bg-emerald-200 px-4 py-3 text-sm text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-300 motion-fade-in">

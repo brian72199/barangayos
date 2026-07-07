@@ -383,7 +383,7 @@ export default function ResidentsPage() {
 
   return (
     <>
-      <PageHeader title="Residents" subtitle="Manage resident profiles and demographic information.">
+      <PageHeader title="Residents">
         {canModify && (
           <Button size="sm" className="gap-1.5 motion-press" onClick={openCreatePanel}>
             <Plus className="size-3.5" />

@@ -188,7 +188,7 @@ export default function HouseholdsPage() {
 
   return (
     <>
-      <PageHeader title="Households" subtitle="Manage household records and view member information.">
+      <PageHeader title="Households">
         {canModify && (
           <Button size="sm" className="gap-1.5 motion-press" onClick={openCreatePanel}>
             <Plus className="size-3.5" />
