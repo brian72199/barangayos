@@ -12,7 +12,9 @@ import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { getFundSources, createFundSource, updateFundSource, deleteFundSource, type ApiFundSource, type FundSourceData } from '@/api/fundSources'
 import { getFinanceAuditLogs, type ApiFinanceAudit } from '@/api/financeAudit'
+import { getRevenuesByFundSource, type ApiRevenue } from '@/api/revenues'
 import { ExportDialog } from '@/components/finance/ExportDialog'
+import { cn } from '@/lib/utils'
 import { getCurrentUser } from '@/auth/session'
 
 const STATUTORY_LABELS: Record<string, string> = {
@@ -33,6 +35,7 @@ export function FundSources() {
   const [editing, setEditing] = useState<ApiFundSource | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [auditLogs, setAuditLogs] = useState<ApiFinanceAudit[]>([])
+  const [fundRevenues, setFundRevenues] = useState<ApiRevenue[]>([])
   const [showExport, setShowExport] = useState(false)
   const [form, setForm] = useState<FundSourceData>({
     name: '', code: '', statutory_rule: 'none', current_balance: 0, fiscal_year: currentYear, is_active: true, description: '', notes: '',
@@ -46,10 +49,14 @@ export function FundSources() {
 
   useEffect(() => { load() }, [])
 
-  async function loadAuditLogs(fundId: string) {
+  async function loadFundDetails(fundId: string) {
     try {
-      const result = await getFinanceAuditLogs(1, 50, '-created', 'fund_sources')
-      setAuditLogs(result.items.filter((l) => l.record_id === fundId))
+      const [logs, revs] = await Promise.all([
+        getFinanceAuditLogs(1, 50, '-created', 'fund_sources'),
+        getRevenuesByFundSource(fundId),
+      ])
+      setAuditLogs(logs.items.filter((l) => l.record_id === fundId))
+      setFundRevenues(revs)
     } catch (_) {}
   }
 
@@ -131,7 +138,7 @@ export function FundSources() {
         columns={columns}
         data={sources}
         loading={loading}
-          onRowClick={(s) => { setFlyout(s); loadAuditLogs(s.id) }}
+          onRowClick={(s) => { setFlyout(s); loadFundDetails(s.id) }}
         emptyState={<p className="text-center text-muted-foreground py-6">No fund sources found. Create one to get started.</p>}
         rowKey={(s) => s.id}
         toolbar
@@ -182,20 +189,43 @@ export function FundSources() {
                 </div>
               </div>
             </DetailSection>
-            <DetailSection icon={<Scale className="size-3.5" />} title="Deduction History">
-              {auditLogs.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No deductions recorded</p>
+            <DetailSection icon={<Scale className="size-3.5" />} title="Transaction History">
+              {fundRevenues.length === 0 && auditLogs.filter(l => l.details?.toLowerCase().includes('disburs') || l.details?.toLowerCase().includes('restor') || l.details?.toLowerCase().includes('revenue')).length === 0 ? (
+                <p className="text-sm text-muted-foreground">No transactions yet</p>
               ) : (
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {auditLogs.filter((l) => l.details?.toLowerCase().includes('disburs') || l.details?.toLowerCase().includes('restor')).map((l) => (
-                    <div key={l.id} className="flex justify-between items-center text-xs border-b pb-1 last:border-0">
-                      <div>
-                        <span className={`inline-flex items-center rounded px-1 py-0.5 text-xs font-semibold ${l.action === 'create' ? 'bg-green-100 text-green-700' : l.action === 'update' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>{l.action}</span>
-                        <span className="ml-1 text-muted-foreground">{l.details}</span>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {[
+                    ...fundRevenues.map(r => ({
+                      date: r.revenue_date,
+                      description: `Revenue: ${r.source}`,
+                      amount: r.amount,
+                      type: 'revenue' as const,
+                    })),
+                    ...auditLogs
+                      .filter(l => l.details?.toLowerCase().includes('disburs') || l.details?.toLowerCase().includes('restor'))
+                      .map(l => ({
+                        date: l.created,
+                        description: l.details || '',
+                        amount: l.amount || 0,
+                        type: l.details?.toLowerCase().includes('restor') ? 'revenue' : 'disbursement' as const,
+                      })),
+                  ]
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .slice(0, 50)
+                    .map((t, i) => (
+                      <div key={i} className="flex justify-between items-center border-b pb-1 last:border-0">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground truncate">{t.description}</p>
+                          <p className="text-[10px] text-muted-foreground">{t.date}</p>
+                        </div>
+                        <span className={cn(
+                          'font-semibold text-xs tabular-nums ml-2',
+                          t.type === 'revenue' ? 'text-emerald-600' : 'text-red-600'
+                        )}>
+                          {t.type === 'revenue' ? '+' : '−'}₱{t.amount.toLocaleString()}
+                        </span>
                       </div>
-                      {l.amount ? <span className="font-semibold">₱{l.amount.toLocaleString()}</span> : null}
-                    </div>
-                  ))}
+                    ))}
                 </div>
               )}
             </DetailSection>
