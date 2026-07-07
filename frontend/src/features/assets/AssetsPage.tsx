@@ -240,7 +240,7 @@ export default function AssetsPage() {
           <span>{a.name}</span>
         </div>
       ) },
-    { key: 'asset_type', label: 'Type', sortable: true, hideBelow: 'sm', filterType: 'select',
+    { key: 'asset_type', label: 'Type', sortable: true, filterType: 'select',
       filterOptions: assetTypeOptions.map(t => ({ label: t.label, value: t.value })) },
     { key: 'condition', label: 'Condition', filterType: 'select',
       filterOptions: conditionOptions.map(c => ({ label: conditionLabels[c] || c, value: c })),
@@ -252,7 +252,7 @@ export default function AssetsPage() {
       render: (a) => (
         <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${assetStatusColors[a.status!] ?? ''}`}>{a.status}</span>
       ) },
-    { key: 'assigned_to', label: 'Assigned To', render: (a) => a.assigned_to ?? '—', hideBelow: 'sm', filterType: 'text' },
+    { key: 'assigned_to', label: 'Assignment', render: (a) => a.assigned_to ?? '—', filterType: 'text' },
   ]
 
   return (

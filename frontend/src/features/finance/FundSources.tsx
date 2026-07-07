@@ -92,7 +92,7 @@ export function FundSources() {
   const columns: Column<ApiFundSource>[] = [
     { key: 'fiscal_year', label: 'Year', sortable: true, filterType: 'text', hideBelow: 'sm' },
     { key: 'name', label: 'Name', sortable: true, filterType: 'text' },
-    { key: 'code', label: 'Code', sortable: true, hideBelow: 'sm', filterType: 'text' },
+    { key: 'code', label: 'Code', sortable: true, filterType: 'text' },
     { key: 'statutory_rule', label: 'Statutory Rule', filterType: 'select',
       filterOptions: [
         { label: 'General', value: 'none' },
@@ -102,6 +102,8 @@ export function FundSources() {
         { label: 'Gender & Development', value: 'GAD' },
       ],
       render: (f) => f.statutory_rule ?? '—' },
+    { key: 'original_balance', label: 'Original Balance', className: 'text-right', filterType: 'text',
+      render: (f) => `₱${Number(f.original_balance ?? 0).toLocaleString()}` },
     { key: 'balance', label: 'Balance', className: 'text-right', filterType: 'text',
       render: (f) => `₱${Number(f.current_balance).toLocaleString()}` },
     { key: 'status', label: 'Status', filterType: 'select',

@@ -175,7 +175,6 @@ export default function VisitorLogPage() {
     {
       key: 'person_to_visit',
       label: 'Person to Visit',
-      hideBelow: 'sm',
       filterType: 'text',
       render: (v) => v.person_to_visit || '—',
     },
@@ -195,24 +194,6 @@ export default function VisitorLogPage() {
           {v.time_out ? 'Completed' : 'Active'}
         </span>
       ),
-    },
-    {
-      key: 'actions',
-      label: '',
-      render: (v) =>
-        !v.time_out && canModify ? (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              handleCheckOut(v.id)
-            }}
-            className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
-          >
-            <LogOut className="size-3" />
-            Check Out
-          </button>
-        ) : null,
     },
   ]
 

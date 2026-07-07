@@ -1,7 +1,7 @@
 import { useBodyScrollLock } from '@/lib/useBodyScrollLock'
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router'
-import { Plus, ChevronDown, Calendar, Users, BookOpen, FileText } from 'lucide-react'
+import { Plus, ChevronDown, Calendar, User, Users, BookOpen, FileText } from 'lucide-react'
 import { getBlotters, createBlotter, updateBlotter, deleteBlotter, getNextCaseNumber, type ApiBlotter, type BlotterData } from '@/api/blotter'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'
@@ -180,13 +180,31 @@ export default function RecordsPage() {
 
   const blotterColumns: Column<ApiBlotter>[] = [
     { key: 'case_number', label: 'Case #', sortable: true, filterType: 'text' },
-    { key: 'complainant_name', label: 'Complainant', sortable: true, filterType: 'text' },
-    { key: 'respondent_name', label: 'Respondent', sortable: true, hideBelow: 'sm', filterType: 'text' },
+    { key: 'complainant_name', label: 'Complainant', sortable: true, filterType: 'text',
+      render: (b) => (
+        <div className="flex items-center gap-2">
+          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-3.5" />
+          </div>
+          <span className="font-medium">{b.complainant_name}</span>
+        </div>
+      ) },
+    { key: 'respondent_name', label: 'Respondent', sortable: true, filterType: 'text',
+      render: (b) => (
+        <div className="flex items-center gap-2">
+          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-3.5" />
+          </div>
+          <span className="font-medium">{b.respondent_name || '—'}</span>
+        </div>
+      ) },
     { key: 'incident_type', label: 'Incident Type', hideBelow: 'sm', filterType: 'select',
       filterOptions: [
         { label: 'Blotter', value: 'blotter' }, { label: 'Complaint', value: 'complaint' },
         { label: 'Dispute', value: 'dispute' }, { label: 'Other', value: 'other' },
       ] },
+    { key: 'incident_location', label: 'Location', filterType: 'text',
+      render: (b) => b.incident_location || '—' },
     { key: 'status', label: 'Status',
       render: (b) => (
         <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${blotterStatusColors[b.status] ?? ''}`}>
