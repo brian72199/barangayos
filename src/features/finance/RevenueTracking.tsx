@@ -12,6 +12,7 @@ import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { getRevenues, createRevenue, deleteRevenue, type ApiRevenue, type RevenueData } from '@/api/revenues'
 import { getIncomeAccounts, type ApiIncomeAccount } from '@/api/incomeAccounts'
+import { getFundSources, type ApiFundSource } from '@/api/fundSources'
 import { ExportDialog } from '@/components/finance/ExportDialog'
 import { getCurrentUser } from '@/auth/session'
 
@@ -35,23 +36,26 @@ export function RevenueTracking() {
   const today = () => new Date().toISOString().split('T')[0]
   const [revenues, setRevenues] = useState<ApiRevenue[]>([])
   const [incomeAccounts, setIncomeAccounts] = useState<ApiIncomeAccount[]>([])
+  const [fundSources, setFundSources] = useState<ApiFundSource[]>([])
   const [loading, setLoading] = useState(true)
   const [flyout, setFlyout] = useState<ApiRevenue | null>(null)
   const [showForm, setShowForm] = useState(false)
   useBodyScrollLock(showForm)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [showExport, setShowExport] = useState(false)
-  const [form, setForm] = useState<RevenueData>({ revenue_date: today(), income_account: '', category: 'document_fee', source: '', amount: 0, or_no: '', remarks: '' })
+  const [form, setForm] = useState<RevenueData>({ revenue_date: today(), income_account: '', fund_source: '', category: 'document_fee', source: '', amount: 0, or_no: '', remarks: '' })
 
   async function load() {
     setLoading(true)
     try {
-      const [revs, accts] = await Promise.all([
+      const [revs, accts, funds] = await Promise.all([
         getRevenues(),
         getIncomeAccounts(),
+        getFundSources(),
       ])
       setRevenues(revs)
       setIncomeAccounts(accts)
+      setFundSources(funds)
     } catch (_) {}
     setLoading(false)
   }
@@ -59,18 +63,22 @@ export function RevenueTracking() {
   useEffect(() => { load() }, [])
 
   async function handleSave() {
-    await createRevenue(form)
-    setShowForm(false)
-    setForm({ revenue_date: today(), income_account: '', category: 'document_fee', source: '', amount: 0, or_no: '', remarks: '' })
-    load()
+    try {
+      await createRevenue(form)
+      setShowForm(false)
+      setForm({ revenue_date: today(), income_account: '', fund_source: '', category: 'document_fee', source: '', amount: 0, or_no: '', remarks: '' })
+      load()
+    } catch (_) {}
   }
 
   async function handleDelete() {
     if (!deleteId) return
-    await deleteRevenue(deleteId)
-    setDeleteId(null)
-    setFlyout(null)
-    load()
+    try {
+      await deleteRevenue(deleteId)
+      setDeleteId(null)
+      setFlyout(null)
+      load()
+    } catch (_) {}
   }
 
   const columns: Column<ApiRevenue>[] = [
@@ -81,6 +89,8 @@ export function RevenueTracking() {
       render: (r) => <span className="text-xs bg-primary/10 px-2 py-0.5 rounded">{CATEGORY_LABELS[r.category] || r.category}</span> },
     { key: 'income_account', label: 'Income Account', hideBelow: 'sm',
       render: (r) => r.expand?.income_account?.name ?? r.income_account ?? '—' },
+    { key: 'fund_source', label: 'Fund Source', hideBelow: 'sm',
+      render: (r) => r.expand?.fund_source?.name ?? '—' },
     { key: 'amount', label: 'Amount', className: 'text-right', filterType: 'text',
       render: (r) => `₱${Number(r.amount).toLocaleString()}` },
     { key: 'reference_number', label: 'OR #', hideBelow: 'sm', filterType: 'text',
@@ -148,6 +158,10 @@ export function RevenueTracking() {
                   <span className="text-muted-foreground">COA Code</span>
                   <span className="font-mono text-xs">{flyout.expand?.income_account?.coa_code || '—'}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Fund Source</span>
+                  <span>{flyout.expand?.fund_source?.name || '—'}</span>
+                </div>
               </div>
             </DetailSection>
             <DetailSection icon={<Receipt className="size-3.5" />} title="Reference">
@@ -156,11 +170,17 @@ export function RevenueTracking() {
                   <span className="text-muted-foreground">OR No.</span>
                   <span className="font-mono text-xs">{flyout.or_no || '—'}</span>
                 </div>
-                {flyout.document_request && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Document Request</span>
-                    <span className="text-xs">#{flyout.document_request}</span>
-                  </div>
+                {flyout.expand?.document_request && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Document Request</span>
+                      <span className="text-xs">#{flyout.document_request}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Received By</span>
+                      <span>{(flyout.expand.document_request as Record<string, unknown>)?.received_by as string || '—'}</span>
+                    </div>
+                  </>
                 )}
               </div>
             </DetailSection>
@@ -200,6 +220,13 @@ export function RevenueTracking() {
                   <Select value={form.income_account || ''} onValueChange={(v) => setForm({ ...form, income_account: v })}>
                     <option value="">Select account</option>
                     {incomeAccounts.map((a) => <option key={a.id} value={a.id}>{a.coa_code} — {a.name}</option>)}
+                  </Select>
+                </div>
+                <div>
+                  <Label>Fund Source</Label>
+                  <Select value={form.fund_source || ''} onValueChange={(v) => setForm({ ...form, fund_source: v })}>
+                    <option value="">Select fund source</option>
+                    {fundSources.filter((f) => f.is_active).map((f) => <option key={f.id} value={f.id}>{f.name} ({f.code})</option>)}
                   </Select>
                 </div>
                 <div>
