@@ -43,18 +43,22 @@ export function Disbursements() {
   useEffect(() => { load() }, [])
 
   async function handleSave() {
-    await createDisbursement(form)
-    setShowForm(false)
-    setForm({ appropriation: '', payee: '', disbursement_date: today(), amount: 0, check_no: '', or_no: '', particular: '' })
-    load()
+    try {
+      await createDisbursement(form)
+      setShowForm(false)
+      setForm({ appropriation: '', payee: '', disbursement_date: today(), amount: 0, check_no: '', or_no: '', particular: '' })
+      load()
+    } catch (_) {}
   }
 
   async function handleDelete() {
     if (!deleteId) return
-    await deleteDisbursement(deleteId)
-    setDeleteId(null)
-    setFlyout(null)
-    load()
+    try {
+      await deleteDisbursement(deleteId)
+      setDeleteId(null)
+      setFlyout(null)
+      load()
+    } catch (_) {}
   }
 
   const totalDisbursed = disbursements.reduce((s, d) => s + d.amount, 0)
