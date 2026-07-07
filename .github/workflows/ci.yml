@@ -74,8 +74,8 @@ jobs:
         run: |
           curl -fsSL https://github.com/pocketbase/pocketbase/releases/download/v0.39.5/pocketbase_0.39.5_linux_amd64.zip -o /tmp/pb.zip
           unzip -o /tmp/pb.zip -d /tmp/pb
-          mv /tmp/pb/pocketbase ./pocketbase
-          chmod +x ./pocketbase
+          mv /tmp/pb/pocketbase ./pocketbase/pocketbase
+          chmod +x ./pocketbase/pocketbase
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
       - uses: actions/upload-artifact@v4

@@ -1,5 +1,5 @@
 import { spawn } from 'child_process'
-import { existsSync, mkdtempSync, rmSync } from 'fs'
+import { existsSync, mkdtempSync, rmSync, statSync } from 'fs'
 import { join, dirname } from 'path'
 import { tmpdir } from 'os'
 import { fileURLToPath } from 'url'
@@ -26,9 +26,10 @@ async function main() {
   console.log(`[e2e-server] PocketBase data: ${tempDir}`)
 
   const pbBin = isWin ? 'pocketbase.exe' : 'pocketbase'
-  const pbPath = join(root, pbBin)
-  if (!existsSync(pbPath)) {
-    console.error(`[e2e-server] PocketBase binary not found at ${pbPath}`)
+  const pbCandidates = [join(root, pbBin), join(root, 'pocketbase', pbBin)]
+  const pbPath = pbCandidates.find((candidate) => existsSync(candidate) && statSync(candidate).isFile())
+  if (!pbPath) {
+    console.error(`[e2e-server] PocketBase binary not found. Checked: ${pbCandidates.join(', ')}`)
     console.error('Download it from https://github.com/pocketbase/pocketbase/releases/tag/v0.39.5')
     process.exit(1)
   }
