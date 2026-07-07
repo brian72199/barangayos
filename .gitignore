@@ -40,6 +40,7 @@ coverage/
 # PocketBase
 pb_data/
 pocketbase.exe
+pocketbase
 pocketbase-service.exe
 pocketbase-service.xml
 
@@ -50,6 +51,13 @@ pb_out.txt
 # AI agent / tooling artifacts
 .superpowers/
 .opencode/
+
+# Playwright
+playwright-report/
+test-results/
+playwright/.auth/
+playwright/.auth/*.json
+!playwright/.auth/.gitkeep
 
 # Infrastructure config
 litestream.yml

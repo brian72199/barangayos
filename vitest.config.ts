@@ -13,6 +13,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: [],
+    exclude: ['e2e/**', 'node_modules/**', '.opencode/**'],
     passWithNoTests: true,
   },
 })
