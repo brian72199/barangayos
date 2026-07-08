@@ -14,7 +14,6 @@ import {
 } from '@tanstack/react-table'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import Pagination from '@/components/ui/Pagination'
 import { DataTableToolbar } from './data-table-toolbar'
 
 declare module '@tanstack/react-table' {
@@ -63,6 +62,9 @@ interface DataTableProps<T> {
   totalItems?: number
   onPageChange?: (page: number) => void
   pageSize?: number
+  title?: string
+  toolbarActions?: ReactNode
+  className?: string
 }
 
 function DataTableInner<T>({
@@ -71,6 +73,7 @@ function DataTableInner<T>({
   sortKey: externalSortKey, sortDir: externalSortDir, onSort: externalOnSort,
   page: externalPage, totalPages: externalTotalPages, totalItems: externalTotalItems,
   onPageChange: externalOnPageChange, pageSize: externalPageSize = 25,
+  title, toolbarActions, className,
 }: DataTableProps<T>) {
   const tanColumns: ColumnDef<T>[] = useMemo(() =>
     columns.map(col => ({
@@ -297,27 +300,41 @@ function DataTableInner<T>({
 
   if (loading) {
     return (
-      <div className="space-y-2 p-4 motion-fade-in">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="flex gap-4">
-            {columns.map((col) => (
-              <div key={col.key} className="h-4 animate-pulse bg-muted flex-1" />
+      <div className={cn('motion-fade-in flex flex-col', className)}>
+        <div className="flex-1 overflow-hidden border border-border/70 bg-card p-4">
+          <div className="space-y-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex gap-4">
+                {columns.map((col) => (
+                  <div key={col.key} className="h-4 animate-pulse bg-muted flex-1" />
+                ))}
+              </div>
             ))}
           </div>
-        ))}
+        </div>
       </div>
     )
   }
 
   if (data.length === 0) {
-    return emptyState ? <div>{emptyState}</div> : null
+    return <div className={cn('motion-fade-in flex flex-col flex-1', className)}>{emptyState}</div>
   }
 
   const displayRows = table.getRowModel().rows
   const showFilters = columns.some(c => c.filterType)
+  const currentPage = hasExternalPagination ? (externalPage ?? 1) : table.getState().pagination.pageIndex + 1
+  const displayTotalPages = hasExternalPagination ? pageCount! : table.getPageCount()
+  const displayTotalItems = hasExternalPagination ? (externalTotalItems ?? data.length) : table.getFilteredRowModel().rows.length
+  const handlePageChange = (p: number) => {
+    if (hasExternalPagination) {
+      externalOnPageChange!(p)
+    } else {
+      table.setPageIndex(p - 1)
+    }
+  }
   return (
-    <div className="motion-fade-in">
-      <div className="overflow-hidden border border-border/70 bg-card">
+    <div className={cn('motion-fade-in flex flex-col flex-1 min-h-0', className)}>
+      <div className="flex flex-col overflow-hidden border border-border/70 bg-card flex-1 min-h-0">
         {toolbar && (
           <DataTableToolbar
             selectedCount={table.getSelectedRowModel().rows.length}
@@ -329,11 +346,18 @@ function DataTableInner<T>({
             onColumnVisibilityChange={(key, visible) =>
               setColumnHidden(h => ({ ...h, [key]: !visible }))
             }
+            title={title}
+            actions={toolbarActions}
+            page={currentPage}
+            totalPages={displayTotalPages}
+            totalItems={displayTotalItems}
+            onPageChange={handlePageChange}
+            pageSize={externalPageSize}
           />
         )}
-        <div className="table-scroll overflow-x-auto">
+        <div className="table-scroll overflow-x-auto overflow-y-auto flex-1 min-h-0">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 z-20 border-b border-border/70 bg-muted/60">
+            <thead className="sticky top-0 z-20 border-b border-border/70 bg-card shadow-[0_1px_2px_-1px] shadow-border/20">
             {table.getHeaderGroups().map(hg => (
               <tr key={hg.id}>
                 {hg.headers.map(h => {
@@ -382,7 +406,7 @@ function DataTableInner<T>({
               </tr>
             ))}
             {showFilters && (
-              <tr className="border-b border-border/60">
+              <tr className="border-b border-border/60 bg-card">
                 {table.getVisibleLeafColumns().map(col => {
                   const colDef = columns.find(c => c.key === col.id)
                   if (!colDef || columnHidden[col.id]) return null
@@ -390,7 +414,7 @@ function DataTableInner<T>({
                     <th
                       key={col.id}
                       className={cn(
-                        'px-3 py-1.5',
+                        'px-3 py-1.5 bg-card',
                         colDef.hideBelow && `hidden ${colDef.hideBelow}:table-cell`,
                       )}
                     >
@@ -447,19 +471,6 @@ function DataTableInner<T>({
           </table>
         </div>
       </div>
-      <Pagination
-        page={hasExternalPagination ? (externalPage ?? 1) : table.getState().pagination.pageIndex + 1}
-        totalPages={hasExternalPagination ? pageCount! : table.getPageCount()}
-        totalItems={hasExternalPagination ? (externalTotalItems ?? data.length) : table.getFilteredRowModel().rows.length}
-        onPageChange={(p) => {
-          if (hasExternalPagination) {
-            externalOnPageChange!(p)
-          } else {
-            table.setPageIndex(p - 1)
-          }
-        }}
-        pageSize={externalPageSize}
-      />
     </div>
   )
 }

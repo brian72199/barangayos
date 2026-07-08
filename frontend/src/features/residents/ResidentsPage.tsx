@@ -7,10 +7,8 @@ import { searchHouseholds, getHousehold, type ApiHousehold } from '@/api/househo
 import { getDocuments, type ApiDocument } from '@/api/documents'
 import { getBlotters, type ApiBlotter } from '@/api/blotter'
 import { getActivities, type ApiActivity } from '@/api/activity'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -388,38 +386,35 @@ export default function ResidentsPage() {
       ) },
   ]
 
+  const newResidentButton = canModify ? (
+    <Button variant="ghost" size="sm" className="gap-1 rounded-md text-blue-400 hover:text-blue-300" onClick={openCreatePanel}>
+      <Plus className="size-4" />
+      New Resident
+    </Button>
+  ) : null
+
   return (
     <>
-      <PageHeader title="Residents">
-        {canModify && (
-          <Button size="sm" className="gap-1.5 motion-press" onClick={openCreatePanel}>
-            <Plus className="size-3.5" />
-            New Resident
-          </Button>
-        )}
-      </PageHeader>
-
-      <Card lifted={false} className="shadow-none">
-        
-        <CardContent className="p-0">
-          <DataTable
-            columns={columns}
-            data={residents}
-            loading={loading}
-            onRowClick={(r) => openFlyout(r)}
-            emptyState={
-              residents.length === 0
-                ? <EmptyState title="No residents yet" description="Add your first resident." action={canModify ? { label: "Create first resident", onClick: openCreatePanel } : undefined} />
-                : undefined
-            }
-            rowKey={(r) => r.id}
-            toolbar
-            exportable
-            sortKey="last_name"
-            sortDir="asc"
-          />
-        </CardContent>
-      </Card>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 h-[calc(100vh-56px)] md:h-[calc(100vh-48px)] flex flex-col">
+        <DataTable
+          title="Residents"
+          toolbarActions={newResidentButton}
+          columns={columns}
+          data={residents}
+          loading={loading}
+          onRowClick={(r) => openFlyout(r)}
+          emptyState={
+            residents.length === 0
+              ? <EmptyState title="No residents yet" description="Add your first resident." action={canModify ? { label: "Create first resident", onClick: openCreatePanel } : undefined} />
+              : undefined
+          }
+          rowKey={(r) => r.id}
+          toolbar
+          exportable
+          sortKey="last_name"
+          sortDir="asc"
+        />
+      </div>
 
       {panelOpen && (
         <div className="fixed inset-0 z-40 flex max-md:flex-col max-md:justify-end md:justify-end">
