@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router'
-import { Menu, MapPin } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import Sidebar from '@/components/Sidebar'
 import OfflineIndicator from '@/offline/OfflineIndicator'
 import { Toaster } from '@/components/ui/toast'
