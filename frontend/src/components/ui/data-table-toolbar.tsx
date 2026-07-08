@@ -62,37 +62,8 @@ export function DataTableToolbar({
         )}
       </div>
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon" onClick={onDenseToggle} title="Toggle dense mode" className="h-7 w-7 rounded-md">
-          <Minimize2 className={cn('size-3.5 transition-transform', dense && 'rotate-180')} />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={onExport} title="Export to CSV" className="h-7 w-7 rounded-md">
-          <Download className="size-3.5" />
-        </Button>
-        <div ref={ref} className="relative">
-          <Button variant="ghost" size="icon" onClick={() => setColumnOpen((o) => !o)} title="Toggle columns" className="h-7 w-7 rounded-md">
-            <Columns2 className="size-3.5" />
-          </Button>
-          {columnOpen && (
-            <div className="absolute right-0 top-full z-50 mt-1 min-w-40 border bg-card p-1.5 shadow-lg motion-scale-in">
-              {columns.map((col) => (
-                <label
-                  key={col.key}
-                  className="flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-accent cursor-pointer transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={col.visible}
-                    onChange={(e) => onColumnVisibilityChange(col.key, e.target.checked)}
-                    className="size-3.5 accent-gold"
-                  />
-                  {col.label}
-                </label>
-              ))}
-            </div>
-          )}
-        </div>
         {page !== undefined && totalPages !== undefined && totalPages > 1 && (
-          <div className="flex items-center gap-0.5 border-l border-border/40 pl-1.5 ml-0.5">
+          <div className="flex items-center gap-0.5 mr-0.5">
             <span className="text-[10px] tabular-nums text-muted-foreground/50 whitespace-nowrap mr-0.5 font-medium">
               {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalItems ?? 0)}
               <span className="mx-0.5">/</span>
@@ -137,6 +108,37 @@ export function DataTableToolbar({
             </button>
           </div>
         )}
+        <div className="flex items-center gap-1 border-l border-border/40 pl-1.5">
+          <Button variant="ghost" size="icon" onClick={onDenseToggle} title="Toggle dense mode" className="h-7 w-7 rounded-md">
+            <Minimize2 className={cn('size-3.5 transition-transform', dense && 'rotate-180')} />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onExport} title="Export to CSV" className="h-7 w-7 rounded-md">
+            <Download className="size-3.5" />
+          </Button>
+          <div ref={ref} className="relative">
+            <Button variant="ghost" size="icon" onClick={() => setColumnOpen((o) => !o)} title="Toggle columns" className="h-7 w-7 rounded-md">
+              <Columns2 className="size-3.5" />
+            </Button>
+            {columnOpen && (
+              <div className="absolute right-0 top-full z-50 mt-1 min-w-40 border bg-card p-1.5 shadow-lg motion-scale-in">
+                {columns.map((col) => (
+                  <label
+                    key={col.key}
+                    className="flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-accent cursor-pointer transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={col.visible}
+                      onChange={(e) => onColumnVisibilityChange(col.key, e.target.checked)}
+                      className="size-3.5 accent-gold"
+                    />
+                    {col.label}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
         {actions}
       </div>
     </div>
