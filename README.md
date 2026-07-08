@@ -198,6 +198,9 @@ barangayos/
 | [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment with Docker, Cloudflare Tunnel, and more |
 | [Contributing Guide](docs/CONTRIBUTING.md) | How to contribute, code style, PR process |
 | [Security Policy](docs/SECURITY.md) | Reporting vulnerabilities, security best practices |
+| [Privacy Notice](docs/PRIVACY_NOTICE.md) | Data privacy notice for residents under RA 10173 |
+| [Terms of Use](docs/TERMS_OF_USE.md) | Acceptable use policy for Barangay staff |
+| [Data Processing Agreement](docs/DATA_PROCESSING_AGREEMENT.md) | DPA template for deployers and processors |
 | [Changelog](CHANGELOG.md) | Version history and release notes |
 
 ## Testing
