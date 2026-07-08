@@ -281,11 +281,11 @@ html::-webkit-scrollbar-thumb:hover {
 }
 
 .sidebar-scroll:hover {
-  scrollbar-color: var(--color-border) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
 .sidebar-scroll:hover::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .table-scroll {
