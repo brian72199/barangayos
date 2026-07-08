@@ -63,3 +63,6 @@ playwright/.auth/*.json
 
 # Production staging area (DO NOT COMMIT)
 prod/
+
+# LAN HTTPS certificates (generated locally)
+backend/certs/

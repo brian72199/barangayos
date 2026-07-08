@@ -15,9 +15,10 @@ The production deployment uses Docker with two containers:
                      └──────────┬──────────┘
                                 │
                      ┌──────────┴──────────┐
-                     │   nginx (port 8080)  │
-                     │   SPA + API proxy    │
-                     └──────────┬──────────┘
+                     │  nginx (port 8080)   │
+                     │  + HTTPS (8443)      │
+                     │  SPA + API proxy     │
+                     └──────────────────────┘
                                 │ /api/*
                      ┌──────────┴──────────┐
                      │ PocketBase (port 8090)│
@@ -374,6 +375,94 @@ For barangay offices that don't need internet access:
 
 ---
 
+## Option D: LAN + HTTPS (For PWA / Installable App)
+
+If you want the PWA install button to appear on LAN devices, the site must be served over HTTPS. This option adds HTTPS on the LAN without needing a domain or internet connection.
+
+> **How it works:** The Docker image includes a self-signed placeholder certificate so nginx always starts with HTTPS enabled (port 8443). For proper PWA install without browser warnings, generate device-trusted certs using `mkcert` — the real certs silently override the placeholder via a Docker volume mount.
+
+### Step 1: Generate trusted certificates
+
+On the **server machine**, run the cert generation script:
+
+```powershell
+.\scripts\generate-certs.ps1
+```
+
+This script will:
+- Install (or verify) `mkcert` — a zero-config local certificate authority
+- Install the mkcert root CA on the server (one-time)
+- Detect your server's LAN IP automatically
+- Generate certificates for your LAN IP (`backend/certs/`)
+
+If automatic IP detection fails, pass it manually:
+
+```powershell
+.\scripts\generate-certs.ps1 -LanIp 192.168.1.100
+```
+
+### Step 2: Enable the cert volume mount
+
+Edit `backend/docker-compose.yml` and **uncomment** the certs volume line:
+
+```yaml
+frontend:
+  # ...
+  ports:
+    - "8080:80"
+    - "8443:443"
+  volumes: [ "./certs:/etc/nginx/certs" ]    # ← uncomment this
+```
+
+### Step 3: Rebuild and restart
+
+```powershell
+cd backend
+docker compose up -d --build
+```
+
+### Step 4: Access via HTTPS
+
+Open `https://<SERVER_LAN_IP>:8443` on any device.
+
+- **Same device as server** → cert is already trusted (mkcert installed the root CA)
+- **Other LAN devices** → visit the URL once and accept the certificate warning, OR install the mkcert root CA on each device:
+
+  | Device | How to trust |
+  |--------|-------------|
+  | Windows | `mkcert -install` (then restart browser) |
+  | macOS   | `mkcert -install` |
+  | Android | Settings → Security → CA certificate → Install the `rootCA.pem` from the server |
+  | iOS     | Share `rootCA.pem` via AirDrop, then Settings → Profile → Install |
+
+  > The mkcert root CA file is at: `$env:LOCALAPPDATA\mkcert\rootCA.pem` (Windows) or `~/.local/share/mkcert/rootCA.pem` (macOS/Linux)
+
+Once the cert is trusted, the PWA install button will appear in the sidebar.
+
+### Architecture diagram
+
+```
+                            ┌──────────────────────────────┐
+                            │         LAN Network          │
+                            │  192.168.x.0/24              │
+                            └──────┬───────────────────────┘
+                                   │
+                        ┌──────────┴──────────┐
+                        │   nginx (docker)     │
+                        │   :80  (HTTP)        │
+                        │   :443 (HTTPS, mkcert)│
+                        └──────────┬──────────┘
+                                   │ /api/*
+                        ┌──────────┴──────────┐
+                        │ PocketBase (port 8090)│
+                        └─────────────────────┘
+
+  HTTP:   http://192.168.x.x:8080     (no PWA, no install)
+  HTTPS:  https://192.168.x.x:8443    (PWA installable)
+```
+
+---
+
 ## Troubleshooting
 
 ### View container logs
@@ -460,6 +549,26 @@ git push origin main
 ```bash
 curl http://localhost:8080/api/health
 curl https://records.barangay.gov.ph/api/health
+```
+
+### Generate LAN HTTPS certificates
+
+```powershell
+.\scripts\generate-certs.ps1
+```
+
+After generating certs, uncomment `volumes: [ "./certs:/etc/nginx/certs" ]` in `backend/docker-compose.yml` and rebuild:
+
+```bash
+cd backend && docker compose up -d --build
+```
+
+### Generate square PWA icons
+
+If you replace `public/icon-logo.png` with a custom logo, regenerate the square icons:
+
+```bash
+cd frontend && node scripts/generate-icons.cjs
 ```
 
 ### View logs

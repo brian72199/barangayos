@@ -1,4 +1,4 @@
-# Architecture Guide
+﻿# Architecture Guide
 
 ## System Overview
 
@@ -15,8 +15,8 @@ BarangayOS uses a two-container Docker architecture. A **frontend** container (n
                      └──────────┬──────────┘
                                 │
                      ┌──────────┴──────────┐
-                     │   nginx (port 8080)  │
-                     │   SPA + API proxy    │
+                     │  nginx (port 8080)   │
+                     │  + HTTPS (8443)      │
                      └──────────┬──────────┘
                                 │ /api/*
                      ┌──────────┴──────────┐
@@ -24,7 +24,7 @@ BarangayOS uses a two-container Docker architecture. A **frontend** container (n
                      │   pb_data/ (volume)   │
                      └─────────────────────┘
 
-LAN Users: http://192.168.x.x:8080 (through nginx, zero latency)
+LAN Users: http://192.168.x.x:8080 or https://192.168.x.x:8443 (HTTPS with mkcert for PWA)
 Remote:    https://app.yourdomain.com (via Cloudflare Tunnel → nginx, HTTPS)
 Direct:    http://192.168.x.x:8090 (PocketBase admin UI, LAN only)
 ```
