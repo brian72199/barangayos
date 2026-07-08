@@ -61,13 +61,7 @@ export default function DashboardHero({ onCustomize, children }: DashboardHeroPr
           </div>
         </div>
 
-        {/* Location bar */}
-        {brgyName && (
-          <div className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground">
-            <MapPin className="size-3" />
-            Brgy. {brgyName}{locationStr}
-          </div>
-        )}
+        
 
         {/* Integrated search section */}
         {children && (
