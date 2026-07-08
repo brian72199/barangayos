@@ -84,7 +84,7 @@ PocketBase handles authentication via email/password. The app uses role-based ac
 
 1. User submits email/password to PocketBase via `login()`
 2. Server validates credentials and returns an auth token
-3. Token is stored in PocketBase's `authStore` (in-memory, not localStorage)
+3. Token is stored in PocketBase's `authStore` (persisted to localStorage under `pocketbase_auth`; the SDK's `LocalAuthStore` writes to localStorage for session persistence across page loads)
 4. `getCurrentUser()` extracts role and user data from the auth record
 5. Route guards (`ProtectedRoute`) check both authentication status and user role before rendering protected pages
 6. On session expiry, the user is redirected to the login page

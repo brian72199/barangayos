@@ -86,12 +86,11 @@ export async function getAssetsPage(
   try {
     const filters: string[] = []
     if (options.search) {
-      const q = options.search.replace(/"/g, '\\"')
-      filters.push(`(name ~ "${q}" || serial_number ~ "${q}")`)
+      filters.push(getClient().filter('(name ~ {:q} || serial_number ~ {:q})', { q: options.search }))
     }
-    if (options.type) filters.push(`asset_type = "${options.type}"`)
-    if (options.condition) filters.push(`condition = "${options.condition}"`)
-    if (options.status) filters.push(`status = "${options.status}"`)
+    if (options.type) filters.push(getClient().filter('asset_type = {:t}', { t: options.type }))
+    if (options.condition) filters.push(getClient().filter('condition = {:c}', { c: options.condition }))
+    if (options.status) filters.push(getClient().filter('status = {:s}', { s: options.status }))
     const query: Record<string, unknown> = { sort: '-id' }
     if (filters.length > 0) query.filter = filters.join(' && ')
     const result = await getClient().collection(COLLECTION).getList<ApiAsset>(page, perPage, query)

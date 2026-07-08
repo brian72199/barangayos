@@ -56,7 +56,7 @@ export async function getResidents(params?: { household_id?: string }): Promise<
   try {
     const query: Record<string, unknown> = { sort: '-id' }
     if (params?.household_id) {
-      query.filter = `household_id = '${params.household_id.trim()}'`
+      query.filter = getClient().filter('household_id = {:id}', { id: params.household_id.trim() })
     }
     return await getClient().collection(COLLECTION).getFullList<ApiResident>(query)
   } catch (err) {
@@ -110,10 +110,9 @@ export async function getResidentsPage(
   try {
     const filters: string[] = []
     if (options.search) {
-      const q = options.search.replace(/"/g, '\\"')
-      filters.push(`(first_name ~ "${q}" || last_name ~ "${q}" || contact_number ~ "${q}")`)
+      filters.push(getClient().filter('(first_name ~ {:q} || last_name ~ {:q} || contact_number ~ {:q})', { q: options.search }))
     }
-    if (options.purok) filters.push(`purok = "${options.purok}"`)
+    if (options.purok) filters.push(getClient().filter('purok = {:p}', { p: options.purok }))
     const query: Record<string, unknown> = { sort: '-id' }
     if (filters.length > 0) query.filter = filters.join(' && ')
     const result = await getClient().collection(COLLECTION).getList<ApiResident>(page, perPage, query)

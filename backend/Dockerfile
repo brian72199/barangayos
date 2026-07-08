@@ -11,4 +11,4 @@ COPY pb_migrations /pb/pb_migrations
 EXPOSE 8090
 VOLUME ["/pb/pb_data"]
 
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations"]
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations", "--automigrate"]

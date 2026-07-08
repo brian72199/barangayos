@@ -36,7 +36,7 @@ export interface ApiFundSource extends RecordModel {
 
 export async function getFundSources(fiscalYear?: number): Promise<ApiFundSource[]> {
   try {
-    const filter = fiscalYear ? `fiscal_year=${fiscalYear}` : ''
+    const filter = fiscalYear ? getClient().filter('fiscal_year={:y}', { y: fiscalYear }) : ''
     return await getClient().collection<ApiFundSource>(COLLECTION).getFullList({ filter, sort: '-id' })
   } catch (e) { throw handleApiError(e) }
 }

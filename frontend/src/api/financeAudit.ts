@@ -20,7 +20,7 @@ export async function getFinanceAuditLogs(
 ): Promise<{ items: ApiFinanceAudit[]; totalItems: number; totalPages: number }> {
   try {
     const filters: string[] = []
-    if (collectionName) filters.push(`collection_name = '${collectionName}'`)
+    if (collectionName) filters.push(getClient().filter('collection_name = {:c}', { c: collectionName }))
     const options: Record<string, unknown> = { sort }
     if (filters.length > 0) options.filter = filters.join(' && ')
     const result = await getClient().collection('finance_audit_logs').getList<ApiFinanceAudit>(page, perPage, options)

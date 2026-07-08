@@ -98,11 +98,10 @@ export async function getDocumentsPage(
   try {
     const filters: string[] = []
     if (options.search) {
-      const q = options.search.replace(/"/g, '\\"')
-      filters.push(`(resident_name ~ "${q}" || queue_number ~ "${q}")`)
+      filters.push(getClient().filter('(resident_name ~ {:q} || queue_number ~ {:q})', { q: options.search }))
     }
-    if (options.status) filters.push(`status = "${options.status}"`)
-    if (options.documentType) filters.push(`document_type = "${options.documentType}"`)
+    if (options.status) filters.push(getClient().filter('status = {:s}', { s: options.status }))
+    if (options.documentType) filters.push(getClient().filter('document_type = {:t}', { t: options.documentType }))
     const query: Record<string, unknown> = { sort: '-requested_at' }
     if (filters.length > 0) query.filter = filters.join(' && ')
     const result = await getClient().collection(COLLECTION).getList<ApiDocument>(page, perPage, query)
@@ -130,7 +129,7 @@ export async function getDailyQueueNumber(): Promise<string> {
     const dd = String(today.getDate()).padStart(2, '0')
     const startOfDay = `${yyyy}-${mm}-${dd} 00:00:00`
     const existing = await getClient().collection(COLLECTION).getFullList<ApiDocument>({
-      filter: `requested_at >= '${startOfDay}'`,
+      filter: getClient().filter('requested_at >= {:start}', { start: startOfDay }),
       requestKey: 'daily-queue',
     })
     const next = existing.length + 1

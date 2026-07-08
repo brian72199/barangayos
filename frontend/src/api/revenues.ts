@@ -43,9 +43,9 @@ export interface ApiRevenue extends RecordModel {
 export async function getRevenues(startDate?: string, endDate?: string, category?: string): Promise<ApiRevenue[]> {
   try {
     const filters: string[] = []
-    if (startDate) filters.push(`revenue_date >= "${startDate}"`)
-    if (endDate) filters.push(`revenue_date <= "${endDate}"`)
-    if (category && category !== 'all') filters.push(`category="${category}"`)
+    if (startDate) filters.push(getClient().filter('revenue_date >= {:d}', { d: startDate }))
+    if (endDate) filters.push(getClient().filter('revenue_date <= {:d}', { d: endDate }))
+    if (category && category !== 'all') filters.push(getClient().filter('category={:c}', { c: category }))
     const filter = filters.join(' && ')
     return await getClient().collection<ApiRevenue>(COLLECTION).getFullList({ filter, sort: '-revenue_date', expand: 'income_account,document_request,fund_source' })
   } catch (e) { throw handleApiError(e) }
@@ -59,7 +59,7 @@ export async function getRevenue(id: string): Promise<ApiRevenue> {
 export async function getRevenuesByFundSource(fundSourceId: string): Promise<ApiRevenue[]> {
   try {
     return await getClient().collection<ApiRevenue>(COLLECTION).getFullList({
-      filter: `fund_source = "${fundSourceId}"`,
+      filter: getClient().filter('fund_source = {:fs}', { fs: fundSourceId }),
       sort: '-revenue_date',
       expand: 'income_account,fund_source',
     })

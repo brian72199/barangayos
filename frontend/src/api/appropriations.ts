@@ -42,7 +42,7 @@ export interface ApiAppropriation extends RecordModel {
 
 export async function getAppropriations(fiscalYear?: number): Promise<ApiAppropriation[]> {
   try {
-    const filter = fiscalYear ? `fiscal_year=${fiscalYear}` : ''
+    const filter = fiscalYear ? getClient().filter('fiscal_year={:y}', { y: fiscalYear }) : ''
     return await getClient().collection(COLLECTION).getFullList({ filter, sort: '-id', expand: 'fund_source' })
   } catch (e) { throw handleApiError(e) }
 }
