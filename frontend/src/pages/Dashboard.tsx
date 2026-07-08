@@ -30,11 +30,14 @@ export default function Dashboard() {
   })
 
   return (
-    <div>
+    <div className="font-display">
 
       <div className="space-y-4">
-        {isVisible('hero') && <DashboardHero onCustomize={() => setSheetOpen(true)} />}
-        {isVisible('search') && <DashboardSearch />}
+        {isVisible('hero') && (
+          <DashboardHero onCustomize={() => setSheetOpen(true)}>
+            {isVisible('search') && <DashboardSearch />}
+          </DashboardHero>
+        )}
         {isVisible('kpi-strip') && (
           <DashboardKPI stats={stats} role={role} loading={loading} config={getWidgetConfig('kpi-strip')} />
         )}

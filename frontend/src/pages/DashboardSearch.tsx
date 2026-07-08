@@ -29,14 +29,14 @@ export default function DashboardSearch() {
   return (
     <div ref={dropdownRef} className="relative">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground/40" />
         <input
           ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Maghanap ng residente o dokumento..."
-          className="w-full rounded-lg border border-border bg-card py-2.5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none ring-1 ring-transparent transition-all focus:ring-2 focus:ring-gold/50"
+          className="w-full rounded-lg bg-primary/5 py-3.5 pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground/40 outline-none ring-1 ring-inset ring-border/50 transition-all focus:ring-2 focus:ring-gold/50 focus:bg-card"
         />
         {searching && (
           <Loader2 className="absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted-foreground" />

@@ -108,7 +108,7 @@ export function BudgetOverview() {
   }
 
   return (
-    <div>
+    <div className="font-display">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">Budget Overview</h1>

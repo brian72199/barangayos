@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { type ReactNode, useState, useEffect } from 'react'
 import { Clock, MapPin, SlidersHorizontal } from 'lucide-react'
 import { getAllSettings } from '@/api/settings'
 
@@ -8,9 +8,10 @@ function formatClock(date: Date): string {
 
 interface DashboardHeroProps {
   onCustomize?: () => void
+  children?: ReactNode
 }
 
-export default function DashboardHero({ onCustomize }: DashboardHeroProps) {
+export default function DashboardHero({ onCustomize, children }: DashboardHeroProps) {
   const [clock, setClock] = useState(new Date())
   const [settings, setSettings] = useState<Record<string, any>>({})
 
@@ -31,7 +32,7 @@ export default function DashboardHero({ onCustomize }: DashboardHeroProps) {
   const locationStr = locationParts.length > 0 ? `, ${locationParts.join(', ')}` : ''
 
   return (
-    <div className="overflow-hidden border border-border bg-card motion-fade-in motion-slide-up">
+    <div className="border border-border bg-card motion-fade-in motion-slide-up">
       <div className="p-3">
         {/* Header: barangay name + clock + customize */}
         <div className="flex items-start justify-between gap-4">
@@ -65,6 +66,13 @@ export default function DashboardHero({ onCustomize }: DashboardHeroProps) {
           <div className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground">
             <MapPin className="size-3" />
             Brgy. {brgyName}{locationStr}
+          </div>
+        )}
+
+        {/* Integrated search section */}
+        {children && (
+          <div className="mt-3 border-t border-border/40 pt-3">
+            {children}
           </div>
         )}
       </div>

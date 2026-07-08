@@ -411,7 +411,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <>
+    <div className="font-display">
       <PageHeader title="Reports Dashboard"/>
 
       <div className="mb-6">
@@ -422,6 +422,6 @@ export default function ReportsPage() {
 
       {/* Tab content */}
       {renderTabContent()}
-    </>
+    </div>
   )
 }
