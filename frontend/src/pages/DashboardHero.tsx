@@ -1,5 +1,5 @@
 import { type ReactNode, useState, useEffect } from 'react'
-import { Clock, MapPin, SlidersHorizontal } from 'lucide-react'
+import { Clock, SlidersHorizontal } from 'lucide-react'
 import { getAllSettings } from '@/api/settings'
 
 function formatClock(date: Date): string {

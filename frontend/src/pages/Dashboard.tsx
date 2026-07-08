@@ -17,7 +17,6 @@ import { cn } from '@/lib/utils'
 export default function Dashboard() {
   const { user, stats, tasks, recentActivity, loading } = useDashboardData()
   const role = user?.role ?? 'viewer'
-  const userName = user?.name ?? 'User'
   const { config, updateWidget, resetToDefaults, isVisible, getWidgetConfig } = useWidgetConfig('dashboard', role)
   const [sheetOpen, setSheetOpen] = useState(false)
 
