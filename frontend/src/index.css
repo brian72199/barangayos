@@ -289,11 +289,28 @@ html::-webkit-scrollbar-thumb:hover {
 }
 
 .table-scroll {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  -ms-overflow-style: auto;
 }
 
 .table-scroll::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  width: 5px;
+  height: 5px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+.table-scroll::-webkit-scrollbar-corner {
+  background: transparent;
 }
