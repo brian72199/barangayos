@@ -290,6 +290,7 @@ html::-webkit-scrollbar-thumb:hover {
 
 .table-scroll {
   scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
   -ms-overflow-style: auto;
 }
 
@@ -303,12 +304,16 @@ html::-webkit-scrollbar-thumb:hover {
 }
 
 .table-scroll::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: transparent;
   border-radius: 3px;
 }
 
-.table-scroll::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+.table-scroll--hover {
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.table-scroll--hover::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
 }
 
 .table-scroll::-webkit-scrollbar-corner {

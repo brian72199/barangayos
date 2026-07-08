@@ -228,6 +228,21 @@ function DataTableInner<T>({
 
   const tableRef = useRef(table)
   tableRef.current = table
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [isScrollbarHover, setIsScrollbarHover] = useState(false)
+
+  const handleScrollbarMove = useCallback((e: React.MouseEvent) => {
+    const el = scrollRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const hasVScroll = el.scrollHeight > el.clientHeight
+    const hasHScroll = el.scrollWidth > el.clientWidth
+    const nearRight = hasVScroll && x > rect.width - 14
+    const nearBottom = hasHScroll && y > rect.height - 14
+    setIsScrollbarHover(nearRight || nearBottom)
+  }, [])
 
   const handleExport = useCallback(() => {
     const rows = tableRef.current.getFilteredRowModel().rows
@@ -355,7 +370,12 @@ function DataTableInner<T>({
             pageSize={externalPageSize}
           />
         )}
-        <div className="table-scroll overflow-x-auto overflow-y-auto flex-1 min-h-0">
+        <div
+          ref={scrollRef}
+          className={cn('table-scroll overflow-x-auto overflow-y-auto flex-1 min-h-0', isScrollbarHover && 'table-scroll--hover')}
+          onMouseMove={handleScrollbarMove}
+          onMouseLeave={() => setIsScrollbarHover(false)}
+        >
           <table className="w-full text-sm">
             <thead className="sticky top-0 z-20 border-b-2 border-border/80 bg-card shadow-[0_1px_2px_-1px] shadow-border/20">
             {table.getHeaderGroups().map(hg => (
