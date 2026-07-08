@@ -47,10 +47,10 @@ export function DataTableToolbar({
   }, [])
 
   return (
-    <div className={cn('flex items-center justify-between gap-2 px-2 py-1 border-b border-border/60', className)}>
+    <div className={cn('flex items-center justify-between gap-2 px-2 py-1.5 border-b border-border/60', className)}>
       <div className="flex items-center gap-2">
         {title && (
-          <h2 className="font-display text-sm font-semibold text-foreground whitespace-nowrap">{title}</h2>
+          <h2 className="font-display text-xs font-semibold text-foreground whitespace-nowrap tracking-tight">{title}</h2>
         )}
         {selectedCount > 0 && (
           <div className="flex items-center gap-1.5 bg-gold/10 px-2.5 py-1 text-xs font-medium text-gold motion-fade-in">
@@ -73,9 +73,9 @@ export function DataTableToolbar({
               type="button"
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="flex size-4 items-center justify-center rounded-sm text-muted-foreground/30 hover:bg-accent hover:text-foreground disabled:opacity-15 disabled:pointer-events-none transition-colors"
+              className="flex size-3 items-center justify-center rounded-sm text-muted-foreground/30 hover:bg-accent hover:text-foreground disabled:opacity-15 disabled:pointer-events-none transition-colors"
             >
-              <ChevronLeft className="size-3" />
+              <ChevronLeft className="size-2.5" />
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1)
               .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
@@ -88,7 +88,7 @@ export function DataTableToolbar({
                     type="button"
                     onClick={() => onPageChange?.(p)}
                     className={cn(
-                      'flex size-4 items-center justify-center rounded-sm text-[9px] font-semibold transition-colors',
+                      'flex size-3 items-center justify-center rounded-sm text-[8px] font-semibold transition-colors',
                       p === page
                         ? 'bg-barangay text-white shadow-xs'
                         : 'text-muted-foreground/50 hover:bg-accent hover:text-foreground',
@@ -102,22 +102,22 @@ export function DataTableToolbar({
               type="button"
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= totalPages}
-              className="flex size-4 items-center justify-center rounded-sm text-muted-foreground/30 hover:bg-accent hover:text-foreground disabled:opacity-15 disabled:pointer-events-none transition-colors"
+              className="flex size-3 items-center justify-center rounded-sm text-muted-foreground/30 hover:bg-accent hover:text-foreground disabled:opacity-15 disabled:pointer-events-none transition-colors"
             >
-              <ChevronRight className="size-3" />
+              <ChevronRight className="size-2.5" />
             </button>
           </div>
         )}
         <div className="flex items-center gap-1 border-l border-border/40 pl-1.5">
-          <Button variant="ghost" size="icon" onClick={onDenseToggle} title="Toggle dense mode" className="h-7 w-7 rounded-md">
-            <Minimize2 className={cn('size-3.5 transition-transform', dense && 'rotate-180')} />
+          <Button variant="ghost" size="icon" onClick={onDenseToggle} title="Toggle dense mode" className="h-6 w-6 rounded-sm">
+            <Minimize2 className={cn('size-3 transition-transform', dense && 'rotate-180')} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onExport} title="Export to CSV" className="h-7 w-7 rounded-md">
-            <Download className="size-3.5" />
+          <Button variant="ghost" size="icon" onClick={onExport} title="Export to CSV" className="h-6 w-6 rounded-sm">
+            <Download className="size-3" />
           </Button>
           <div ref={ref} className="relative">
-            <Button variant="ghost" size="icon" onClick={() => setColumnOpen((o) => !o)} title="Toggle columns" className="h-7 w-7 rounded-md">
-              <Columns2 className="size-3.5" />
+            <Button variant="ghost" size="icon" onClick={() => setColumnOpen((o) => !o)} title="Toggle columns" className="h-6 w-6 rounded-sm">
+              <Columns2 className="size-3" />
             </Button>
             {columnOpen && (
               <div className="absolute right-0 top-full z-50 mt-1 min-w-40 border bg-card p-1.5 shadow-lg motion-scale-in">

@@ -264,7 +264,7 @@ function DataTableInner<T>({
         <select
           value={value}
           onChange={(e) => tanCol.setFilterValue(e.target.value || undefined)}
-          className="h-7 w-full border border-border/50 bg-transparent px-1 text-[11px] text-muted-foreground outline-none focus:border-ring cursor-pointer"
+          className="h-5 w-full rounded-none border-0 border-b border-transparent bg-transparent px-0 text-[10px] text-muted-foreground outline-none focus:border-ring cursor-pointer hover:border-border/50 transition-colors"
         >
           <option value="">All</option>
           {colDef.filterOptions.map(o => (
@@ -279,7 +279,7 @@ function DataTableInner<T>({
           type="date"
           value={value}
           onChange={(e) => tanCol.setFilterValue(e.target.value || undefined)}
-          className="h-7 w-full border border-border/50 bg-transparent px-1 text-[11px] text-muted-foreground outline-none focus:border-ring"
+          className="h-5 w-full rounded-none border-0 border-b border-transparent bg-transparent px-0 text-[10px] text-muted-foreground outline-none focus:border-ring hover:border-border/50 transition-colors"
         />
       )
     }
@@ -289,7 +289,7 @@ function DataTableInner<T>({
         value={value}
         onChange={(e) => tanCol.setFilterValue(e.target.value || undefined)}
         placeholder="Filter..."
-        className="h-7 w-full rounded border border-border/50 bg-transparent px-1 text-[11px] text-muted-foreground outline-none placeholder:text-muted-foreground/50 focus:border-ring"
+        className="h-5 w-full rounded-none border-0 border-b border-transparent bg-transparent px-0 text-[10px] text-muted-foreground outline-none placeholder:text-muted-foreground/30 focus:border-ring hover:border-border/50 transition-colors"
       />
     )
   }
@@ -357,7 +357,7 @@ function DataTableInner<T>({
         )}
         <div className="table-scroll overflow-x-auto overflow-y-auto flex-1 min-h-0">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 z-20 border-b border-border/70 bg-card shadow-[0_1px_2px_-1px] shadow-border/20">
+            <thead className="sticky top-0 z-20 border-b-2 border-border/80 bg-card shadow-[0_1px_2px_-1px] shadow-border/20">
             {table.getHeaderGroups().map(hg => (
               <tr key={hg.id}>
                 {hg.headers.map(h => {
@@ -371,7 +371,7 @@ function DataTableInner<T>({
                     <th
                       key={h.id}
                       className={cn(
-                        'relative px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground',
+                        'relative px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground',
                         canSort && 'cursor-pointer select-none',
                         meta?.pinned === 'left' && 'sticky left-0 z-10 bg-card shadow-[2px_0_4px_-2px] shadow-border/30',
                         meta?.pinned === 'right' && 'sticky right-0 z-10 bg-card shadow-[-2px_0_4px_-2px] shadow-border/30',
@@ -385,12 +385,12 @@ function DataTableInner<T>({
                       }}
                       aria-sort={sorted ? (sorted === 'asc' ? 'ascending' : 'descending') : undefined}
                     >
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-0.5">
                         {flexRender(h.column.columnDef.header, h.getContext())}
                         {sorted && (
                           sorted === 'asc'
-                            ? <ChevronUp className="size-3 shrink-0 transition-transform" />
-                            : <ChevronDown className="size-3 shrink-0 transition-transform" />
+                            ? <ChevronUp className="size-2.5 shrink-0 transition-transform" />
+                            : <ChevronDown className="size-2.5 shrink-0 transition-transform" />
                         )}
                       </div>
                       {colDef.resizable && (
@@ -414,7 +414,7 @@ function DataTableInner<T>({
                     <th
                       key={col.id}
                       className={cn(
-                        'px-3 py-1.5 bg-card',
+                        'px-2 py-0.5 bg-card',
                         colDef.hideBelow && `hidden ${colDef.hideBelow}:table-cell`,
                       )}
                     >
