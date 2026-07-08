@@ -28,7 +28,7 @@ export interface ApiIncomeAccount extends RecordModel {
 
 export async function getIncomeAccounts(fiscalYear?: number): Promise<ApiIncomeAccount[]> {
   try {
-    const filter = fiscalYear ? `fiscal_year=${fiscalYear}` : ''
+    const filter = fiscalYear ? getClient().filter('fiscal_year={:y}', { y: fiscalYear }) : ''
     return await getClient().collection<ApiIncomeAccount>(COLLECTION).getFullList({ filter, sort: '-created' })
   } catch (e) { throw handleApiError(e) }
 }

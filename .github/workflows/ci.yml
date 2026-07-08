@@ -109,7 +109,6 @@ jobs:
       - run: npm ci
       - name: npm audit
         run: npm audit --audit-level=high
-        continue-on-error: true
 
   e2e-tests:
     name: E2E Tests

@@ -48,10 +48,9 @@ export async function getHouseholdsPage(
   try {
     const filters: string[] = []
     if (options.search) {
-      const q = options.search.replace(/"/g, '\\"')
-      filters.push(`(head_name ~ "${q}" || household_number ~ "${q}")`)
+      filters.push(getClient().filter('(head_name ~ {:q} || household_number ~ {:q})', { q: options.search }))
     }
-    if (options.purok) filters.push(`purok = "${options.purok}"`)
+    if (options.purok) filters.push(getClient().filter('purok = {:p}', { p: options.purok }))
     const query: Record<string, unknown> = { sort: 'household_number' }
     if (filters.length > 0) query.filter = filters.join(' && ')
     const result = await getClient().collection(COLLECTION).getList<ApiHousehold>(page, perPage, query)
@@ -72,7 +71,7 @@ export async function getHouseholds(): Promise<ApiHousehold[]> {
 export async function searchHouseholds(query: string): Promise<ApiHousehold[]> {
   try {
     const result = await getClient().collection(COLLECTION).getList<ApiHousehold>(1, 20, {
-      filter: `(head_name ~ "${query}" || household_number ~ "${query}" || address ~ "${query}")`,
+      filter: getClient().filter('(head_name ~ {:q} || household_number ~ {:q} || address ~ {:q})', { q: query }),
       sort: 'head_name',
     })
     return result.items

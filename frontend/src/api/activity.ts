@@ -20,8 +20,8 @@ export async function getActivities(
 ): Promise<{ items: ApiActivity[]; totalItems: number; totalPages: number }> {
   try {
     const filters: string[] = []
-    if (collection) filters.push(`collection = '${collection}'`)
-    if (recordId) filters.push(`record_id = '${recordId}'`)
+    if (collection) filters.push(getClient().filter('collection = {:c}', { c: collection }))
+    if (recordId) filters.push(getClient().filter('record_id = {:r}', { r: recordId }))
     const options: Record<string, unknown> = { sort }
     if (filters.length > 0) options.filter = filters.join(' && ')
     const result = await getClient().collection('activity_logs').getList<ApiActivity>(page, perPage, options)

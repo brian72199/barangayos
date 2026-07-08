@@ -20,7 +20,7 @@ export interface ApiAgendaItem extends RecordModel, AgendaItemData {}
 export async function getAgendaItems(meetingId: string): Promise<ApiAgendaItem[]> {
   try {
     return await getClient().collection(COLLECTION).getFullList<ApiAgendaItem>({
-      filter: `meeting_id = '${meetingId}'`,
+      filter: getClient().filter('meeting_id = {:m}', { m: meetingId }),
       sort: 'sort_order',
     })
   } catch (err) {

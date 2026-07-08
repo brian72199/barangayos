@@ -40,7 +40,7 @@ We take security vulnerabilities seriously. If you discover a security issue, **
 ### Authentication
 
 - **Password-based auth** managed by PocketBase with bcrypt password hashing
-- **Session tokens** stored in PocketBase's in-memory auth store (not localStorage, reducing XSS exposure)
+- **Session tokens** stored in PocketBase's `LocalAuthStore` (persisted to `window.localStorage` under key `pocketbase_auth` by default, for session persistence across page loads). Be aware this means tokens are accessible to JavaScript — implement Content Security Policy headers and keep dependencies audited to mitigate XSS risks.
 - **Rate limiting** configurable via PocketBase admin UI or JS hooks to prevent brute-force attacks
 - **Session expiry** — Tokens expire and users are redirected to login automatically
 

@@ -158,7 +158,7 @@ barangayos/
 
 ### TypeScript
 
-- Strict mode enabled (`strict: true` in tsconfig)
+- Strict mode enabled (`strict: true` in `tsconfig.app.json`)
 - `noUnusedLocals` and `noUnusedParameters` are enabled — catch unused code at compile time
 - Prefer explicit return types on function declarations for readability
 - Use `import type` for type-only imports to avoid bundler issues

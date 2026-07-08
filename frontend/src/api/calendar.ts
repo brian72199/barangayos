@@ -36,7 +36,7 @@ export async function getEventsByMonth(year: number, month: number): Promise<Api
     const end = `${nextYear}-${pad(nextMonth)}-01`
     return await getClient().collection(COLLECTION).getFullList<ApiCalendarEvent>({
       sort: 'start_datetime',
-      filter: `start_datetime >= '${start}' && start_datetime < '${end}'`,
+      filter: getClient().filter('start_datetime >= {:start} && start_datetime < {:end}', { start, end }),
     })
   } catch (err) {
     throw handleApiError(err)

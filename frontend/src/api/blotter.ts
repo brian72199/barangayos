@@ -92,11 +92,10 @@ export async function getBlottersPage(
   try {
     const filters: string[] = []
     if (options.search) {
-      const q = options.search.replace(/"/g, '\\"')
-      filters.push(`(complainant_name ~ "${q}" || respondent_name ~ "${q}" || case_number ~ "${q}")`)
+      filters.push(getClient().filter('(complainant_name ~ {:q} || respondent_name ~ {:q} || case_number ~ {:q})', { q: options.search }))
     }
-    if (options.status) filters.push(`status = "${options.status}"`)
-    if (options.incidentType) filters.push(`incident_type = "${options.incidentType}"`)
+    if (options.status) filters.push(getClient().filter('status = {:s}', { s: options.status }))
+    if (options.incidentType) filters.push(getClient().filter('incident_type = {:t}', { t: options.incidentType }))
     const query: Record<string, unknown> = { sort: '-incident_date' }
     if (filters.length > 0) query.filter = filters.join(' && ')
     const result = await getClient().collection(COLLECTION).getList<ApiBlotter>(page, perPage, query)

@@ -12,8 +12,8 @@
     <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4" alt="Tailwind CSS 4"></a>
     <br>
     <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-compose-2496ED" alt="Docker"></a>
-    <a href="https://github.com/YOUR_USER/barangayos/actions"><img src="https://img.shields.io/github/actions/workflow/status/YOUR_USER/barangayos/ci.yml?branch=main&label=CI" alt="CI"></a>
-    <a href="https://github.com/YOUR_USER/barangayos/issues"><img src="https://img.shields.io/github/issues/YOUR_USER/barangayos" alt="Issues"></a>
+    <a href="https://github.com/rodneydelacruz/barangayos/actions"><img src="https://img.shields.io/github/actions/workflow/status/rodneydelacruz/barangayos/ci.yml?branch=main&label=CI" alt="CI"></a>
+    <a href="https://github.com/rodneydelacruz/barangayos/issues"><img src="https://img.shields.io/github/issues/rodneydelacruz/barangayos" alt="Issues"></a>
   </p>
 
   <br>
@@ -108,7 +108,7 @@ BarangayOS is a comprehensive, offline-capable web application purpose-built for
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR_USER/barangayos.git
+git clone https://github.com/rodneydelacruz/barangayos.git
 cd barangayos
 
 # 2. Install frontend dependencies
@@ -240,14 +240,14 @@ npm run build
 - [ ] Electronic signatures
 - [ ] Integration with Philippine government systems (PSA, DILG)
 
-> Suggest and vote on features via [GitHub Issues](https://github.com/YOUR_USER/barangayos/issues/new?template=feature_request.md).
+> Suggest and vote on features via [GitHub Issues](https://github.com/rodneydelacruz/barangayos/issues/new?template=feature_request.md).
 
 ## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](docs/CONTRIBUTING.md) for details.
 
-- [Report a bug](https://github.com/YOUR_USER/barangayos/issues/new?template=bug_report.md)
-- [Request a feature](https://github.com/YOUR_USER/barangayos/issues/new?template=feature_request.md)
+- [Report a bug](https://github.com/rodneydelacruz/barangayos/issues/new?template=bug_report.md)
+- [Request a feature](https://github.com/rodneydelacruz/barangayos/issues/new?template=feature_request.md)
 - Read the [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## License

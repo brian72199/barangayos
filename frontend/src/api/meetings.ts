@@ -79,10 +79,9 @@ export async function getMeetingsPage(
   try {
     const filters: string[] = []
     if (options.search) {
-      const q = options.search.replace(/"/g, '\\"')
-      filters.push(`title ~ "${q}"`)
+      filters.push(getClient().filter('title ~ {:q}', { q: options.search }))
     }
-    if (options.status) filters.push(`status = "${options.status}"`)
+    if (options.status) filters.push(getClient().filter('status = {:s}', { s: options.status }))
     const query: Record<string, unknown> = { sort: '-meeting_date' }
     if (filters.length > 0) query.filter = filters.join(' && ')
     const result = await getClient().collection(COLLECTION).getList<ApiMeeting>(page, perPage, query)
@@ -96,7 +95,7 @@ export async function getUpcomingMeetings(): Promise<ApiMeeting[]> {
   try {
     const today = new Date().toISOString().split('T')[0]
     return await getClient().collection(COLLECTION).getFullList<ApiMeeting>({
-      filter: `meeting_date >= '${today}'`,
+      filter: getClient().filter('meeting_date >= {:today}', { today }),
       sort: 'meeting_date',
     })
   } catch (err) {

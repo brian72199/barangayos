@@ -41,8 +41,8 @@ export async function getDisbursements(startDate?: string, endDate?: string): Pr
   try {
     let filter = ''
     const filters: string[] = []
-    if (startDate) filters.push(`disbursement_date >= "${startDate}"`)
-    if (endDate) filters.push(`disbursement_date <= "${endDate}"`)
+    if (startDate) filters.push(getClient().filter('disbursement_date >= {:d}', { d: startDate }))
+    if (endDate) filters.push(getClient().filter('disbursement_date <= {:d}', { d: endDate }))
     if (filters.length) filter = filters.join(' && ')
     return await getClient().collection<ApiDisbursement>(COLLECTION).getFullList({ filter, sort: '-disbursement_date', expand: 'appropriation' })
   } catch (e) { throw handleApiError(e) }
