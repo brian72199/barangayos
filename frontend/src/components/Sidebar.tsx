@@ -134,14 +134,14 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
     <>
       <aside
         className={cn(
-          'z-40 flex flex-col border-r bg-background transition-all duration-200',
+          'z-40 flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-200',
           pinned ? 'w-60' : 'w-16',
           mobileOpen ? 'fixed inset-y-0 left-0 translate-x-0' : 'fixed inset-y-0 left-0 -translate-x-full',
           'md:sticky md:top-0 md:h-screen md:translate-x-0',
         )}
       >
         <div className={cn(
-          'flex items-center border-b transition-all duration-200',
+          'flex items-center border-b border-sidebar-border transition-all duration-200',
           pinned || mobileOpen ? 'h-14 gap-3 px-4' : 'h-14 justify-center',
         )}>
           {(pinned || mobileOpen) ? (
@@ -151,7 +151,7 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
                 alt="BarangayOS"
                 className="size-8 shrink-0 rounded-md object-contain"
               />
-              <span className="font-display min-w-0 flex-1 truncate text-sm font-semibold">
+              <span className="font-display min-w-0 flex-1 truncate text-sm font-semibold text-sidebar-foreground">
                 BarangayOS
               </span>
             </>
@@ -160,7 +160,7 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
             <button
               type="button"
               onClick={onTogglePin}
-              className="ml-auto hidden size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground md:flex"
+              className="ml-auto hidden size-8 shrink-0 items-center justify-center rounded-md text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground md:flex"
               aria-label="Collapse sidebar"
               title="Collapse to icons"
             >
@@ -176,7 +176,7 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
               <button
                 type="button"
                 onClick={onTogglePin}
-                className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 aria-label="Expand sidebar"
                 title="Expand sidebar"
               >
@@ -195,7 +195,7 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
               return (
                 <div key={group.label}>
                   {pinned && (
-                    <p className="mb-1.5 px-1 font-display text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/60">
+                    <p className="mb-1.5 px-1 font-display text-[11px] font-semibold uppercase tracking-[0.12em] text-sidebar-muted/80">
                       {group.label}
                     </p>
                   )}
@@ -209,13 +209,13 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
                           key={item.to}
                           to={item.to}
                           className={cn(
-                            'relative flex items-center rounded-md font-display text-sm font-medium transition-colors',
+                            'relative flex items-center rounded-md font-display text-sm font-light tracking-wide transition-colors',
                             pinned
                               ? 'h-9 gap-3 px-3'
                               : 'h-10 justify-center',
                             active
-                              ? 'bg-[#C9953E]/10 text-[#C9953E] dark:bg-[#D4A84B]/10 dark:text-[#D4A84B]'
-                              : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+                              ? 'bg-gold/10 text-gold'
+                              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground',
                           )}
                           title={!pinned ? item.label : undefined}
                         >
@@ -232,12 +232,12 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
           </div>
         </nav>
 
-        <div className="border-t">
+        <div className="border-t border-sidebar-border">
           <div className={cn('py-3', pinned ? 'space-y-2 px-4' : 'flex flex-col items-center gap-2')}>
             <div className={cn('flex items-center', pinned ? 'gap-2' : 'flex-col gap-1')}>
               <ThemeToggle />
               {pinned && (
-                <span className="text-[11px] text-muted-foreground capitalize">
+                <span className="text-[11px] text-sidebar-muted capitalize">
                   {theme} mode
                 </span>
               )}
@@ -249,21 +249,21 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
                 pinned ? 'items-center gap-2' : 'flex-col items-center gap-1',
               )}>
                 <div
-                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-secondary-foreground"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent/50 text-xs font-semibold text-sidebar-foreground"
                   title={user.name ?? user.email}
                 >
                   {(user.name ?? user.email).charAt(0).toUpperCase()}
                 </div>
                 {pinned && (
                   <div className="min-w-0 flex-1">
-                    <p className="font-display truncate text-sm font-medium text-foreground">{user.name ?? user.email}</p>
-                    <p className="truncate text-[11px] text-muted-foreground capitalize">{user.role}</p>
+                    <p className="font-display truncate text-sm font-medium text-sidebar-foreground">{user.name ?? user.email}</p>
+                    <p className="truncate text-[11px] text-sidebar-muted capitalize">{user.role}</p>
                   </div>
                 )}
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-destructive"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-muted hover:bg-sidebar-accent hover:text-destructive"
                   aria-label="Logout"
                   title="Logout"
                 >

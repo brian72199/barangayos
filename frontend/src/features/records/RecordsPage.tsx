@@ -3,10 +3,8 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router'
 import { Plus, ChevronDown, Calendar, User, Users, BookOpen, FileText } from 'lucide-react'
 import { getBlotters, createBlotter, updateBlotter, deleteBlotter, getNextCaseNumber, type ApiBlotter, type BlotterData } from '@/api/blotter'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -174,6 +172,13 @@ export default function RecordsPage() {
 
   const canModify = hasRole('admin', 'staff')
 
+  const newBlotterButton = canModify ? (
+    <Button variant="ghost" size="sm" className="gap-0.5 rounded-md text-blue-400 hover:text-blue-300 h-6 text-xs" onClick={openCreatePanel}>
+      <Plus className="size-3" />
+      New Blotter
+    </Button>
+  ) : null
+
   function closeFlyout() {
     setFlyoutBlotter(null)
   }
@@ -182,20 +187,20 @@ export default function RecordsPage() {
     { key: 'case_number', label: 'Case #', sortable: true, filterType: 'text' },
     { key: 'complainant_name', label: 'Complainant', sortable: true, filterType: 'text',
       render: (b) => (
-        <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <User className="size-3.5" />
+        <div className="flex items-center gap-1.5">
+          <div className="flex size-6 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-3" />
           </div>
-          <span className="font-medium">{b.complainant_name}</span>
+          <span className="font-medium text-xs">{b.complainant_name}</span>
         </div>
       ) },
     { key: 'respondent_name', label: 'Respondent', sortable: true, filterType: 'text',
       render: (b) => (
-        <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <User className="size-3.5" />
+        <div className="flex items-center gap-1.5">
+          <div className="flex size-6 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-3" />
           </div>
-          <span className="font-medium">{b.respondent_name || '—'}</span>
+          <span className="font-medium text-xs">{b.respondent_name || '—'}</span>
         </div>
       ) },
     { key: 'incident_type', label: 'Incident Type', hideBelow: 'sm', filterType: 'select',
@@ -207,7 +212,7 @@ export default function RecordsPage() {
       render: (b) => b.incident_location || '—' },
     { key: 'status', label: 'Status',
       render: (b) => (
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${blotterStatusColors[b.status] ?? ''}`}>
+        <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${blotterStatusColors[b.status] ?? ''}`}>
           {b.status}
         </span>
       ),
@@ -222,35 +227,25 @@ export default function RecordsPage() {
 
   return (
     <>
-      <PageHeader title="Blotter Records">
-        {canModify && (
-          <Button size="sm" className="gap-1.5 motion-press" onClick={openCreatePanel}>
-            <Plus className="size-3.5" />
-            New Blotter
-          </Button>
-        )}
-      </PageHeader>
-
-      <Card lifted={false} className="shadow-none">
-        
-        <CardContent className="p-0">
-          <DataTable
-            columns={blotterColumns}
-            data={blotters}
-            loading={loading}
-            onRowClick={(b) => setFlyoutBlotter(b)}
-            emptyState={
-              <EmptyState
-                title="No blotter cases yet."
-                action={canModify && blotters.length === 0 ? { label: "Create first case", onClick: openCreatePanel } : undefined}
-              />
-            }
-            toolbar
-            exportable
-            rowKey={(b) => b.id}
-          />
-        </CardContent>
-      </Card>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
+        <DataTable
+          title="BLOTTER RECORDS"
+          toolbarActions={newBlotterButton}
+          columns={blotterColumns}
+          data={blotters}
+          loading={loading}
+          onRowClick={(b) => setFlyoutBlotter(b)}
+          emptyState={
+            <EmptyState
+              title="No blotter cases yet."
+              action={canModify && blotters.length === 0 ? { label: "Create first case", onClick: openCreatePanel } : undefined}
+            />
+          }
+          toolbar
+          exportable
+          rowKey={(b) => b.id}
+        />
+      </div>
 
       {panelOpen && (
         <div className="fixed inset-0 z-40 flex max-md:flex-col max-md:justify-end md:justify-end">

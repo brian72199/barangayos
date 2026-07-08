@@ -5,9 +5,7 @@ import { getDocuments, updateDocument, getDocumentFee, type ApiDocument } from '
 import { createRevenue } from '@/api/revenues'
 import { getFundSources, type ApiFundSource } from '@/api/fundSources'
 import { Select } from '@/components/ui/select'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DataTable, type Column } from '@/components/ui/data-table'
@@ -142,11 +140,11 @@ export default function ReleasePage() {
       render: (d) => `#${d.queue_number}` },
     { key: 'resident_name', label: 'Resident', sortable: true, filterType: 'text',
       render: (d) => (
-        <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <User className="size-3.5" />
+        <div className="flex items-center gap-1.5">
+          <div className="flex size-6 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-3" />
           </div>
-          <span className="font-medium">{d.resident_name}</span>
+          <span className="font-medium text-xs">{d.resident_name}</span>
         </div>
       ) },
     { key: 'document_type', label: 'Type', hideBelow: 'sm', filterType: 'select',
@@ -162,7 +160,7 @@ export default function ReleasePage() {
     { key: 'purpose', label: 'Purpose', filterType: 'text' },
     { key: 'status', label: 'Status',
       render: (d) => (
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${documentStatusColors[d.status] ?? ''}`}>
+        <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${documentStatusColors[d.status] ?? ''}`}>
           {d.status.replace(/_/g, ' ')}
         </span>
       ),
@@ -203,24 +201,22 @@ export default function ReleasePage() {
 
   return (
     <>
-      <PageHeader title="Document Release"/>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
 
       {successMsg && (
-        <div className="mb-4 rounded-md bg-emerald-200 px-4 py-3 text-sm text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-300 motion-fade-in">
+        <div className="shrink-0 rounded-none bg-emerald-200 px-4 py-2 text-xs text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-300 motion-fade-in">
           {successMsg}
         </div>
       )}
 
       {error && (
-        <div className="mb-4 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive motion-fade-in">
+        <div className="shrink-0 rounded-none bg-destructive/10 px-4 py-2 text-xs text-destructive motion-fade-in">
           {error}
         </div>
       )}
 
-      <Card lifted={false} className="shadow-none">
-
-        <CardContent className="p-0">
-          <DataTable
+      <DataTable
+            title="DOCUMENT RELEASE"
             columns={releaseColumns}
             data={displayDocs}
             loading={loading}
@@ -235,8 +231,7 @@ export default function ReleasePage() {
             exportable
             rowKey={(d) => d.id}
           />
-        </CardContent>
-      </Card>
+      </div>
 
       {releaseDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">

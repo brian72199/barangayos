@@ -7,10 +7,8 @@ import { searchHouseholds, getHousehold, type ApiHousehold } from '@/api/househo
 import { getDocuments, type ApiDocument } from '@/api/documents'
 import { getBlotters, type ApiBlotter } from '@/api/blotter'
 import { getActivities, type ApiActivity } from '@/api/activity'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -357,11 +355,11 @@ export default function ResidentsPage() {
     { key: 'last_name', label: 'Name', sortable: true, filterType: 'text',
       filterValue: (r) => `${r.last_name}, ${r.first_name}${r.middle_name ? ' ' + r.middle_name : ''}`,
       render: (r) => (
-        <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <User className="size-3.5" />
+        <div className="flex items-center gap-1.5">
+          <div className="flex size-6 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-3" />
           </div>
-          <span className="font-medium">{r.last_name}, {r.first_name}{r.middle_name ? ' ' + r.middle_name : ''}</span>
+          <span className="font-medium text-xs">{r.last_name}, {r.first_name}{r.middle_name ? ' ' + r.middle_name : ''}</span>
         </div>
       ) },
     { key: 'purok', label: 'Purok', sortable: true, filterType: 'select',
@@ -376,11 +374,12 @@ export default function ResidentsPage() {
         { label: 'Widowed', value: 'widowed' }, { label: 'Separated', value: 'separated' },
       ] },
     { key: 'nationality', label: 'Nationality', filterType: 'text' },
-    { key: 'tags', label: 'Tags',
+    { key: 'tags', label: 'Tags', filterType: 'text',
+      filterValue: (r) => tagKeys.filter((k) => (r as Record<string, unknown>)[k]).map((k) => tagLabels[k]).join(' '),
       render: (r) => (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-0.5">
           {tagKeys.filter((k) => (r as Record<string, unknown>)[k]).map((k) => (
-            <span key={k} className={cn('inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold', tagColors[k])}>
+            <span key={k} className={cn('inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold', tagColors[k])}>
               {tagLabels[k]}
             </span>
           ))}
@@ -388,38 +387,35 @@ export default function ResidentsPage() {
       ) },
   ]
 
+  const newResidentButton = canModify ? (
+    <Button variant="ghost" size="sm" className="gap-0.5 rounded-md text-blue-400 hover:text-blue-300 h-6 text-xs" onClick={openCreatePanel}>
+      <Plus className="size-3" />
+      New Resident
+    </Button>
+  ) : null
+
   return (
     <>
-      <PageHeader title="Residents">
-        {canModify && (
-          <Button size="sm" className="gap-1.5 motion-press" onClick={openCreatePanel}>
-            <Plus className="size-3.5" />
-            New Resident
-          </Button>
-        )}
-      </PageHeader>
-
-      <Card lifted={false} className="shadow-none">
-        
-        <CardContent className="p-0">
-          <DataTable
-            columns={columns}
-            data={residents}
-            loading={loading}
-            onRowClick={(r) => openFlyout(r)}
-            emptyState={
-              residents.length === 0
-                ? <EmptyState title="No residents yet" description="Add your first resident." action={canModify ? { label: "Create first resident", onClick: openCreatePanel } : undefined} />
-                : undefined
-            }
-            rowKey={(r) => r.id}
-            toolbar
-            exportable
-            sortKey="last_name"
-            sortDir="asc"
-          />
-        </CardContent>
-      </Card>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
+        <DataTable
+          title="RESIDENT PROFILES"
+          toolbarActions={newResidentButton}
+          columns={columns}
+          data={residents}
+          loading={loading}
+          onRowClick={(r) => openFlyout(r)}
+          emptyState={
+            residents.length === 0
+              ? <EmptyState title="No residents yet" description="Add your first resident." action={canModify ? { label: "Create first resident", onClick: openCreatePanel } : undefined} />
+              : undefined
+          }
+          rowKey={(r) => r.id}
+          toolbar
+          exportable
+          sortKey="last_name"
+          sortDir="asc"
+        />
+      </div>
 
       {panelOpen && (
         <div className="fixed inset-0 z-40 flex max-md:flex-col max-md:justify-end md:justify-end">

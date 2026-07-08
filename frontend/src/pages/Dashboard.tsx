@@ -23,27 +23,17 @@ export default function Dashboard() {
 
   const documentItems = Object.entries(stats.documentByStatus).map(([key, count]) => {
     const colorMap: Record<string, string> = {
-      pending: '#f59e0b', processing: '#3b82f6', for_release: '#10b981',
-      released: '#6b7280', cancelled: '#ef4444',
+      pending: '#C9953E', processing: '#1B3A4B', for_release: '#0D9488',
+      released: '#A09688', cancelled: '#CE1126',
     }
-    return { label: key.replace(/_/g, ' '), count, color: colorMap[key] ?? '#6b7280' }
+    return { label: key.replace(/_/g, ' '), count, color: colorMap[key] ?? '#A09688' }
   })
 
   return (
     <div className="font-display">
-      <div className="flex items-center justify-between mb-4">
-        
-        <button
-          onClick={() => setSheetOpen(true)}
-          className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-        >
-          <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
-          Customize
-        </button>
-      </div>
 
       <div className="space-y-5">
-        {isVisible('hero') && <DashboardHero userName={userName} role={role} stats={stats} />}
+        {isVisible('hero') && <DashboardHero userName={userName} role={role} stats={stats} onCustomize={() => setSheetOpen(true)} />}
         {isVisible('search') && <DashboardSearch />}
         {isVisible('kpi-strip') && (
           <DashboardKPI stats={stats} role={role} loading={loading} config={getWidgetConfig('kpi-strip')} />

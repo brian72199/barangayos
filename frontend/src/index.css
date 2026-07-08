@@ -32,6 +32,12 @@
   --color-bamboo: var(--bamboo);
   --color-red-pinoy: var(--red-pinoy);
 
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-fg);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-border: var(--sidebar-border);
+
   --color-accent-blue: var(--accent-blue);
   --color-accent-teal: var(--accent-teal);
   --color-accent-rose: var(--accent-rose);
@@ -122,9 +128,9 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
 :root {
   color-scheme: light;
 
-  --bg: #F6F2EB;
+  --bg: #F5F0E8;
   --fg: #1A1513;
-  --card: #FCF9F5;
+  --card: #FFFFFF;
   --card-fg: #1A1513;
   --popover: #FFFFFF;
   --popover-fg: #1A1513;
@@ -132,21 +138,21 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
   --primary-fg: #FFFFFF;
   --secondary: #F0EBE0;
   --secondary-fg: #1A1513;
-  --muted: #EDE9E2;
+  --muted: #F0EBE0;
   --muted-fg: #7A6E62;
   --accent: #F0EBE0;
   --accent-fg: #1A1513;
   --destructive: #CE1126;
   --destructive-fg: #FFFFFF;
-  --border: #E8DFD0;
-  --input: #E8DFD0;
+  --border: #E4DBC8;
+  --input: #E4DBC8;
   --ring: #C9953E;
 
   --capiz: #F8F5F0;
   --barangay: #1B3A4B;
   --gold: #C9953E;
   --narra: #5C4033;
-  --bamboo: #E8DFD0;
+  --bamboo: #E4DBC8;
   --red-pinoy: #CE1126;
 
   --accent-blue: #1B3A4B;
@@ -155,6 +161,11 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
   --accent-amber: #C9953E;
 
   --surface-raised: #FFFFFF;
+  --sidebar: #131E2B;
+  --sidebar-fg: #EDE4D6;
+  --sidebar-muted: #B8ADA0;
+  --sidebar-accent: rgba(255, 255, 255, 0.07);
+  --sidebar-border: #162434;
   --surface-overlay: rgba(0, 0, 0, 0.4);
   --text-subtle: #A09688;
 }
@@ -195,6 +206,11 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
   --accent-amber: #C9953E;
 
   --surface-raised: #1C1917;
+  --sidebar: #131E2B;
+  --sidebar-fg: #EDE4D6;
+  --sidebar-muted: #B8ADA0;
+  --sidebar-accent: rgba(255, 255, 255, 0.07);
+  --sidebar-border: #162434;
   --surface-overlay: rgba(0, 0, 0, 0.6);
   --text-subtle: #7A7064;
 
@@ -208,8 +224,10 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
   backdrop-filter: blur(8px);
 }
 
-* {
-  border-color: var(--color-border);
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
 }
 
 body {
@@ -263,19 +281,41 @@ html::-webkit-scrollbar-thumb:hover {
 }
 
 .sidebar-scroll:hover {
-  scrollbar-color: var(--color-border) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
 .sidebar-scroll:hover::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .table-scroll {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  -ms-overflow-style: auto;
 }
 
 .table-scroll::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  width: 5px;
+  height: 5px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.table-scroll--hover {
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.table-scroll--hover::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+}
+
+.table-scroll::-webkit-scrollbar-corner {
+  background: transparent;
 }
