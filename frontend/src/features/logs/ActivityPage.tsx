@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { User, Clock, Database } from 'lucide-react'
+import { User } from 'lucide-react'
 import { getActivities, type ApiActivity } from '@/api/activity'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { cn, formatDateTime } from '@/lib/utils'
