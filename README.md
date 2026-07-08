@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
   <h1>BarangayOS</h1>
   <p align="center">
     <strong>A modern document and records management system for Philippine Barangay LGUs</strong>
@@ -77,7 +77,7 @@ BarangayOS is a comprehensive, offline-capable web application purpose-built for
 | **Dark Mode** | Light/dark theme toggle with automatic system preference detection |
 | **Cloudflare Tunnel** | Secure public access without opening firewall ports |
 | **Database Backup** | Automatic backups to S3-compatible storage (Cloudflare R2) via admin UI |
-| **PWA Ready** | Mobile-friendly interface with service worker support |
+| **PWA Installable** | Desktop/mobile app install with sidebar button; works on HTTPS (LAN with mkcert or Cloudflare Tunnel) |
 | **Reports Dashboard** | Aggregated statistics and data visualization with interactive charts |
 | **Smart URL Resolution** | Automatic API URL selection based on network environment |
 
@@ -158,10 +158,11 @@ barangayos/
 │   │   ├── offline/           # IndexedDB queue, sync manager, indicator
 │   │   ├── pages/             # Page-level components
 │   │   └── routes/            # Route definitions
-│   ├── public/                # Static assets
+│   ├── public/                # Static assets (manifest, icons, service worker)
 │   ├── e2e/                   # Playwright E2E tests
 │   ├── Dockerfile             # Multi-stage production build
-│   ├── nginx.conf             # Nginx config with API proxy
+│   ├── nginx-entrypoint.sh    # Startup that copies placeholder TLS certs
+│   ├── nginx.conf             # Nginx config with API proxy + HTTPS
 │   └── package.json           # Frontend dependencies
 ├── backend/                   # PocketBase backend
 │   ├── pb_migrations/         # Schema + RBAC migrations
@@ -173,6 +174,8 @@ barangayos/
 │   ├── deploy-prod.ps1        # Production deploy from GitHub artifact
 │   ├── e2e-server.mjs         # E2E test server orchestrator
 │   ├── export-data.sh         # Export PocketBase data via API
+│   ├── generate-certs.ps1       # Generate mkcert certs for LAN HTTPS
+│   ├── generate-icons.cjs       # Generate square PWA icons from logo
 │   └── healthcheck.sh         # PocketBase health check
 ├── docs/                      # Documentation
 │   ├── ARCHITECTURE.md        # System design and data flow

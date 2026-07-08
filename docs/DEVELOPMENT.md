@@ -1,4 +1,4 @@
-# Development Guide
+﻿# Development Guide
 
 ## Prerequisites
 
@@ -129,7 +129,8 @@ barangayos/
 │   │   └── routes/            # Route definitions
 │   ├── e2e/                   # Playwright E2E tests
 │   ├── public/                # Static assets
-│   ├── nginx.conf             # Nginx config for production container
+│   ├── nginx-entrypoint.sh    # Startup that copies placeholder TLS certs
+│   ├── nginx.conf             # Nginx config with API proxy + HTTPS
 │   ├── Dockerfile             # Multi-stage Docker build
 │   └── package.json           # Frontend dependencies
 ├── backend/                   # PocketBase backend
@@ -142,6 +143,8 @@ barangayos/
 │   ├── deploy-prod.ps1        # Production deploy from GitHub artifact
 │   ├── e2e-server.mjs         # E2E test server orchestrator
 │   ├── export-data.sh         # Export PocketBase data via API
+│   ├── generate-certs.ps1       # Generate mkcert certs for LAN HTTPS
+│   ├── generate-icons.cjs       # Generate square PWA icons from logo
 │   └── healthcheck.sh         # PocketBase health check
 └── docs/                      # Documentation
     ├── ARCHITECTURE.md        # System design and data flow

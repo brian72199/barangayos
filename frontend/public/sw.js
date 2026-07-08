@@ -4,6 +4,9 @@ const STATIC = [
   '/index.html',
   '/manifest.json',
   '/icon-logo.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-512-maskable.png',
   '/standard-logo.png',
 ]
 

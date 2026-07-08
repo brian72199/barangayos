@@ -21,6 +21,7 @@ import {
   Wallet,
   ArrowUpFromLine,
   ScrollText,
+  Download,
 } from 'lucide-react'
 import { getCurrentUser, logout, type Role } from '@/auth/session'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -95,6 +96,69 @@ const navGroups: { label: string; items: NavItem[] }[] = [
 function ActiveDot() {
   return (
     <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-gold transition-all duration-200" />
+  )
+}
+
+function InstallPWAButton({ expanded }: { expanded: boolean }) {
+  const [installEvent, setInstallEvent] = useState<any>(null)
+  const [hidden, setHidden] = useState(false)
+
+  useEffect(() => {
+    // Already installed / running as standalone PWA
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setHidden(true)
+      return
+    }
+
+    const onPrompt = (e: Event) => {
+      e.preventDefault()
+      setInstallEvent(e)
+    }
+    const onInstalled = () => {
+      setHidden(true)
+      setInstallEvent(null)
+    }
+
+    window.addEventListener('beforeinstallprompt', onPrompt)
+    window.addEventListener('appinstalled', onInstalled)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onPrompt)
+      window.removeEventListener('appinstalled', onInstalled)
+    }
+  }, [])
+
+  const handleInstall = async () => {
+    if (!installEvent) return
+    installEvent.prompt()
+    const { outcome } = await installEvent.userChoice
+    if (outcome === 'accepted') setHidden(true)
+    setInstallEvent(null)
+  }
+
+  if (hidden || !installEvent) return null
+
+  if (expanded) {
+    return (
+      <button
+        type="button"
+        onClick={handleInstall}
+        className="flex w-full items-center gap-3 border-b border-sidebar-border px-4 py-2.5 text-sm font-display font-medium text-gold hover:bg-gold/5 transition-colors"
+      >
+        <Download className="size-4 shrink-0" />
+        <span>Install App</span>
+      </button>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleInstall}
+      className="flex h-10 w-full items-center justify-center text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+      title="Install App"
+    >
+      <Download className="size-4 shrink-0" />
+    </button>
   )
 }
 
@@ -178,6 +242,8 @@ export default function Sidebar({ pinned, onTogglePin, mobileOpen, onMobileOpenC
             </button>
           )}
         </div>
+
+        <InstallPWAButton expanded={pinned || mobileOpen} />
 
         <nav className="sidebar-scroll flex-1 overflow-y-auto py-4">
           <div className={cn('space-y-6', pinned ? 'px-3' : 'px-2')}>
