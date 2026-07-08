@@ -162,9 +162,36 @@ export default function LoginPage() {
           </div>
 
           {/* Footer */}
-          <p className="mt-10 text-center text-xs text-gray-400">
-            Made with ❤️ by <a href="https://github.com/rodneydelacruz" target="_blank" rel="noopener noreferrer" className="font-medium text-gray-500 underline transition-colors hover:text-gray-600">Rodney</a> for all Barangays.
-          </p>
+          {/* Footer links */}
+          <div className="mt-10 text-center text-xs text-gray-400">
+           
+            <a
+              href="https://github.com/rodneydelacruz/barangayos/blob/main/docs/PRIVACY_NOTICE.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-gray-500 underline transition-colors hover:text-gray-600"
+            >
+              Privacy Notice
+            </a>
+            <span className="mx-1.5 text-gray-300">&middot;</span>
+            <a
+              href="https://github.com/rodneydelacruz/barangayos/blob/main/docs/TERMS_OF_USE.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-gray-500 underline transition-colors hover:text-gray-600"
+            >
+              Terms of Use
+            </a>
+            <span className="mx-1.5 text-gray-300">&middot;</span>
+            <a
+              href="https://github.com/rodneydelacruz/barangayos/blob/main/docs/DATA_PROCESSING_AGREEMENT.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-gray-500 underline transition-colors hover:text-gray-600"
+            >
+              DPA
+            </a>
+          </div>
         </div>
       </div>
     </div>
