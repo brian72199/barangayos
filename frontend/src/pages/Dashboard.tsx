@@ -23,10 +23,10 @@ export default function Dashboard() {
 
   const documentItems = Object.entries(stats.documentByStatus).map(([key, count]) => {
     const colorMap: Record<string, string> = {
-      pending: '#f59e0b', processing: '#3b82f6', for_release: '#10b981',
-      released: '#6b7280', cancelled: '#ef4444',
+      pending: '#C9953E', processing: '#1B3A4B', for_release: '#0D9488',
+      released: '#A09688', cancelled: '#CE1126',
     }
-    return { label: key.replace(/_/g, ' '), count, color: colorMap[key] ?? '#6b7280' }
+    return { label: key.replace(/_/g, ' '), count, color: colorMap[key] ?? '#A09688' }
   })
 
   return (

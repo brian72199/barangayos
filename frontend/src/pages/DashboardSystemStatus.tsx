@@ -47,7 +47,7 @@ export default function DashboardSystemStatus() {
   const statusColor = pbReachable === null
     ? 'bg-muted-foreground/40'
     : pbReachable && online
-      ? 'bg-emerald-500'
+      ? 'bg-accent-teal'
       : 'bg-red-pinoy'
 
   const statusLabel = !online
@@ -94,7 +94,7 @@ export default function DashboardSystemStatus() {
             </div>
             <span className={cn(
               'text-xs font-medium',
-              online ? 'text-emerald-500' : 'text-red-pinoy',
+              online ? 'text-accent-teal' : 'text-red-pinoy',
             )}>
               {online ? 'Connected' : 'Disconnected'}
             </span>

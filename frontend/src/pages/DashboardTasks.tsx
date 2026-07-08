@@ -10,9 +10,9 @@ interface DashboardTasksProps {
 }
 
 const priorityConfig = {
-  urgent: { icon: AlertCircle, color: 'text-red-pinoy', bg: 'bg-red-50 dark:bg-red-500/10' },
-  normal: { icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10' },
-  info: { icon: Info, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-500/10' },
+  urgent: { icon: AlertCircle, color: 'text-red-pinoy', bg: 'bg-red-pinoy/10' },
+  normal: { icon: AlertTriangle, color: 'text-gold', bg: 'bg-gold/10' },
+  info: { icon: Info, color: 'text-barangay', bg: 'bg-barangay/10' },
 }
 
 export default function DashboardTasks({ tasks }: DashboardTasksProps) {
@@ -26,8 +26,8 @@ export default function DashboardTasks({ tasks }: DashboardTasksProps) {
 
         {tasks.length === 0 ? (
           <div className="mt-8 flex flex-col items-center gap-3 py-12 text-center">
-            <div className="flex size-14 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
-              <CheckCircle className="size-7 text-emerald-500" />
+            <div className="flex size-14 items-center justify-center rounded-full bg-accent-teal/10">
+              <CheckCircle className="size-7 text-accent-teal" />
             </div>
             <div>
               <p className="text-sm font-medium text-foreground">Maayos ang lahat!</p>
