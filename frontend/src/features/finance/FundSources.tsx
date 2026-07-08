@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -112,39 +111,45 @@ export function FundSources() {
         { label: 'Inactive', value: 'inactive' },
       ],
       render: (f) => (
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${f.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'}`}>{f.is_active ? 'active' : 'inactive'}</span>
+        <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${f.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'}`}>{f.is_active ? 'active' : 'inactive'}</span>
       ) },
   ]
 
+  const toolbarActions = (
+    <div className="flex items-center gap-1">
+      {getCurrentUser()?.role === 'admin' && (
+        <Button variant="ghost" size="sm" className="h-6 text-xs gap-0.5" onClick={() => setShowExport(true)}>
+          <Download className="size-3" /> Export
+        </Button>
+      )}
+      <Button size="sm" className="gap-0.5 motion-press h-6 text-xs" onClick={() => {
+        setEditing(null)
+        setForm({ name: '', code: '', statutory_rule: 'none', current_balance: 0, original_balance: 0, fiscal_year: currentYear, is_active: true, description: '', notes: '' })
+        setShowForm(true)
+      }}>
+        <Plus className="size-3" />
+        Add
+      </Button>
+    </div>
+  )
+
   return (
-    <div>
-      <PageHeader title="Fund Sources">
-        <div className="flex items-center gap-4">
-          {getCurrentUser()?.role === 'admin' && (
-            <Button variant="outline" onClick={() => setShowExport(true)}>
-              <Download className="h-4 w-4 mr-1" /> Export
-            </Button>
-          )}
-          <Button onClick={() => {
-            setEditing(null)
-            setForm({ name: '', code: '', statutory_rule: 'none', current_balance: 0, original_balance: 0, fiscal_year: currentYear, is_active: true, description: '', notes: '' })
-            setShowForm(true)
-          }}>
-            <Plus className="h-4 w-4 mr-1" /> Add Fund Source
-          </Button>
-        </div>
-      </PageHeader>
+    <>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
       
-      <DataTable
-        columns={columns}
-        data={sources}
-        loading={loading}
+        <DataTable
+          title="FUND SOURCES"
+          toolbarActions={toolbarActions}
+          columns={columns}
+          data={sources}
+          loading={loading}
           onRowClick={(s) => { setFlyout(s); loadFundDetails(s.id) }}
-        emptyState={<p className="text-center text-muted-foreground py-6">No fund sources found. Create one to get started.</p>}
-        rowKey={(s) => s.id}
-        toolbar
-        exportable
-      />
+          emptyState={<p className="text-center text-muted-foreground py-6">No fund sources found. Create one to get started.</p>}
+          rowKey={(s) => s.id}
+          toolbar
+          exportable
+        />
+      </div>
       <DetailPanel
         open={!!flyout}
         onClose={() => setFlyout(null)}
@@ -324,6 +329,6 @@ export function FundSources() {
         }}
         filename="fund-sources"
       />
-    </div>
+    </>
   )
 }

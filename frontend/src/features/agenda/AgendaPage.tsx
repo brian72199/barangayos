@@ -322,7 +322,7 @@ export default function AgendaPage() {
       filterOptions: meetingTypeOptions.map(t => ({ label: t.label, value: t.value })) },
     { key: 'status', label: 'Status',
       render: (m) => (
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${meetingStatusColors[m.status] ?? ''}`}>{m.status}</span>
+        <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${meetingStatusColors[m.status] ?? ''}`}>{m.status}</span>
       ),
       filterType: 'select',
       filterOptions: statusOptions.map(s => ({ label: statusLabels[s] || s, value: s })) },
@@ -333,7 +333,7 @@ export default function AgendaPage() {
     { key: 'title', label: 'Title', filterType: 'text' },
     { key: 'status', label: 'Status',
       render: (a) => (
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${agendaStatusColors[a.status] ?? ''}`}>{a.status}</span>
+        <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${agendaStatusColors[a.status] ?? ''}`}>{a.status}</span>
       ),
       filterType: 'select',
       filterOptions: agendaStatusOptions.map(s => ({ label: agendaStatusLabels[s] || s, value: s })) },

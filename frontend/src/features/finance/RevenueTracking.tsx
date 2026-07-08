@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -96,29 +95,36 @@ export function RevenueTracking() {
       render: (r) => <span className="font-mono text-xs">{r.or_no || '—'}</span> },
   ]
 
+  const toolbarActions = (
+    <div className="flex items-center gap-1">
+      {getCurrentUser()?.role === 'admin' && (
+        <Button variant="ghost" size="sm" className="h-6 text-xs gap-0.5" onClick={() => setShowExport(true)}>
+          <Download className="size-3" /> Export
+        </Button>
+      )}
+      <Button size="sm" className="gap-0.5 motion-press h-6 text-xs" onClick={() => setShowForm(true)}>
+        <Plus className="size-3" />
+        Add
+      </Button>
+    </div>
+  )
+
   return (
-    <div>
-      <PageHeader title="Revenue Tracking">
-        <div className="flex items-center gap-2">
-          {getCurrentUser()?.role === 'admin' && (
-            <Button variant="outline" onClick={() => setShowExport(true)}>
-              <Download className="h-4 w-4 mr-1" /> Export
-            </Button>
-          )}
-          <Button onClick={() => setShowForm(true)}><Plus className="h-4 w-4 mr-1" /> Add Revenue</Button>
-        </div>
-      </PageHeader>
-      
-      <DataTable
-        columns={columns}
-        data={revenues}
-        loading={loading}
-        onRowClick={(r) => setFlyout(r)}
-        emptyState={<p className="text-center text-muted-foreground py-6">No revenue records found</p>}
-        rowKey={(r) => r.id}
-        toolbar
-        exportable
-      />
+    <>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
+        <DataTable
+          title="REVENUE TRACKING"
+          toolbarActions={toolbarActions}
+          columns={columns}
+          data={revenues}
+          loading={loading}
+          onRowClick={(r) => setFlyout(r)}
+          emptyState={<p className="text-center text-muted-foreground py-6">No revenue records found</p>}
+          rowKey={(r) => r.id}
+          toolbar
+          exportable
+        />
+      </div>
       <DetailPanel
         open={!!flyout}
         onClose={() => setFlyout(null)}
@@ -277,6 +283,6 @@ export function RevenueTracking() {
         }}
         filename="revenues"
       />
-    </div>
+    </>
   )
 }

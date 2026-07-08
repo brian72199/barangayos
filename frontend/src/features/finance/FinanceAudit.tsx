@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Clock, User, Database, FileText } from 'lucide-react'
 import { getFinanceAuditLogs, type ApiFinanceAudit } from '@/api/financeAudit'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { DataTable, type Column } from '@/components/ui/data-table'
-import { Card, CardContent } from '@/components/ui/card'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { cn, formatDateTime } from '@/lib/utils'
 
@@ -71,7 +69,7 @@ export function FinanceAudit() {
         { label: 'Delete', value: 'delete' },
       ],
       render: (a) => (
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${a.action === 'create' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : a.action === 'update' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}>{a.action}</span>
+        <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${a.action === 'create' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : a.action === 'update' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}>{a.action}</span>
       ) },
     { key: 'collection_name', label: 'Collection', sortable: true, filterType: 'select',
       filterOptions: [...FINANCE_COLLECTIONS].map((c) => ({ label: collectionLabels[c], value: c })),
@@ -83,25 +81,19 @@ export function FinanceAudit() {
 
   return (
     <>
-      <PageHeader title="Finance Audit Trail"/>
-
-      
-
-      <Card lifted={false} className="shadow-none">
-        
-        <CardContent className="p-0">
-          <DataTable
-            columns={columns}
-            data={logs}
-            loading={loading}
-            onRowClick={(l) => setFlyoutLog(l)}
-            emptyState={<p className="text-center text-muted-foreground py-12">No finance activity recorded yet.</p>}
-            rowKey={(l) => l.id}
-            toolbar
-            exportable
-          />
-        </CardContent>
-      </Card>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
+        <DataTable
+          title="FINANCE AUDIT TRAIL"
+          columns={columns}
+          data={logs}
+          loading={loading}
+          onRowClick={(l) => setFlyoutLog(l)}
+          emptyState={<p className="text-center text-muted-foreground py-12">No finance activity recorded yet.</p>}
+          rowKey={(l) => l.id}
+          toolbar
+          exportable
+        />
+      </div>
 
       <DetailPanel
         open={flyoutLog !== null}

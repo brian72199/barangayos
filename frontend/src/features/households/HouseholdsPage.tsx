@@ -5,10 +5,8 @@ import { Plus, ChevronDown, Home, User, Users } from 'lucide-react'
 import { getHouseholds, getNextHouseholdNumber, createHousehold, updateHousehold, deleteHousehold, type ApiHousehold } from '@/api/households'
 import { getResidents, type ApiResident } from '@/api/residents'
 import { ResidentCombobox } from '@/components/ui/ResidentCombobox'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -173,15 +171,22 @@ export default function HouseholdsPage() {
 
   const canModify = hasRole('admin', 'staff')
 
+  const newHouseholdButton = canModify ? (
+    <Button size="sm" className="gap-0.5 motion-press h-6 text-xs" onClick={openCreatePanel}>
+      <Plus className="size-3" />
+      New Household
+    </Button>
+  ) : null
+
   const columns: Column<ApiHousehold>[] = [
     { key: 'household_number', label: 'Household #', sortable: true, filterType: 'text' },
     { key: 'head_name', label: 'Head of Household', sortable: true, filterType: 'text',
       render: (h) => (
-        <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <User className="size-3.5" />
+        <div className="flex items-center gap-1.5">
+          <div className="flex size-5 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-2.5" />
           </div>
-          <span className="font-medium">{h.head_name}</span>
+          <span className="font-medium text-[11px]">{h.head_name}</span>
         </div>
       ) },
     { key: 'address', label: 'Address', filterType: 'text',
@@ -198,34 +203,24 @@ export default function HouseholdsPage() {
 
   return (
     <>
-      <PageHeader title="Households">
-        {canModify && (
-          <Button size="sm" className="gap-1.5 motion-press" onClick={openCreatePanel}>
-            <Plus className="size-3.5" />
-            New Household
-          </Button>
-        )}
-      </PageHeader>
-
-      <Card lifted={false} className="shadow-none">
-        
-        <CardContent className="p-0">
-          <DataTable
-            columns={columns}
-            data={households}
-            loading={loading}
-            onRowClick={(h) => setFlyoutHousehold(h)}
-            emptyState={
-              households.length === 0
-                ? <EmptyState title="No households yet" description="Create your first household." action={canModify ? { label: "Create first household", onClick: openCreatePanel } : undefined} />
-                : undefined
-            }
-            rowKey={(h) => h.id}
-            toolbar
-            exportable
-          />
-        </CardContent>
-      </Card>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
+        <DataTable
+          title="HOUSEHOLDS"
+          toolbarActions={newHouseholdButton}
+          columns={columns}
+          data={households}
+          loading={loading}
+          onRowClick={(h) => setFlyoutHousehold(h)}
+          emptyState={
+            households.length === 0
+              ? <EmptyState title="No households yet" description="Create your first household." action={canModify ? { label: "Create first household", onClick: openCreatePanel } : undefined} />
+              : undefined
+          }
+          rowKey={(h) => h.id}
+          toolbar
+          exportable
+        />
+      </div>
 
       {panelOpen && (
         <div className="fixed inset-0 z-40 flex max-md:flex-col max-md:justify-end md:justify-end">

@@ -3,10 +3,8 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router'
 import { Plus, ChevronDown, FileText, Clock, User, CheckCircle2, RotateCcw, Ban, DollarSign } from 'lucide-react'
 import { getDocuments, createDocument, updateDocument, deleteDocument, getDailyQueueNumber, type ApiDocument } from '@/api/documents'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -175,6 +173,13 @@ export default function DocumentsPage() {
 
   const canModify = hasRole('admin', 'staff')
 
+  const newRequestButton = canModify ? (
+    <Button size="sm" className="gap-0.5 motion-press h-6 text-xs" onClick={openCreatePanel}>
+      <Plus className="size-3" />
+      New Request
+    </Button>
+  ) : null
+
   function closeFlyout() {
     setFlyoutDoc(null)
   }
@@ -185,11 +190,11 @@ export default function DocumentsPage() {
       render: (d) => `#${d.queue_number}` },
     { key: 'resident_name', label: 'Resident', sortable: true, filterType: 'text',
       render: (d) => (
-        <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <User className="size-3.5" />
+        <div className="flex items-center gap-1.5">
+          <div className="flex size-5 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-2.5" />
           </div>
-          <span className="font-medium">{d.resident_name}</span>
+          <span className="font-medium text-[11px]">{d.resident_name}</span>
         </div>
       ) },
     { key: 'document_type', label: 'Type', sortable: true, filterType: 'select',
@@ -206,7 +211,7 @@ export default function DocumentsPage() {
       render: (d) => d.purpose || '—' },
     { key: 'status', label: 'Status',
       render: (d) => (
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${documentStatusColors[d.status] ?? ''}`}>
+        <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${documentStatusColors[d.status] ?? ''}`}>
           {d.status.replace(/_/g, ' ')}
         </span>
       ),
@@ -226,36 +231,26 @@ export default function DocumentsPage() {
 
   return (
     <>
-      <PageHeader title="Document Queue">
-        {canModify && (
-          <Button size="sm" className="gap-1.5 motion-press" onClick={openCreatePanel}>
-            <Plus className="size-3.5" />
-            New Request
-          </Button>
-        )}
-      </PageHeader>
-
-      <Card lifted={false} className="shadow-none">
-        
-        <CardContent className="p-0">
-          <DataTable
-            columns={documentsColumns}
-            data={docs}
-            loading={loading}
-            onRowClick={(d) => setFlyoutDoc(d)}
-            rowClassName={(d) => d.status === 'released' || d.status === 'cancelled' ? 'opacity-40' : undefined}
-            emptyState={
-              <EmptyState
-                title="No document requests yet."
-                action={canModify && docs.length === 0 ? { label: "Create first request", onClick: openCreatePanel } : undefined}
-              />
-            }
-            toolbar
-            exportable
-            rowKey={(d) => d.id}
-          />
-        </CardContent>
-      </Card>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
+        <DataTable
+          title="DOCUMENT QUEUE"
+          toolbarActions={newRequestButton}
+          columns={documentsColumns}
+          data={docs}
+          loading={loading}
+          onRowClick={(d) => setFlyoutDoc(d)}
+          rowClassName={(d) => d.status === 'released' || d.status === 'cancelled' ? 'opacity-40' : undefined}
+          emptyState={
+            <EmptyState
+              title="No document requests yet."
+              action={canModify && docs.length === 0 ? { label: "Create first request", onClick: openCreatePanel } : undefined}
+            />
+          }
+          toolbar
+          exportable
+          rowKey={(d) => d.id}
+        />
+      </div>
 
       {panelOpen && (
         <div className="fixed inset-0 z-40 flex max-md:flex-col max-md:justify-end md:justify-end">

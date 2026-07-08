@@ -3,10 +3,8 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router'
 import { ChevronDown, DoorOpen, LogOut, User, Clock } from 'lucide-react'
 import { getVisitors, createVisitor, updateVisitor, deleteVisitor, checkOutVisitor, type ApiVisitor } from '@/api/visitors'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { hasRole } from '@/auth/session'
@@ -144,6 +142,13 @@ export default function VisitorLogPage() {
 
   const canModify = hasRole('admin', 'staff')
 
+  const checkInButton = canModify ? (
+    <Button size="sm" className="gap-0.5 motion-press h-6 text-xs" onClick={openCreatePanel}>
+      <DoorOpen className="size-3" />
+      Check In
+    </Button>
+  ) : null
+
   const visitorColumns: Column<ApiVisitor>[] = [
     {
       key: 'visitor_name',
@@ -151,11 +156,11 @@ export default function VisitorLogPage() {
       sortable: true,
       filterType: 'text',
       render: (v) => (
-        <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <User className="size-3.5" />
+        <div className="flex items-center gap-1.5">
+          <div className="flex size-5 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <User className="size-2.5" />
           </div>
-          <span className="font-medium">{v.visitor_name}</span>
+          <span className="font-medium text-[11px]">{v.visitor_name}</span>
         </div>
       ),
     },
@@ -189,7 +194,7 @@ export default function VisitorLogPage() {
       label: 'Status',
       render: (v) => (
         <span
-          className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${v.time_out ? statusStyles.checkedOut : statusStyles.checkedIn}`}
+          className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${v.time_out ? statusStyles.checkedOut : statusStyles.checkedIn}`}
         >
           {v.time_out ? 'Completed' : 'Active'}
         </span>
@@ -199,55 +204,38 @@ export default function VisitorLogPage() {
 
   return (
     <>
-      <PageHeader
-        title="Visitor Logs"
-        subtitle="Track visitor entries and exits."
-      >
-        {canModify && (
-          <Button
-            size="sm"
-            className="gap-1.5 motion-press"
-            onClick={openCreatePanel}
-          >
-            <DoorOpen className="size-3.5" />
-            Check In
-          </Button>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
+        {error && (
+          <div className="shrink-0 rounded-none bg-destructive/10 px-4 py-2 text-xs text-destructive motion-fade-in">
+            {error}
+          </div>
         )}
-      </PageHeader>
-
-      {error && (
-        <div className="mb-4 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error}
-        </div>
-      )}
-
-      <Card lifted={false} className="shadow-none">
-        <CardContent className="p-0">
-          <DataTable
-            columns={visitorColumns}
-            data={visitors}
-            loading={loading}
-            onRowClick={(v) => setFlyoutVisitor(v)}
-            emptyState={
-              <EmptyState
-                title="No visitors yet"
-                description="Check in your first visitor."
-                action={
-                  canModify && visitors.length === 0
-                    ? {
-                        label: 'Check in visitor',
-                        onClick: openCreatePanel,
-                      }
-                    : undefined
-                }
-              />
-            }
-            rowKey={(v) => v.id}
-            toolbar
-            exportable
-          />
-        </CardContent>
-      </Card>
+        <DataTable
+          title="VISITOR LOGS"
+          toolbarActions={checkInButton}
+          columns={visitorColumns}
+          data={visitors}
+          loading={loading}
+          onRowClick={(v) => setFlyoutVisitor(v)}
+          emptyState={
+            <EmptyState
+              title="No visitors yet"
+              description="Check in your first visitor."
+              action={
+                canModify && visitors.length === 0
+                  ? {
+                      label: 'Check in visitor',
+                      onClick: openCreatePanel,
+                    }
+                  : undefined
+              }
+            />
+          }
+          rowKey={(v) => v.id}
+          toolbar
+          exportable
+        />
+      </div>
 
       {panelOpen && (
         <div className="fixed inset-0 z-40 flex max-md:flex-col max-md:justify-end md:justify-end">

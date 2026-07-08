@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { DetailPanel, DetailSection } from '@/components/ui/DetailPanel'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -147,7 +146,7 @@ export function Appropriations() {
       render: (a) => {
         const status = getComputedStatus(a)
         return (
-          <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${appropriationStatusColors[status] ?? ''}`}>{status.replace(/_/g, ' ')}</span>
+          <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${appropriationStatusColors[status] ?? ''}`}>{status.replace(/_/g, ' ')}</span>
         )
       }},
     { key: 'payee', label: 'Payee', filterType: 'text', render: (a) => a.payee || '—' },
@@ -155,29 +154,36 @@ export function Appropriations() {
       render: (a) => `₱${Number(a.disbursed_amount).toLocaleString()}` },
   ]
 
+  const toolbarActions = (
+    <div className="flex items-center gap-1">
+      {getCurrentUser()?.role === 'admin' && (
+        <Button variant="ghost" size="sm" className="h-6 text-xs gap-0.5" onClick={() => setShowExport(true)}>
+          <Download className="size-3" /> Export
+        </Button>
+      )}
+      <Button size="sm" className="gap-0.5 motion-press h-6 text-xs" onClick={() => { setEditId(null); setForm({ fiscal_year: currentYear, fund_source: '', expense_class: 'MOOE', item_name: '', appropriated_amount: 0, notes: '' }); setShowForm(true) }}>
+        <Plus className="size-3" />
+        Add
+      </Button>
+    </div>
+  )
+
   return (
-    <div>
-      <PageHeader title="Appropriations">
-        <div className="flex items-center gap-4">
-          {getCurrentUser()?.role === 'admin' && (
-            <Button variant="outline" onClick={() => setShowExport(true)}>
-              <Download className="h-4 w-4 mr-1" /> Export
-            </Button>
-          )}
-          <Button onClick={() => { setEditId(null); setForm({ fiscal_year: currentYear, fund_source: '', expense_class: 'MOOE', item_name: '', appropriated_amount: 0, notes: '' }); setShowForm(true) }}>+ Add Appropriation</Button>
+    <>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
+          <DataTable
+            title="APPROPRIATIONS"
+            toolbarActions={toolbarActions}
+            columns={columns}
+            data={appropriations}
+            loading={loading}
+            onRowClick={handleFlyout}
+            emptyState={<p className="text-center text-muted-foreground py-6">No appropriations found</p>}
+            rowKey={(a) => a.id}
+            toolbar
+            exportable
+          />
         </div>
-      </PageHeader>
-      
-      <DataTable
-        columns={columns}
-        data={appropriations}
-        loading={loading}
-        onRowClick={handleFlyout}
-        emptyState={<p className="text-center text-muted-foreground py-6">No appropriations found</p>}
-        rowKey={(a) => a.id}
-        toolbar
-        exportable
-      />
 
       <DetailPanel
         open={!!flyout}
@@ -204,7 +210,7 @@ export function Appropriations() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Status</p>
-                    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${appropriationStatusColors[status] ?? ''}`}>{status.replace(/_/g, ' ')}</span>
+                    <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${appropriationStatusColors[status] ?? ''}`}>{status.replace(/_/g, ' ')}</span>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Balance</p>
@@ -414,6 +420,6 @@ export function Appropriations() {
         }}
         filename="appropriations"
       />
-    </div>
+    </>
   )
 }

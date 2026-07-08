@@ -5,10 +5,8 @@ import { Plus, ChevronDown, Camera, X, ClipboardList, Tag, MapPin } from 'lucide
 import { getAssets, createAsset, updateAsset, deleteAsset, type ApiAsset } from '@/api/assets'
 
 import { uploadImage } from '@/api/upload'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -220,6 +218,13 @@ export default function AssetsPage() {
 
   const isAdmin = hasRole('admin')
 
+  const addAssetButton = isAdmin ? (
+    <Button size="sm" className="gap-0.5 motion-press h-6 text-xs" onClick={openCreatePanel}>
+      <Plus className="size-3" />
+      Add Asset
+    </Button>
+  ) : null
+
   function openFlyout(asset: ApiAsset) {
     setFlyoutAsset(asset)
   }
@@ -245,53 +250,42 @@ export default function AssetsPage() {
     { key: 'condition', label: 'Condition', filterType: 'select',
       filterOptions: conditionOptions.map(c => ({ label: conditionLabels[c] || c, value: c })),
       render: (a) => (
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${assetConditionColors[a.condition] ?? ''}`}>{a.condition}</span>
+        <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${assetConditionColors[a.condition] ?? ''}`}>{a.condition}</span>
       ) },
     { key: 'status', label: 'Status', filterType: 'select',
       filterOptions: statusOptions.map(s => ({ label: statusLabels[s] || s, value: s })),
       render: (a) => (
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${assetStatusColors[a.status!] ?? ''}`}>{a.status}</span>
+        <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold ${assetStatusColors[a.status!] ?? ''}`}>{a.status}</span>
       ) },
     { key: 'assigned_to', label: 'Assignment', render: (a) => a.assigned_to ?? '—', filterType: 'text' },
   ]
 
   return (
     <>
-      <PageHeader title="Assets">
-        {isAdmin && (
-          <Button size="sm" className="gap-1.5 motion-press" onClick={openCreatePanel}>
-            <Plus className="size-3.5" />
-            Add Asset
-          </Button>
+      <div className="-ml-4 -mr-4 sm:-ml-6 sm:-mr-6 lg:-ml-8 lg:-mr-8 -mt-4 sm:-mt-6 lg:-mt-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-56px)] h-[calc(100dvh-60px)] md:h-[calc(100dvh-52px)] flex flex-col overflow-hidden">
+        {error && (
+          <div className="shrink-0 rounded-none bg-destructive/10 px-4 py-2 text-xs text-destructive motion-fade-in">
+            {error}
+          </div>
         )}
-      </PageHeader>
-
-      {error && (
-        <div className="mb-4 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error}
-        </div>
-      )}
-
-      <Card lifted={false} className="shadow-none">
-        
-        <CardContent className="p-0">
-          <DataTable
-            columns={assetColumns}
-            data={assets}
-            loading={loading}
-            onRowClick={(a) => openFlyout(a)}
-            emptyState={
-              <EmptyState
-                title="No assets yet. Add your first asset."
-                action={isAdmin && assets.length === 0 ? { label: "Add first asset", onClick: openCreatePanel } : undefined}
-              />
-            }
-            rowKey={(a) => a.id}
-            toolbar
-            exportable
-          />
-        </CardContent>
-      </Card>
+        <DataTable
+          title="ASSETS"
+          toolbarActions={addAssetButton}
+          columns={assetColumns}
+          data={assets}
+          loading={loading}
+          onRowClick={(a) => openFlyout(a)}
+          emptyState={
+            <EmptyState
+              title="No assets yet. Add your first asset."
+              action={isAdmin && assets.length === 0 ? { label: "Add first asset", onClick: openCreatePanel } : undefined}
+            />
+          }
+          rowKey={(a) => a.id}
+          toolbar
+          exportable
+        />
+      </div>
 
       {panelOpen && (
         <div className="fixed inset-0 z-40 flex max-md:flex-col max-md:justify-end md:justify-end">
