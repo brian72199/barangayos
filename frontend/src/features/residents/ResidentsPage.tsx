@@ -49,7 +49,7 @@ function calculateAge(birthDate: string): number {
   return Math.max(0, age)
 }
 
-const purokOptions = ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6', 'Purok 7']
+const purokOptions = ['Bougainvilla', 'Yellow Bell', 'Vanda', 'Sampaguita', 'Sunflower', 'Roses']
 
 const tagKeys = ['is_voter', 'is_4ps', 'is_senior', 'is_pwd', 'is_deceased'] as const
 const tagLabels: Record<string, string> = {
